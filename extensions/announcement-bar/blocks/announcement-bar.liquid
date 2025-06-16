@@ -1,0 +1,131 @@
+{% assign settings = section.settings %}
+
+<style>
+@keyframes scrollText {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+</style>
+
+<div style="
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  overflow: hidden;
+  border: {{ settings.border_size }} {{ settings.border_style }} {{ settings.border_color }};
+  background-color: {{ settings.bg_color }};
+  color: {{ settings.text_color }};
+  font-size: {{ settings.font_size }};
+  text-align: center;
+  height: {{ settings.bar_height }};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 9999;
+  font-family: {{ settings.font_family }};
+  {% if settings.add_shadow %}box-shadow: 0 4px 12px rgba(0,0,0,0.2);{% endif %}
+">
+  {% if settings.icon != blank %}
+    <span style="margin-right: 8px;">{{ settings.icon }}</span>
+  {% endif %}
+  <div style="
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: scrollText {{ settings.scroll_speed }}s linear infinite;
+  ">
+    <span style="padding: 0 2rem;">
+      {{ settings.text }} — {{ settings.text }} — {{ settings.text }}
+    </span>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Barre d'annonce complète",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Texte de l'annonce",
+      "default": "🚚 Livraison gratuite sur toutes les commandes !"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Couleur de fond",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Couleur de la bordure",
+      "default": "#ff0000"
+    },
+    {
+      "type": "text",
+      "id": "border_size",
+      "label": "Taille de la bordure",
+      "default": "2px"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Style de la bordure",
+      "options": [
+        { "value": "solid", "label": "Solide" },
+        { "value": "dashed", "label": "Tiretée" },
+        { "value": "dotted", "label": "Pointillée" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "text",
+      "id": "font_size",
+      "label": "Taille de la police",
+      "default": "18px"
+    },
+    {
+      "type": "text",
+      "id": "bar_height",
+      "label": "Hauteur de la barre",
+      "default": "50px"
+    },
+    {
+      "type": "text",
+      "id": "scroll_speed",
+      "label": "Vitesse du défilement (secondes)",
+      "default": "15"
+    },
+    {
+      "type": "text",
+      "id": "font_family",
+      "label": "Police personnalisée",
+      "default": "Arial, sans-serif"
+    },
+    {
+      "type": "checkbox",
+      "id": "add_shadow",
+      "label": "Ajouter une ombre",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "icon",
+      "label": "Icône (emoji ou HTML)",
+      "default": "📢"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barre d'annonce complète"
+    }
+  ]
+}
+{% endschema %}

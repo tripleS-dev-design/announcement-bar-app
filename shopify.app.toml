@@ -1,0 +1,36 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "be79dab79ff6bb4be47d4e66577b6c50"
+name = "Announcement-bar-app"
+handle = "announcement-bar-app-18"
+application_url = "https://this-ethernet-yarn-painting.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://this-ethernet-yarn-painting.trycloudflare.com/auth/callback",
+  "https://this-ethernet-yarn-painting.trycloudflare.com/auth/shopify/callback",
+  "https://this-ethernet-yarn-painting.trycloudflare.com/api/auth/callback"
+]
+
+[pos]
+embedded = false
