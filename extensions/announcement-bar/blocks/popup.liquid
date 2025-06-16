@@ -15,6 +15,10 @@
     justify-content: center;
   }
 
+  .custom-popup-wrapper.active {
+    display: flex;
+  }
+
   .custom-popup-content {
     background-color: {{ block.settings.bg_color }};
     color: {{ block.settings.text_color }};
@@ -47,10 +51,10 @@
 
 <div class="custom-popup-wrapper" id="popup-{{ block.id }}">
   <div class="custom-popup-content">
-    <button class="custom-popup-close" onclick="document.getElementById('popup-{{ block.id }}').style.display = 'none';">×</button>
+    <button class="custom-popup-close" onclick="document.getElementById('popup-{{ block.id }}').classList.remove('active');">×</button>
     <h2>{{ block.settings.title }}</h2>
     <p>{{ block.settings.message }}</p>
-    {% if block.settings.button_text != blank %}
+    {% if block.settings.button_text != blank and block.settings.button_link != blank %}
       <a href="{{ block.settings.button_link }}" style="display:inline-block; margin-top:15px; background:#000; color:#fff; padding:10px 20px; border-radius:5px; text-decoration:none;">
         {{ block.settings.button_text }}
       </a>
@@ -60,11 +64,11 @@
 
 <script>
   setTimeout(function () {
-    const popup = document.getElementById("popup-{{ block.id }}");
+    var popup = document.getElementById("popup-{{ block.id }}");
     if (popup) {
-      popup.style.display = "flex";
+      popup.classList.add("active");
     }
-  }, {{ block.settings.delay | default: 3 }} * 1000);
+  }, {{ block.settings.delay | default: 4 }} * 1000);
 </script>
 
 {% schema %}
@@ -93,8 +97,8 @@
     {
       "type": "url",
       "id": "button_link",
-      "label": "Lien du bouton (optionnel)",
-      "default": "/collections/offres"
+      "label": "Lien du bouton",
+      "default": "/collections"
     },
     {
       "type": "range",

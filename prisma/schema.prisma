@@ -36,7 +36,7 @@ model AnnouncementSettings {
   borderColor String
   borderSize  String
   fontSize    String
-  
+  speed       String
   
 }
 

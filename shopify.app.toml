@@ -3,7 +3,7 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://this-ethernet-yarn-painting.trycloudflare.com"
+application_url = "https://comment-annotation-permits-populations.trycloudflare.com"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://this-ethernet-yarn-painting.trycloudflare.com/auth/callback",
-  "https://this-ethernet-yarn-painting.trycloudflare.com/auth/shopify/callback",
-  "https://this-ethernet-yarn-painting.trycloudflare.com/api/auth/callback"
+  "https://comment-annotation-permits-populations.trycloudflare.com/auth/callback",
+  "https://comment-annotation-permits-populations.trycloudflare.com/auth/shopify/callback",
+  "https://comment-annotation-permits-populations.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
