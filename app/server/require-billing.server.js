@@ -25,3 +25,4 @@ const shopify = shopifyApp({
 });
 
 export const ensureBilling = shopify.ensureBilling;
+export const requireBilling = shopify.ensureBilling; // ✅ C’est ça qu’il te manquait
