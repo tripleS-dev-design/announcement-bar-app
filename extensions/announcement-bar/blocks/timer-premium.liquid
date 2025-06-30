@@ -1,0 +1,124 @@
+<style>
+  .countdown-container {
+    width: 100vw !important;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    padding: 20px 10px;
+    text-align: center;
+    {% if block.settings.background_image != blank %}
+    background-image: url({{ block.settings.block_background_image | image_url: width: 800 }});
+      background-size: cover;
+    {% else %}
+      background-color: {{ block.settings.bg_color }};
+    {% endif %}
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column; 
+    gap: 15px;
+    align-items: center;
+  }
+
+  .countdown-label {
+    margin-bottom: 10px;
+    font-size: calc({{ block.settings.font_size }}px + 2px);
+  }
+
+  .countdown-timer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .countdown-block {
+    padding: 12px;
+    min-width: {{ block.settings.block_width }};
+    min-height: {{ block.settings.block_height }};
+    {% if block.settings.block_background_image != blank %}
+      background-image: url({{ block.settings.block_background_image | img_url: 'master' }});
+      background-size: cover;
+    {% else %}
+      background-color: {{ block.settings.timer_bg }};
+    {% endif %}
+    border: {{ block.settings.border_size }} solid {{ block.settings.border_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .countdown-rectangle .countdown-block { border-radius: 8px; }
+  .countdown-circle .countdown-block { border-radius: 50%; }
+  .glow-effect .countdown-block { animation: glow 1.5s infinite alternate; }
+
+  @keyframes glow {
+    from { box-shadow: 0 0 8px {{ block.settings.border_color }}; }
+    to   { box-shadow: 0 0 20px {{ block.settings.border_color }}; }
+  }
+</style>
+
+<div class="shopify-section countdown-container countdown-{{ block.settings.style }}{% if block.settings.glow_effect %} glow-effect{% endif %}">
+  <div class="countdown-label">{{ block.settings.text }}</div>
+  <div id="countdown-{{ block.id }}" class="countdown-timer"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const endTime = new Date("{{ block.settings.end_date }}").getTime();
+    const display = document.getElementById("countdown-{{ block.id }}");
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function updateCountdown() {
+      const now = Date.now();
+      let diff = endTime - now;
+      if (diff <= 0) { clearInterval(timer); diff = 0; }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      const parts = [];
+      if ({{ block.settings.show_days }}) { parts.push(`<div class="countdown-block">${pad(d)}${'{{ block.settings.label_days }}'}</div>`); }
+      if ({{ block.settings.show_hours }}) { parts.push(`<div class="countdown-block">${pad(h)}${'{{ block.settings.label_hours }}'}</div>`); }
+      if ({{ block.settings.show_minutes }}) { parts.push(`<div class="countdown-block">${pad(m)}${'{{ block.settings.label_minutes }}'}</div>`); }
+      if ({{ block.settings.show_seconds }}) { parts.push(`<div class="countdown-block">${pad(s)}${'{{ block.settings.label_seconds }}'}</div>`); }
+      display.innerHTML = parts.join("");
+    }
+
+    const timer = setInterval(updateCountdown, 1000);
+    updateCountdown();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "🕒 Compteur Premium",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "end_date", "label": "Date de fin (ISO)", "default": "2025-12-31T23:59:59Z", "info": "Format YYYY-MM-DDThh:mm:00Z" },
+    { "type": "select", "id": "style", "label": "Style du compteur", "default": "standard", "options": [ { "value": "standard", "label": "Standard" }, { "value": "rectangle", "label": "Rectangle" }, { "value": "circle", "label": "Cercle" } ] },
+    { "type": "checkbox", "id": "glow_effect", "label": "Activer effet lumineux", "default": true },
+    { "type": "text", "id": "text", "label": "Texte avant le compteur", "default": "🔥 Offre limitée, se termine dans" },
+    { "type": "image_picker", "id": "background_image", "label": "Image de fond du conteneur" },
+    { "type": "color", "id": "bg_color", "label": "Couleur fond conteneur", "default": "#ffffff" },
+    { "type": "checkbox", "id": "show_days", "label": "Afficher jours", "default": true },
+    { "type": "text", "id": "label_days", "label": "Libellé jours", "default": "j" },
+    { "type": "checkbox", "id": "show_hours", "label": "Afficher heures", "default": true },
+    { "type": "text", "id": "label_hours", "label": "Libellé heures", "default": "h" },
+    { "type": "checkbox", "id": "show_minutes", "label": "Afficher minutes", "default": true },
+    { "type": "text", "id": "label_minutes", "label": "Libellé minutes", "default": "m" },
+    { "type": "checkbox", "id": "show_seconds", "label": "Afficher secondes", "default": true },
+    { "type": "text", "id": "label_seconds", "label": "Libellé secondes", "default": "s" },
+    { "type": "image_picker", "id": "block_background_image", "label": "Image fond blocs" },
+    { "type": "color", "id": "timer_bg", "label": "Fond blocs temps", "default": "#ffffff" },
+    { "type": "text", "id": "border_size", "label": "Taille bordure (ex: 2px)", "default": "2px" },
+    { "type": "color", "id": "border_color", "label": "Couleur bordure", "default": "#ff0000" },
+    { "type": "range", "id": "font_size", "label": "Taille texte (px)", "min": 12, "max": 50, "step": 1, "default": 18 },
+    { "type": "text", "id": "block_width", "label": "Largeur blocs (ex: 70px)", "default": "70px" },
+    { "type": "text", "id": "block_height", "label": "Hauteur blocs (ex: 70px)", "default": "70px" }
+  ]
+}
+{% endschema %}

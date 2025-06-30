@@ -3,7 +3,7 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://comment-annotation-permits-populations.trycloudflare.com"
+application_url = "https://formatting-advantages-comp-interact.trycloudflare.com"
 embedded = true
 
 [build]
@@ -26,11 +26,12 @@ api_version = "2025-04"
 scopes = "write_products"
 
 [auth]
-redirect_urls = [
-  "https://comment-annotation-permits-populations.trycloudflare.com/auth/callback",
-  "https://comment-annotation-permits-populations.trycloudflare.com/auth/shopify/callback",
-  "https://comment-annotation-permits-populations.trycloudflare.com/api/auth/callback"
-]
+redirect_urls = ["https://formatting-advantages-comp-interact.trycloudflare.com/auth/callback", "https://formatting-advantages-comp-interact.trycloudflare.com/auth/shopify/callback", "https://formatting-advantages-comp-interact.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
+
+[web]
+  command = "npm run dev"
+  path = "web"
+  url = "http://localhost:3000" # ou le bon port si Remix tourne ailleurs

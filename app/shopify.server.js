@@ -7,6 +7,21 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
+export const billing = {
+  "Premium Monthly": {
+    amount: 4.99,
+    currencyCode: "USD",
+    interval: "EVERY_30_DAYS",
+    trialDays: 14,
+  },
+  "Premium Annual": {
+    amount: 39.99,
+    currencyCode: "USD",
+    interval: "ANNUAL",
+    trialDays: 14,
+  },
+};
+
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
@@ -16,13 +31,11 @@ const shopify = shopifyApp({
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
+  billing,
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
   },
-  ...(process.env.SHOP_CUSTOM_DOMAIN
-    ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
-    : {}),
 });
 
 export default shopify;

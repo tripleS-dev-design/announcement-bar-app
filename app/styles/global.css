@@ -1,0 +1,11 @@
+@media (max-width: 768px) {
+  .block-preview-container {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .block-preview {
+    margin-top: 10px;
+    width: 100%;
+  }
+}
