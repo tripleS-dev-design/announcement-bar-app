@@ -22,8 +22,6 @@ export default function Pricing() {
         fontWeight: "bold",
         textAlign: "center",
         padding: "20px",
-                      boxShadow: "0 0 12px #fff",
-
         borderRadius: "12px",
         boxShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
         marginBottom: "30px"
