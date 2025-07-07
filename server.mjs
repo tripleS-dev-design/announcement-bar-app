@@ -25,7 +25,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
-const port = process.env.PORT || 8080;
+// ✅ CORRECT : une seule fois
+const port = Number(process.env.PORT) || 8080;
 
 app.use(express.static(path.join(__dirname, "build", "client")));
 
@@ -39,8 +40,6 @@ app.all(
   })
 );
 
-const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
-
