@@ -1,3 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log("Loaded SHOPIFY_APP_URL:", process.env.SHOPIFY_APP_URL);
+console.log("Loaded SHOPIFY_API_KEY:", process.env.SHOPIFY_API_KEY);
+
+
 import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
@@ -21,6 +28,8 @@ export const billing = {
     trialDays: 14,
   },
 };
+
+console.log("SHOPIFY_APP_URL =", process.env.SHOPIFY_APP_URL);
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,

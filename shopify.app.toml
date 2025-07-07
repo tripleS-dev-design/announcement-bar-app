@@ -1,9 +1,7 @@
-# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://formatting-advantages-comp-interact.trycloudflare.com"
+application_url = "https://flying-watts-gas-generations.trycloudflare.com"
 embedded = true
 
 [build]
@@ -22,16 +20,10 @@ api_version = "2025-04"
   uri = "/webhooks/app/scopes_update"
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://formatting-advantages-comp-interact.trycloudflare.com/auth/callback", "https://formatting-advantages-comp-interact.trycloudflare.com/auth/shopify/callback", "https://formatting-advantages-comp-interact.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://flying-watts-gas-generations.trycloudflare.com/auth/callback", "https://flying-watts-gas-generations.trycloudflare.com/auth/shopify/callback", "https://flying-watts-gas-generations.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
-
-[web]
-  command = "npm run dev"
-  path = "web"
-  url = "http://localhost:3000" # ou le bon port si Remix tourne ailleurs

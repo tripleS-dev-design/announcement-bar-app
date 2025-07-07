@@ -91,16 +91,20 @@
   }
 
   /* 4) BOUTON inline + position */
-.announcement-button-container {
-  display: flex;
-  {% if block.settings.button_position == 'right' %}
-    margin-left: auto;
-    margin-right: 12px;
-  {% else %}
-    margin-right: auto;
-    margin-left: 12px;
-  {% endif %}
-}
+  .announcement-button-container {
+    display: flex;
+    justify-content:
+      {% case block.settings.button_position %}
+        {% when 'left' %} flex-start;
+        {% when 'center' %} center;
+        {% when 'right' %} flex-end;
+        {% else %} flex-end;
+      {% endcase %}
+    /* Ajoute un petit padding horizontal pour ne pas coller au bord */
+    padding-left: 12px;
+    padding-right: 12px;
+    min-width: 150px; /* Optionnel, largeur minimale du bouton */
+  }
 
   .announcement-button {
     background: {{ block.settings.button_color }};
@@ -109,6 +113,10 @@
     border-radius: 4px;
     font-weight: bold;
     text-decoration: none;
+    white-space: nowrap;
+     box-shadow: 0 0 {{ block.settings.pro_glow_size | default: 20 }}px {{ block.settings.pro_glow_color }};
+     animation: buttonGlowPulse {{ block.settings.pro_glow_speed | default: 2 }}s ease-in-out infinite;
+
   }
 </style>
 
@@ -186,6 +194,8 @@
     { "type":"text","id":"button_text","label":"Texte bouton","default":"En savoir plus"},
     { "type":"url","id":"button_link","label":"Lien bouton"},
     
+  
+
     { "type":"color","id":"button_color","label":"Fond bouton","default":"#000000"},
     { "type":"color","id":"button_text_color","label":"Couleur texte bouton","default":"#ffffff"},
     { "type":"color","id":"pro_glow_color","label":"Couleur lueur","default":"#ffffff"},

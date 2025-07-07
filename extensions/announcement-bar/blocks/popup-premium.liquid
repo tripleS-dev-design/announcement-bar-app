@@ -112,6 +112,8 @@
   style="
     font-size: {{ block.settings.message_font_size }}px;
     text-align: {{ block.settings.message_alignment }};
+    font-weight: {{ block.settings.message_font_weight }};
+
   ">
   {{ block.settings.message }}
 </p>
@@ -197,7 +199,16 @@
       "label": "Message",
       "default": "Profitez de 10% avec le code BIENVENUE10"
     },
-
+     {
+      "type": "select",
+      "id": "message_font_weight",
+      "label": "Poids du message",
+      "default": "bold",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold",   "label": "Gras"   }
+      ]
+    },
 
    {
    "type": "select",
@@ -335,17 +346,9 @@
       "id": "button_text_color",
       "label": "Couleur texte du bouton",
       "default": "#ffffff"
-    },
-  
-    {
-      "type": "range",
-      "id": "button_border_radius",
-      "label": "Rayon arrondi bouton (px)",
-      "min": 0,
-      "max": 50,
-      "step": 1,
-      "default": 5
     }
+  
+  
   ]
 }
 {% endschema %}
