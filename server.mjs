@@ -25,7 +25,7 @@ if (!process.env.HOST) {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ;
 
 app.use(express.static(path.join(__dirname, "build", "client")));
 
@@ -39,6 +39,6 @@ app.all(
   })
 );
 
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
