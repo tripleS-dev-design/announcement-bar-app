@@ -3,7 +3,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createRequestHandler } from "@remix-run/express";
 
-// ✅ Log toutes les variables d'environnement pour debugging
 console.log("🚀 ENVIRONMENT VARIABLES:");
 console.log("SHOPIFY_API_KEY =", process.env.SHOPIFY_API_KEY);
 console.log("SHOPIFY_API_SECRET =", process.env.SHOPIFY_API_SECRET);
@@ -25,7 +24,8 @@ if (!process.env.HOST) {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const port = process.env.PORT ;
+
+const port = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, "build", "client")));
 
