@@ -1,6 +1,9 @@
-import dotenv from "dotenv";
-dotenv.config();
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { createRequestHandler } from "@remix-run/express";
 
+// ✅ Log toutes les variables d'environnement pour debugging
 console.log("🚀 ENVIRONMENT VARIABLES:");
 console.log("SHOPIFY_API_KEY =", process.env.SHOPIFY_API_KEY);
 console.log("SHOPIFY_API_SECRET =", process.env.SHOPIFY_API_SECRET);
@@ -9,13 +12,8 @@ console.log("SCOPES =", process.env.SCOPES);
 console.log("SHOPIFY_APP_URL =", process.env.SHOPIFY_APP_URL);
 console.log("HOST =", process.env.HOST);
 console.log("DATABASE_URL =", process.env.DATABASE_URL);
+console.log("PORT =", process.env.PORT);
 
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-import { createRequestHandler } from "@remix-run/express";
-
-// ✅ Set fallback URLs if not defined
 if (!process.env.SHOPIFY_APP_URL) {
   process.env.SHOPIFY_APP_URL = "https://announcement-bar-app-production.up.railway.app";
 }
@@ -24,12 +22,9 @@ if (!process.env.HOST) {
   process.env.HOST = "https://announcement-bar-app-production.up.railway.app";
 }
 
-console.log("Loaded SHOPIFY_APP_URL:", process.env.SHOPIFY_APP_URL);
-console.log("Loaded HOST:", process.env.HOST);
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
 
+const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, "build", "client")));
