@@ -25,7 +25,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
-// ✅ CORRECT : une seule fois
 const port = Number(process.env.PORT) || 8080;
 
 app.use(express.static(path.join(__dirname, "build", "client")));
