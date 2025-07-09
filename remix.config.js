@@ -14,7 +14,7 @@ if (
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
   appDirectory: "app",
-  serverModuleFormat: "cjs",
+  serverModuleFormat: "esm", // ✅ obligé si tu utilises import()
   dev: { port: process.env.HMR_SERVER_PORT || 8002 },
   future: {},
 };
