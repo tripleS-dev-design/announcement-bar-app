@@ -11,10 +11,12 @@ if (
 }
 
 /** @type {import('@remix-run/dev').AppConfig} */
-module.exports = {
+export default {
   ignoredRouteFiles: ["**/.*"],
   appDirectory: "app",
-  serverModuleFormat: "esm", // ✅ obligé si tu utilises import()
-  dev: { port: process.env.HMR_SERVER_PORT || 8002 },
-  future: {},
+  assetsBuildDirectory: "public/build",
+  publicPath: "/build/",
+  serverBuildDirectory: "build/server",
+  serverModuleFormat: "esm", // ✅ très important
+  serverPlatform: "node",
 };
