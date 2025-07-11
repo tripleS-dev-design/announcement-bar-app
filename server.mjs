@@ -33,7 +33,7 @@ if (!fs.existsSync(buildPath)) {
   process.exit(1);
 }
 
-const remixBuild = await import(buildPath);
+const remixBuild = await import(`file://${buildPath}`);
 
 const app = express();
 const port = Number(process.env.PORT) || 8080;
