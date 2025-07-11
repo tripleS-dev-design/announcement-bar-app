@@ -37,6 +37,8 @@ const remixBuild = await import(`file://${buildPath}`);
 
 const app = express();
 const port = Number(process.env.PORT) || 8080;
+console.log("✅ PORT utilisé =", port);
+
 
 app.use(express.static(path.join(__dirname, "build", "client")));
 
