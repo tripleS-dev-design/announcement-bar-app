@@ -36,7 +36,7 @@ const shopify = shopifyApp({
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
   apiVersion: ApiVersion.January25,
   scopes: process.env.SCOPES?.split(","),
-  appUrl: process.env.SHOPIFY_APP_URL || (() => { throw new Error("❌ SHOPIFY_APP_URL is missing"); })(),
+  appUrl: process.env.appUrl || process.env.APPURL || process.env.SHOPIFY_APP_URL || (() => { throw new Error("❌ appUrl is missing"); })(),
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
