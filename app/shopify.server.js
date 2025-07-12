@@ -1,9 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log("Loaded SHOPIFY_APP_URL:", process.env.SHOPIFY_APP_URL);
-console.log("Loaded SHOPIFY_API_KEY:", process.env.SHOPIFY_API_KEY);
-
+console.log("✅ Loaded SHOPIFY_APP_URL:", process.env.SHOPIFY_APP_URL);
+console.log("✅ Loaded SHOPIFY_API_KEY:", process.env.SHOPIFY_API_KEY);
 
 import "@shopify/shopify-app-remix/adapters/node";
 import {
@@ -14,6 +13,7 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
+// ✅ Configuration billing
 export const billing = {
   "Premium Monthly": {
     amount: 4.99,
@@ -29,14 +29,26 @@ export const billing = {
   },
 };
 
-console.log("SHOPIFY_APP_URL =", process.env.SHOPIFY_APP_URL);
+// ✅ Lecture sécurisée de l'app URL
+const rawAppUrl =
+  process.env.SHOPIFY_APP_URL ||
+  process.env.APPURL ||
+  process.env.appUrl;
 
+if (!rawAppUrl) {
+  throw new Error("❌ SHOPIFY_APP_URL is missing from environment variables.");
+}
+
+// 🟡 Si Shopify attend juste le hostname (sans protocole), décommente cette ligne :
+const appUrl = rawAppUrl.replace(/^https?:\/\//, "");
+
+// ✅ Création de l’app Shopify
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
   apiVersion: ApiVersion.January25,
   scopes: process.env.SCOPES?.split(","),
-  appUrl: process.env.appUrl || process.env.APPURL || process.env.SHOPIFY_APP_URL || (() => { throw new Error("❌ appUrl is missing"); })(),
+  appUrl, // 🟡 ici on passe le host sans https://
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
@@ -47,6 +59,7 @@ const shopify = shopifyApp({
   },
 });
 
+// ✅ Export Shopify utils
 export default shopify;
 export const apiVersion = ApiVersion.January25;
 export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
