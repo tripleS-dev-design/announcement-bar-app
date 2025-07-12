@@ -1,7 +1,7 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://announcement-bar-app-production.up.railway.app"
+application_url = "https://announcement-bar-app.onrender.com"
 embedded = true
 
 [build]
