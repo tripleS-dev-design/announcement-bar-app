@@ -1,7 +1,7 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://announcement-bar-app.onrender.com"
+application_url = "https://bargain-previously-dennis-president.trycloudflare.com"
 embedded = true
 
 [build]
@@ -23,8 +23,4 @@ api_version = "2025-04"
 scopes = "read_products,write_products,read_themes,write_themes"
 
 [auth]
-redirect_urls = [
-  "https://announcement-bar-app-production.up.railway.app/auth/callback",
-  "https://announcement-bar-app-production.up.railway.app/auth/shopify/callback",
-  "https://announcement-bar-app-production.up.railway.app/api/auth/callback"
-]
+redirect_urls = ["https://bargain-previously-dennis-president.trycloudflare.com/auth/callback", "https://bargain-previously-dennis-president.trycloudflare.com/auth/shopify/callback", "https://bargain-previously-dennis-president.trycloudflare.com/api/auth/callback"]
