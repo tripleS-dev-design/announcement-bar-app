@@ -1,4 +1,4 @@
-import { authenticate, billing } from "../../../shopify.server";
+import { authenticate, billing } from "../../../../shopify.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
