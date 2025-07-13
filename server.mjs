@@ -24,10 +24,19 @@ const remixBuild = await import(pathToFileURL(buildPath).href);
 
 const app = express();
 const port = Number(process.env.PORT) || 8080;
+
 console.log("✅ PORT utilisé =", port);
 
+// Logger simple (optionnel)
+app.use((req, res, next) => {
+  console.log(`➡️ ${req.method} ${req.url}`);
+  next();
+});
+
+// Servir les fichiers statiques Remix
 app.use(express.static(path.join(__dirname, "build", "client")));
 
+// Gestion des routes Remix
 app.all(
   "*",
   createRequestHandler({
@@ -36,6 +45,13 @@ app.all(
   })
 );
 
+// Middleware gestion d’erreurs (optionnel)
+app.use((err, req, res, next) => {
+  console.error("⚠️ Erreur serveur :", err);
+  res.status(500).send("Internal Server Error");
+});
+
+// Lancer le serveur
 app.listen(port, "0.0.0.0", () => {
   console.log(`✅ Server is running on port ${port}`);
 });
