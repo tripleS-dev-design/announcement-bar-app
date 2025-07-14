@@ -1,23 +1,26 @@
+// app/routes/api/billing/request.jsx
+import { redirect } from "@remix-run/node";
 import { authenticate, billing } from "../../../../shopify.server";
 
-export const loader = async ({ request }) => {
+export async function loader({ request }) {
   const { session } = await authenticate.admin(request);
-
   const url = new URL(request.url);
-  const selectedPlan = url.searchParams.get("plan") === "annual"
+  const planParam = url.searchParams.get("plan");
+  
+  const selectedPlan = planParam === "annual"
     ? "Premium Annual"
     : "Premium Monthly";
 
   const confirmationUrl = await billing.request({
     session,
     plan: selectedPlan,
-    isTest: true, // Mets false en production
+    isTest: true,
   });
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: confirmationUrl,
-    },
-  });
-};
+  return redirect(confirmationUrl);
+}
+
+// Composant vide car c'est juste une redirection
+export default function BillingRequest() {
+  return null;
+}
