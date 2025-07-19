@@ -1,12 +1,12 @@
 import { redirect } from "@remix-run/node";
-import { shopify } from "~/shopify.server"; // ton helper Shopify config
+import { shopify } from "~/shopify.server";
 
 export const loader = async ({ request }) => {
-  // Choix du plan, par défaut mensuel
+  const session = await shopify.auth.loadCurrentSession(request);
+
   const url = new URL(request.url);
   const plan = url.searchParams.get("plan") || "monthly";
 
-  // Configurations des plans
   const plans = {
     monthly: {
       name: "Premium Monthly Plan",
@@ -22,7 +22,6 @@ export const loader = async ({ request }) => {
 
   const selectedPlan = plans[plan];
 
-  // Mutation GraphQL pour créer l'abonnement
   const mutation = `
     mutation {
       appSubscriptionCreate(
@@ -49,18 +48,17 @@ export const loader = async ({ request }) => {
     }
   `;
 
-  // Exécution de la mutation
-  const response = await shopify.api.admin.graphql.request({
+  const response = await shopify.api.graphqlProxy(session, {
     data: mutation,
   });
 
-  const { appSubscriptionCreate } = response.body.data;
+  const body = await response.json();
+  const { appSubscriptionCreate } = body.data;
 
-  // Si erreurs, on arrête et on affiche une erreur simple
   if (appSubscriptionCreate.userErrors.length > 0) {
+    console.error("Billing error:", appSubscriptionCreate.userErrors);
     throw new Error(appSubscriptionCreate.userErrors[0].message);
   }
 
-  // Sinon on redirige vers la page Shopify pour payer
   return redirect(appSubscriptionCreate.confirmationUrl);
 };
