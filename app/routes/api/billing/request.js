@@ -52,8 +52,7 @@ export const loader = async ({ request }) => {
     data: mutation,
   });
 
-  const body = await response.json();
-  const { appSubscriptionCreate } = body.data;
+  const { appSubscriptionCreate } = response.data;
 
   if (appSubscriptionCreate.userErrors.length > 0) {
     console.error("Billing error:", appSubscriptionCreate.userErrors);
