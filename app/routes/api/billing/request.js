@@ -26,7 +26,7 @@ export const loader = async ({ request }) => {
     mutation {
       appSubscriptionCreate(
         name: "${selectedPlan.name}",
-        returnUrl: "${process.env.HOST}/api/billing/confirm",
+        returnUrl: "https://announcement-bar-app.onrender.com/api/billing/confirm",
         test: true,
         lineItems: [
           {
