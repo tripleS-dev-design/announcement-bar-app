@@ -1,9 +1,9 @@
-// app/routes/api/billing/request.js
+// app/routes/api/billing/request.jsx
 import { redirect } from "@remix-run/node";
-import { shopify } from "~/shopify.server";
+import { authenticate } from "~/shopify.server";
 
 export const loader = async ({ request }) => {
-  const session = await shopify.auth.loadCurrentSession(request);
+  const { admin } = await authenticate.admin(request);
 
   const url = new URL(request.url);
   const planType = url.searchParams.get("plan") || "monthly";
@@ -23,12 +23,15 @@ export const loader = async ({ request }) => {
 
   const selectedPlan = plans[planType];
 
-  const query = `
-    mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $lineItems: [AppSubscriptionLineItemInput!]!) {
-      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems) {
+  const mutation = `#graphql
+    mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $trialDays: Int, $lineItems: [AppSubscriptionLineItemInput!]!) {
+      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, trialDays: $trialDays, lineItems: $lineItems) {
         userErrors {
           field
           message
+        }
+        appSubscription {
+          id
         }
         confirmationUrl
       }
@@ -37,7 +40,8 @@ export const loader = async ({ request }) => {
 
   const variables = {
     name: selectedPlan.name,
-    returnUrl: `${process.env.SHOPIFY_APP_URL}/api/billing/confirm`,
+    returnUrl: \`\${process.env.SHOPIFY_APP_URL}/api/billing/confirm\`,
+    trialDays: 7, // Tu peux ajuster ici si besoin
     lineItems: [
       {
         plan: {
@@ -53,18 +57,9 @@ export const loader = async ({ request }) => {
     ]
   };
 
-  const client = new shopify.api.clients.Graphql({
-    session
-  });
+  const data = await admin.graphql(mutation, { variables });
 
-  const response = await client.query({
-    data: {
-      query,
-      variables
-    }
-  });
-
-  const { appSubscriptionCreate } = response.body.data;
+  const { appSubscriptionCreate } = data;
 
   if (appSubscriptionCreate.userErrors.length > 0) {
     console.error("Billing error:", appSubscriptionCreate.userErrors);
