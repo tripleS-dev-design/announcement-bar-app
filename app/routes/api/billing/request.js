@@ -1,3 +1,4 @@
+// app/routes/api/billing/request.js
 import { redirect } from "@remix-run/node";
 import { shopify } from "~/shopify.server";
 
@@ -5,7 +6,7 @@ export const loader = async ({ request }) => {
   const session = await shopify.auth.loadCurrentSession(request);
 
   const url = new URL(request.url);
-  const plan = url.searchParams.get("plan") || "monthly";
+  const planType = url.searchParams.get("plan") || "monthly";
 
   const plans = {
     monthly: {
@@ -20,39 +21,50 @@ export const loader = async ({ request }) => {
     },
   };
 
-  const selectedPlan = plans[plan];
+  const selectedPlan = plans[planType];
 
-  const mutation = `
-    mutation {
-      appSubscriptionCreate(
-        name: "${selectedPlan.name}",
-        returnUrl: "https://announcement-bar-app.onrender.com/api/billing/confirm",
-        test: true,
-        lineItems: [
-          {
-            plan: {
-              appRecurringPricingDetails: {
-                interval: ${selectedPlan.interval},
-                price: { amount: ${selectedPlan.price}, currencyCode: USD }
-              }
-            }
-          }
-        ]
-      ) {
-        confirmationUrl
+  const query = `
+    mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $lineItems: [AppSubscriptionLineItemInput!]!) {
+      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems) {
         userErrors {
           field
           message
         }
+        confirmationUrl
       }
     }
   `;
 
-  const response = await shopify.api.graphqlProxy(session, {
-    data: mutation,
+  const variables = {
+    name: selectedPlan.name,
+    returnUrl: `${process.env.SHOPIFY_APP_URL}/api/billing/confirm`,
+    lineItems: [
+      {
+        plan: {
+          appRecurringPricingDetails: {
+            interval: selectedPlan.interval,
+            price: {
+              amount: selectedPlan.price,
+              currencyCode: "USD"
+            }
+          }
+        }
+      }
+    ]
+  };
+
+  const client = new shopify.api.clients.Graphql({
+    session
   });
 
-  const { appSubscriptionCreate } = response.data;
+  const response = await client.query({
+    data: {
+      query,
+      variables
+    }
+  });
+
+  const { appSubscriptionCreate } = response.body.data;
 
   if (appSubscriptionCreate.userErrors.length > 0) {
     console.error("Billing error:", appSubscriptionCreate.userErrors);
