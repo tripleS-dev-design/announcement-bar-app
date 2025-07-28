@@ -1,4 +1,4 @@
-// app/routes/api/billing/request.jsx
+// app/routes/api/billing/request.js
 import { redirect } from "@remix-run/node";
 import { authenticate } from "~/shopify.server";
 
@@ -41,7 +41,7 @@ export const loader = async ({ request }) => {
   const variables = {
     name: selectedPlan.name,
     returnUrl: \`\${process.env.SHOPIFY_APP_URL}/api/billing/confirm\`,
-    trialDays: 7, // Tu peux ajuster ici si besoin
+    trialDays: 7,
     lineItems: [
       {
         plan: {
@@ -49,12 +49,12 @@ export const loader = async ({ request }) => {
             interval: selectedPlan.interval,
             price: {
               amount: selectedPlan.price,
-              currencyCode: "USD"
-            }
-          }
-        }
-      }
-    ]
+              currencyCode: "USD",
+            },
+          },
+        },
+      },
+    ],
   };
 
   const data = await admin.graphql(mutation, { variables });
