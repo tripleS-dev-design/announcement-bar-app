@@ -1,7 +1,7 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://bargain-previously-dennis-president.trycloudflare.com"
+application_url = "https://wright-ending-fever-cooper.trycloudflare.com"
 embedded = true
 
 [build]
@@ -23,4 +23,4 @@ api_version = "2025-04"
 scopes = "read_products,write_products,read_themes,write_themes"
 
 [auth]
-redirect_urls = ["https://bargain-previously-dennis-president.trycloudflare.com/auth/callback", "https://bargain-previously-dennis-president.trycloudflare.com/auth/shopify/callback", "https://bargain-previously-dennis-president.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://wright-ending-fever-cooper.trycloudflare.com/auth/callback", "https://wright-ending-fever-cooper.trycloudflare.com/auth/shopify/callback", "https://wright-ending-fever-cooper.trycloudflare.com/api/auth/callback"]
