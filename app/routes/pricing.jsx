@@ -141,7 +141,7 @@ export default function Pricing() {
           </div>
 
           {/* ✅ Remplacement de Link par <a> pour déclencher le loader */}
-         <a href={`/api/billing/request?plan=${period}`}
+          <a href={`/billing/activate?plan=${period}`}
            style={{ textDecoration: "none" }}
           >
             <button style={{
