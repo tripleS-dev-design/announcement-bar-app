@@ -5,29 +5,12 @@ export default function Pricing() {
   const [period, setPeriod] = useState("monthly");
   const location = useLocation();
 
-  // Récupère les query params Shopify :
-  // 1) ceux de l'iframe (location.search)
-  // 2) et si vide, essaie la barre d'URL de l'admin (window.top)
-  const searchFromTop =
-    typeof window !== "undefined" &&
-    window.top &&
-    window.top.location &&
-    window.top.location.search
-      ? window.top.location.search
-      : "";
-
+  // Conserve les params Shopify (shop, host, embedded, hmac, …) déjà présents dans l’iframe
   const activateHref = useMemo(() => {
-    // point de départ: query string courant (iframe), sinon celui du parent admin
-    const baseSearch = location.search && location.search !== "?"
-      ? location.search
-      : searchFromTop;
-
-    const params = new URLSearchParams(baseSearch || "");
-    params.set("plan", period); // monthly | annual
-
-    // IMPORTANT: on garde shop, host, embedded, hmac, etc. si présents
+    const params = new URLSearchParams(location.search || "");
+    params.set("plan", period); // "monthly" | "annual"
     return `/billing/activate?${params.toString()}`;
-  }, [location.search, searchFromTop, period]);
+  }, [location.search, period]);
 
   return (
     <div
@@ -141,11 +124,16 @@ export default function Pricing() {
               Premium Features
             </h4>
 
-            {/* … (tes listes de features inchangées) … */}
+            {/* … tes listes de features … */}
           </div>
 
           {/* Bouton: conserve les params & ouvre au top */}
-          <a href={activateHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+          <a
+            href={activateHref}
+            target="_top"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none" }}
+          >
             <button
               style={{
                 background: "linear-gradient(90deg, #000000, #4b4b4b)",
@@ -188,3 +176,4 @@ export default function Pricing() {
     </div>
   );
 }
+
