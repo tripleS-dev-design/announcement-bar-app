@@ -1,37 +1,44 @@
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server"; // ajuste le chemin si besoin
+import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  const { billing } = await authenticate.admin(request);
+  try {
+    const { billing } = await authenticate.admin(request);
 
-  const url = new URL(request.url);
-  const planType = url.searchParams.get("plan") || "monthly";
-  const shop = url.searchParams.get("shop");
-  const host = url.searchParams.get("host");
+    const url = new URL(request.url);
+    const planType = url.searchParams.get("plan") || "monthly";
+    const shop = url.searchParams.get("shop");
+    const host = url.searchParams.get("host");
 
-  const plans = {
-    monthly: {
-      name: "Premium Monthly Plan",
-      price: 4.99,
-      interval: "EVERY_30_DAYS",
-    },
-    annual: {
-      name: "Premium Annual Plan",
-      price: 39.99,
-      interval: "ANNUAL",
-    },
-  };
+    if (!shop || !host) {
+      throw new Error("Missing shop or host in URL params.");
+    }
 
-  const selectedPlan = plans[planType];
+    const plans = {
+      monthly: {
+        name: "Premium Monthly Plan",
+        price: 4.99,
+        interval: "EVERY_30_DAYS",
+      },
+      annual: {
+        name: "Premium Annual Plan",
+        price: 39.99,
+        interval: "ANNUAL",
+      },
+    };
 
-  // Crée l'abonnement avec 7 jours d'essai gratuit
-  const confirmationUrl = await billing.require({
-    plans: [selectedPlan.name],
-    trialDays: 7, // Essai gratuit
-    isTest: true, // mettre sur false en prod
-    returnUrl: `${process.env.SHOPIFY_APP_URL}/settings?shop=${shop}&host=${host}`,
-  });
+    const selectedPlan = plans[planType];
 
-  return redirect(confirmationUrl);
+    const confirmationUrl = await billing.require({
+      plans: [selectedPlan.name],
+      isTest: true, // mettre false en prod
+      trialDays: 7, // 7 jours d'essai
+      returnUrl: `${process.env.SHOPIFY_APP_URL}/settings?shop=${shop}&host=${host}`,
+    });
+
+    return redirect(confirmationUrl);
+  } catch (error) {
+    console.error("Billing activation error:", error);
+    return new Response("Billing activation failed", { status: 500 });
+  }
 };
-
