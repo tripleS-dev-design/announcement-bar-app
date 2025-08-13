@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../../shopify.server";
+import { authenticate } from "../shopify.server"; // ajuste le chemin si besoin
 
 export const loader = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
@@ -24,13 +24,14 @@ export const loader = async ({ request }) => {
 
   const selectedPlan = plans[planType];
 
-  // Création abonnement avec 7 jours d'essai
+  // Crée l'abonnement avec 7 jours d'essai gratuit
   const confirmationUrl = await billing.require({
     plans: [selectedPlan.name],
     trialDays: 7, // Essai gratuit
-    isTest: true, // mettre false en prod
+    isTest: true, // mettre sur false en prod
     returnUrl: `${process.env.SHOPIFY_APP_URL}/settings?shop=${shop}&host=${host}`,
   });
 
   return redirect(confirmationUrl);
 };
+
