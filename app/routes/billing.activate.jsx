@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/node";
-import { authenticate } from "./shopify.server";
+import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   try {
