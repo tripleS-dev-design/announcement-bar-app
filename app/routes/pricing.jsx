@@ -126,24 +126,7 @@ export default function Pricing() {
       </div>
 
       {/* Retour */}
-      <div style={{ textAlign: "center", marginTop: 40 }}>
-        <a href="/settings">
-          <button
-            style={{
-              backgroundColor: "#fff",
-              color: "#000",
-              padding: "10px 20px",
-              border: "1px solid #000",
-              borderRadius: 6,
-              fontWeight: "bold",
-              cursor: "pointer",
-              boxShadow: "0 0 10px rgba(0,0,0,.3)",
-            }}
-          >
-            ⬅ Back to Dashboard
-          </button>
-        </a>
-      </div>
+
     </div>
   );
 }
