@@ -1,23 +1,36 @@
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server";
-
-const PLAN_KEYS = { monthly: "Premium Monthly", annual: "Premium Annual" };
+import { authenticate } from "../../shopify.server";
 
 export const loader = async ({ request }) => {
-  const { billing, session } = await authenticate.admin(request);
+  const { billing } = await authenticate.admin(request);
 
   const url = new URL(request.url);
-  const planName = PLAN_KEYS[url.searchParams.get("plan")] ?? PLAN_KEYS.monthly;
+  const planType = url.searchParams.get("plan") || "monthly";
+  const shop = url.searchParams.get("shop");
+  const host = url.searchParams.get("host");
 
-  await billing.require({
-    plans: Object.values(PLAN_KEYS), // ok si déjà monthly OU annual
-    onFailure: async () =>
-      billing.request({
-        plan: planName,
-        // isTest: true, // dev-store
-        returnUrl: `${process.env.SHOPIFY_APP_URL}/premium`,
-      }),
+  const plans = {
+    monthly: {
+      name: "Premium Monthly Plan",
+      price: 4.99,
+      interval: "EVERY_30_DAYS",
+    },
+    annual: {
+      name: "Premium Annual Plan",
+      price: 39.99,
+      interval: "ANNUAL",
+    },
+  };
+
+  const selectedPlan = plans[planType];
+
+  // Création abonnement avec 7 jours d'essai
+  const confirmationUrl = await billing.require({
+    plans: [selectedPlan.name],
+    trialDays: 7, // Essai gratuit
+    isTest: true, // mettre false en prod
+    returnUrl: `${process.env.SHOPIFY_APP_URL}/settings?shop=${shop}&host=${host}`,
   });
 
-  return redirect(`/premium?shop=${session.shop}&billing=active`);
+  return redirect(confirmationUrl);
 };
