@@ -1,7 +1,7 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
-application_url = "https://announcement-bar-app.onrender.com"  # <- mets ton URL Render ici
+application_url = "https://announcement-bar-app.onrender.com"
 embedded = true
 
 [build]
@@ -11,27 +11,15 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2025-04"
 
-# --- App lifecycle
+# Un seul endpoint pour les 3 topics obligatoires
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+uri = "/webhooks/compliance"
+
+# (facultatif) Désabonnement de l'app
 [[webhooks.subscriptions]]
 topics = ["app/uninstalled"]
 uri = "/webhooks/app/uninstalled"
-
-[[webhooks.subscriptions]]
-topics = ["app/scopes_update"]
-uri = "/webhooks/app/scopes_update"
-
-# --- GDPR compliance (obligatoire pour les vérifications)
-[[webhooks.subscriptions]]
-topics = ["customers/data_request"]
-uri = "/webhooks/customers/data_request"
-
-[[webhooks.subscriptions]]
-topics = ["customers/redact"]
-uri = "/webhooks/customers/redact"
-
-[[webhooks.subscriptions]]
-topics = ["shop/redact"]
-uri = "/webhooks/shop/redact"
 
 [access_scopes]
 scopes = "read_products,write_products,read_themes,write_themes"
