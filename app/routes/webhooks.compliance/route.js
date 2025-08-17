@@ -1,70 +1,59 @@
 // app/routes/webhooks.compliance/route.js
-import { verifyWebhookHmacFromRaw } from "~/utils/verifyWebhook.server";
+import { verifyWebhookHmac } from "../../utils/verifyWebhook.server";
 
-/**
- * Shopify envoie un POST JSON (Content-Type: application/json).
- * - On lit le corps *brut* (request.text()) -> indispensable pour le HMAC.
- * - 401 si HMAC invalide, sinon 200+ et on traite par topic.
- */
-export async function action({ request }) {
-  // Shopify exige POST
+export const loader = () =>
+  // on refuse les GET (Shopify enverra des POST)
+  new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } });
+
+export const action = async ({ request }) => {
   if (request.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } });
   }
 
-  const contentType = request.headers.get("content-type") || "";
-  if (!contentType.toLowerCase().includes("application/json")) {
-    // Les tests automatiques vérifient ça
-    return new Response("Unsupported Media Type", { status: 415 });
+  // Shopify envoie ces en-têtes
+  const hmac = request.headers.get("x-shopify-hmac-sha256") || "";
+  const topic = request.headers.get("x-shopify-topic") || "";
+  const shopDomain = request.headers.get("x-shopify-shop-domain") || "";
+
+  // ⚠️ Lire le corps BRUT (string). Ne pas faire request.json() ici.
+  const rawBody = await request.text();
+
+  // Vérification HMAC obligatoire
+  const valid = verifyWebhookHmac(hmac, rawBody);
+  if (!valid) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
-  // Corps BRUT, surtout pas request.json() avant la vérif !
-  const raw = await request.text();
-
-  const { ok, topic, shop } = verifyWebhookHmacFromRaw(request, raw);
-  if (!ok) {
-    return new Response("Unauthorized (bad hmac)", { status: 401 });
-  }
-
-  // OK -> tu peux parser maintenant
-  let payload = {};
-  try {
-    payload = JSON.parse(raw || "{}");
-  } catch (e) {
-    // Si jamais
-    payload = {};
-  }
-
-  // Traite les 3 cas (optionnel pour les tests – un 200 suffit)
+  // (Optionnel) Traiter selon le topic — exige au minimum 200
   try {
     switch (topic) {
       case "customers/data_request":
-        // -> Fournis les données au marchand en dehors de ce webhook si besoin
-        // console.log("data_request", shop, payload);
+        // TODO: Récupérer les données client et les fournir au marchand si nécessaire
         break;
 
       case "customers/redact":
-        // -> Supprime/anonymise les données client que TU stockes
-        // console.log("customers/redact", shop, payload);
+        // TODO: Effacer/anonymiser les données client dans ta base
         break;
 
       case "shop/redact":
-        // -> 48h après uninstall, supprime toutes les données liées à la boutique
-        // console.log("shop/redact", shop, payload);
+        // TODO: 48h après désinstallation, effacer les données du shop dans ta base
         break;
 
       default:
-        // Autre topic (si tu en ajoutes)
+        // Autres topics ignorés sans erreur
         break;
     }
-  } catch (err) {
-    // Erreur interne, mais HMAC OK -> 200 reste accepté pour la conformité
-    console.error("compliance handling error:", err);
+
+    // Important: répondre 200 à Shopify
+    return new Response("OK", { status: 200 });
+  } catch (e) {
+    // En cas d'erreur interne, renvoyer 500
+    console.error("Compliance webhook error:", e);
+    return new Response("Internal Server Error", { status: 500 });
   }
+};
 
-  // Répondre 2xx confirme la bonne réception
-  return new Response("ok", { status: 200 });
+export default function WebhooksCompliance() {
+  // Remix exige un composant par défaut pour les routes (même s'il ne s'affiche jamais ici)
+  return null;
 }
-
-// Par sécurité, on bloque GET
-export const loader = () => new Response("Not Found", { status: 404 });
