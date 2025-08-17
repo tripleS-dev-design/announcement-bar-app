@@ -18,6 +18,11 @@ api_version = "2025-04"
   [[webhooks.subscriptions]]
   topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
+  
+[[webhooks.subscriptions]]
+topics = [ "app/uninstalled" ]
+uri = "/webhooks/app/uninstalled"
+
 
 [access_scopes]
 scopes = "read_products,write_products,read_themes,write_themes"
