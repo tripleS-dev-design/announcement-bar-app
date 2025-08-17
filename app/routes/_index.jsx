@@ -1,6 +1,6 @@
 // app/routes/_index.jsx
 import { redirect } from "@remix-run/node";
-import { authenticate } from "~/shopify.server";
+import { authenticate } from "../shopify.server";
 
 // Ajuste ces noms pour correspondre EXACTEMENT
 // aux clés que tu as déclarées dans `billing` dans shopify.server
