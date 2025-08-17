@@ -11,12 +11,12 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2025-04"
 
-# Un seul endpoint pour les 3 topics obligatoires
+# ✅ Webhooks de conformité (obligatoires) — un seul endpoint
 [[webhooks.subscriptions]]
 compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
 uri = "/webhooks/compliance"
 
-# (facultatif) Désabonnement de l'app
+# (optionnel) Webhook de désinstallation
 [[webhooks.subscriptions]]
 topics = ["app/uninstalled"]
 uri = "/webhooks/app/uninstalled"
