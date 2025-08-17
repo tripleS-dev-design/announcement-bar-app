@@ -1,9 +1,30 @@
-import { useState, useMemo } from "react";
-import { useLocation } from "@remix-run/react";
+import { useState, useMemo, useEffect } from "react";
+import { useLocation, useSearchParams } from "@remix-run/react";
 
 export default function Pricing() {
   const [period, setPeriod] = useState("monthly");
   const location = useLocation();
+  const [params] = useSearchParams();
+
+  // 🚀 Si backend a détecté un dev store, il ajoute ?billing=dev
+  // => on redirige immédiatement vers /settings en conservant shop/host/etc.
+  useEffect(() => {
+    if (params.get("billing") === "dev") {
+      const shop = params.get("shop");
+      const host = params.get("host");
+      const rest = new URLSearchParams(location.search || "");
+      rest.delete("billing"); // on enlève juste le flag
+      // reconstruit la query proprement
+      const qs = new URLSearchParams();
+      if (shop) qs.set("shop", shop);
+      if (host) qs.set("host", host);
+      // on garde les autres params utiles (embedded, hmac, etc.)
+      for (const [k, v] of rest.entries()) {
+        if (k !== "shop" && k !== "host") qs.set(k, v);
+      }
+      window.location.replace(`/settings?${qs.toString()}`);
+    }
+  }, [params, location.search]);
 
   // Conserver tous les paramètres Shopify présents (shop, host, embedded, hmac, …)
   const activateHref = useMemo(() => {
