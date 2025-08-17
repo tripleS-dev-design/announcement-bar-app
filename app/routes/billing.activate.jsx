@@ -1,9 +1,10 @@
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server";
+import { authenticate } from "../shopify.server"; // garde ce chemin si shopify.server est dans app/
 
-const PLAN_NAMES = {
-  monthly: ["Premium Monthly", "Premium Monthly Plan"], // 1er = nom principal
-  annual:  ["Premium Annual",  "Premium Annual Plan"],
+// ⚠️ Mets ici exactement les mêmes noms que dans Partner -> Pricing
+const PLAN_NAME = {
+  monthly: "Premium Monthly Plan",
+  annual:  "Premium Annual Plan",
 };
 
 export const loader = async ({ request }) => {
@@ -19,23 +20,15 @@ export const loader = async ({ request }) => {
       throw new Error("Missing 'shop' or 'host' query param.");
     }
 
-    // noms possibles pour require (accepte monthly OU annual déjà actif)
-    const allPlanOptions = [
-      ...PLAN_NAMES.monthly,
-      ...PLAN_NAMES.annual,
-    ];
-
-    // nom demandé pour request (priorité au premier de la liste)
-    const requestedName =
-      (PLAN_NAMES[planKey] && PLAN_NAMES[planKey][0]) || PLAN_NAMES.monthly[0];
-
+    // 1) Si un abonnement actif existe déjà (mensuel ou annuel) -> OK
+    // 2) Sinon -> on lance la demande pour le plan choisi avec 7 jours d'essai
     await billing.require({
-      plans: allPlanOptions,
+      plans: Object.values(PLAN_NAME),
       onFailure: async () =>
         billing.request({
-          plan: requestedName,
-          // isTest: true, // active si tu testes sur un dev store
-          trialDays: 7,
+          plan: PLAN_NAME[planKey] || PLAN_NAME.monthly,
+          trialDays: 7,               // essai gratuit
+          // isTest: true,            // laisse true sur dev store, passe à false en prod
           returnUrl: `${process.env.SHOPIFY_APP_URL}/settings?shop=${shop}&host=${host}&billing=success`,
         }),
     });
