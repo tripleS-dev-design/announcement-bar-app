@@ -12,6 +12,7 @@
     "start": "node server.mjs",
     "docker-start": "npm run setup && npm run start",
     "setup": "prisma generate && prisma migrate deploy",
+    "prepare": "prisma generate",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "shopify": "shopify",
     "prisma": "prisma",
@@ -20,7 +21,7 @@
   },
   "type": "module",
   "engines": {
-    "node": "^18.20 || ^20.10 || >=21.0.0"
+    "node": "^18.20 || ^20.10"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
