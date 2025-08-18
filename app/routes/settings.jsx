@@ -1,9 +1,8 @@
 // app/routes/settings.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server"; // ajuste si ton shopify.server est ailleurs
-import { useAuthenticatedFetch } from "@shopify/shopify-app-remix/react"; // ✅ pour les session tokens
+import { authenticate } from "../shopify.server"; // ajuste si besoin
 
 // ⚡️ NOMS EXACTS des plans comme définis dans ton Partner Dashboard
 const PLANS = ["Premium Monthly Plan", "Premium Annual Plan"];
@@ -22,15 +21,13 @@ export const loader = async ({ request }) => {
   try {
     await billing.require({ plans: PLANS });
     return null; // OK, affiche Settings
-  } catch (e) {
-    console.warn("Redirecting to /pricing: no valid subscription");
+  } catch (_e) {
     return redirect(`/pricing?${qs}`);
   }
 };
 
-// === Ton composant React Settings inchangé ===
+// ====== le reste de TON composant inchangé ======
 
-// Style constants
 const BUTTON_BASE = {
   border: "none",
   borderRadius: "8px",
@@ -58,45 +55,7 @@ const CARD_STYLE = {
   alignItems: "center",
 };
 
-// ----------------------
-// ✅ Bouton de test API (session token) pour faire passer le contrôle Shopify
-function PingButton() {
-  const fetcher = useAuthenticatedFetch();
-
-  async function test() {
-    try {
-      const res = await fetcher("/api/ping");
-      const data = await res.json();
-      console.log("API /api/ping ->", data);
-      alert("Ping OK: " + JSON.stringify(data));
-    } catch (e) {
-      console.error(e);
-      alert("Ping FAILED (voir console)");
-    }
-  }
-
-  return (
-    <button
-      onClick={test}
-      style={{
-        position: "fixed",
-        bottom: "24px",
-        right: "24px",
-        ...BUTTON_BASE,
-        backgroundColor: "#111",
-        color: "#fff",
-        padding: "12px 20px",
-        borderRadius: "10px",
-      }}
-    >
-      Test API (session token)
-    </button>
-  );
-}
-// ----------------------
-
-// … (tout ton code OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown,
-// GLOBAL_STYLES, StyledTimer, etc. reste identique ici) …
+// … tes composants OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown, GLOBAL_STYLES, etc.
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
@@ -128,7 +87,6 @@ export default function Settings() {
       <style>{GLOBAL_STYLES}</style>
       <OpeningPopup />
       <div style={CONTAINER_STYLE}>
-        {/* bannière d’accueil */}
         <div
           style={{
             background:
@@ -169,7 +127,6 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* liste de tes blocs premium */}
         {blocks.map((block) => (
           <div key={block.id} style={CARD_STYLE}>
             <div style={{ flex: 1, minWidth: "220px" }}>
@@ -200,7 +157,6 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* bouton Pricing en bas */}
       <Link to="/pricing">
         <button
           style={{
@@ -218,9 +174,6 @@ export default function Settings() {
           Pricing
         </button>
       </Link>
-
-      {/* ✅ Bouton de test session token */}
-      <PingButton />
     </>
   );
 }
