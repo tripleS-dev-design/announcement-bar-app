@@ -1,6 +1,6 @@
 // app/routes/api.ping.jsx
 import { json } from "@remix-run/node";
-import { authenticate } from "~/shopify.server";
+import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   // 🔐 Exige une session valide (et accepte les session tokens / JWT)
