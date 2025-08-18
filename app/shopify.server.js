@@ -1,22 +1,31 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log("🛠️ process.env.SHOPIFY_APP_URL =", process.env.SHOPIFY_APP_URL);
-
-const appUrl = process.env.SHOPIFY_APP_URL || "https://announcement-bar-app.onrender.com";
-console.log("🛠️ appUrl utilisée =", appUrl);
-
 import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
   AppDistribution,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
-
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
-// ✅ Configuration billing
+// --- Sanity checks (évite des débogages incompréhensibles) ---
+const requiredEnv = [
+  "SHOPIFY_API_KEY",
+  "SHOPIFY_API_SECRET",
+  "SHOPIFY_APP_URL",
+  "SCOPES",
+];
+for (const k of requiredEnv) {
+  if (!process.env[k] || process.env[k].trim() === "") {
+    throw new Error(`Missing env var: ${k}`);
+  }
+}
+
+const appUrl = process.env.SHOPIFY_APP_URL;
+
+// ✅ Billing (noms 100% identiques à ceux utilisés dans l’activation)
 export const billing = {
   "Premium Monthly": {
     amount: 4.99,
@@ -32,16 +41,23 @@ export const billing = {
   },
 };
 
+// ⚠️ L’API Admin peut rester sur Janvier 2025.
+// (Ton shopify.app.toml pour les webhooks est sur 2025-04: OK, ce n’est pas obligé d’être identique)
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  apiSecretKey: process.env.SHOPIFY_API_SECRET,
   apiVersion: ApiVersion.January25,
-  scopes: process.env.SCOPES?.split(","),
+  scopes: process.env.SCOPES.split(",").map((s) => s.trim()).filter(Boolean),
+
   appUrl,
   authPathPrefix: "/auth",
+
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
-  billing, // ✅ billing bien passé ici
+
+  billing, // ← plans de facturation
+
+  // 🔑 Indispensable pour que Shopify détecte l’auth via "jetons de visite" (JWT)
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
