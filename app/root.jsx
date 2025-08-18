@@ -5,10 +5,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { AppProvider } from "@shopify/shopify-app-remix/react";
 
 export default function App() {
   return (
-    <html>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -21,7 +22,11 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        {/* ✅ Fournit App Bridge et gestion des session tokens */}
+        <AppProvider>
+          <Outlet />
+        </AppProvider>
+
         <ScrollRestoration />
         <Scripts />
       </body>
