@@ -1,14 +1,14 @@
 // app/routes/api.ping.jsx
 import { json } from "@remix-run/node";
-import { authenticate } from "../shopify.server";
+import { authenticate } from "../shopify.server"; // <- import RELATIF depuis app/routes/
 
+// Vérifie le session token côté serveur (devient vert dans les contrôles Shopify)
 export const loader = async ({ request }) => {
-  // 🔐 Exige une session valide (et accepte les session tokens / JWT)
-  await authenticate.admin(request);
-  return json({ ok: true, time: new Date().toISOString() });
+  await authenticate.admin(request); // 401/redirect si pas de session valide
+  return json({ ok: true, ts: Date.now() });
 };
 
+// Pas d’UI pour cette route
 export default function ApiPing() {
-  // route API -> pas d'UI
   return null;
 }
