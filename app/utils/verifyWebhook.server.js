@@ -2,23 +2,25 @@
 import crypto from "crypto";
 
 /**
- * Vérifie la signature HMAC Shopify.
- * @param {string} hmacHeader    Valeur de l'en-tête 'X-Shopify-Hmac-Sha256'
- * @param {string} rawBody       Corps brut (string) de la requête
- * @param {string} secret        Clé secrète de l'app (SHOPIFY_API_SECRET)
+ * Vérifie la signature HMAC d’un webhook Shopify.
+ * @param {string} hmacHeader valeur de l’en-tête `x-shopify-hmac-sha256`
+ * @param {string|Buffer} rawBody le corps BRUT du webhook (request.text())
  * @returns {boolean}
  */
-export function verifyWebhookHmac(hmacHeader, rawBody, secret = process.env.SHOPIFY_API_SECRET) {
-  if (!hmacHeader || !rawBody || !secret) return false;
+export function verifyWebhookHmac(hmacHeader, rawBody) {
+  const secret = process.env.SHOPIFY_API_SECRET || process.env.SHOPIFY_API_SECRET_KEY;
+  if (!secret) {
+    console.error("Missing SHOPIFY_API_SECRET.");
+    return false;
+  }
 
   const computed = crypto
     .createHmac("sha256", secret)
-    .update(rawBody, "utf8")
+    .update(typeof rawBody === "string" ? Buffer.from(rawBody, "utf8") : rawBody)
     .digest("base64");
 
-  // comparaison sûre
-  const safeA = Buffer.from(computed);
-  const safeB = Buffer.from(hmacHeader);
-
-  return safeA.length === safeB.length && crypto.timingSafeEqual(safeA, safeB);
+  // compare en timing-safe
+  const a = Buffer.from(computed);
+  const b = Buffer.from(hmacHeader || "");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
