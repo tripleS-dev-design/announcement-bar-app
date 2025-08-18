@@ -3,12 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Link } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 import { authenticate } from "../shopify.server"; // ajuste si ton shopify.server est ailleurs
+import { useAuthenticatedFetch } from "@shopify/shopify-app-remix/react"; // ✅ pour les session tokens
 
 // ⚡️ NOMS EXACTS des plans comme définis dans ton Partner Dashboard
 const PLANS = ["Premium Monthly Plan", "Premium Annual Plan"];
 
 /**
- * Loader côté serveur : 
+ * Loader côté serveur :
  * - Sur DEV store -> passe sans facturation
  * - Sur client AVEC abonnement -> passe
  * - Sur client SANS abonnement -> redirect vers /pricing
@@ -57,7 +58,45 @@ const CARD_STYLE = {
   alignItems: "center",
 };
 
-// … (tout ton code OpeningPopup, PreviewAnnouncementBar, etc. reste pareil) …
+// ----------------------
+// ✅ Bouton de test API (session token) pour faire passer le contrôle Shopify
+function PingButton() {
+  const fetcher = useAuthenticatedFetch();
+
+  async function test() {
+    try {
+      const res = await fetcher("/api/ping");
+      const data = await res.json();
+      console.log("API /api/ping ->", data);
+      alert("Ping OK: " + JSON.stringify(data));
+    } catch (e) {
+      console.error(e);
+      alert("Ping FAILED (voir console)");
+    }
+  }
+
+  return (
+    <button
+      onClick={test}
+      style={{
+        position: "fixed",
+        bottom: "24px",
+        right: "24px",
+        ...BUTTON_BASE,
+        backgroundColor: "#111",
+        color: "#fff",
+        padding: "12px 20px",
+        borderRadius: "10px",
+      }}
+    >
+      Test API (session token)
+    </button>
+  );
+}
+// ----------------------
+
+// … (tout ton code OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown,
+// GLOBAL_STYLES, StyledTimer, etc. reste identique ici) …
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
@@ -179,6 +218,9 @@ export default function Settings() {
           Pricing
         </button>
       </Link>
+
+      {/* ✅ Bouton de test session token */}
+      <PingButton />
     </>
   );
 }
