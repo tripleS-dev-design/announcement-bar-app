@@ -1,30 +1,39 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
 handle = "announcement-bar-app-18"
+
+# URL publique de ton app (Render)
 application_url = "https://announcement-bar-app.onrender.com"
+
+# L’app est embarquée dans l’admin Shopify (iframe)
 embedded = true
 
 [build]
+# Inclure ce TOML dans chaque déploiement
 include_config_on_deploy = true
+# Pratique pour le dev via CLI; n’affecte pas la prod Render
 automatically_update_urls_on_dev = true
 
 [webhooks]
+# Version d’API des webhooks
 api_version = "2025-04"
 
-# ✅ Webhooks de conformité (obligatoires) — un seul endpoint
+# ✅ Webhooks de conformité (obligatoires) – un seul endpoint
 [[webhooks.subscriptions]]
 compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
 uri = "/webhooks/compliance"
 
-# (optionnel) Webhook de désinstallation
+# (optionnel) désinstallation de l’app
 [[webhooks.subscriptions]]
 topics = ["app/uninstalled"]
 uri = "/webhooks/app/uninstalled"
 
 [access_scopes]
+# Ajuste si ton app a besoin d’autres scopes
 scopes = "read_products,write_products,read_themes,write_themes"
 
 [auth]
+# URLs de redirection OAuth (doivent matcher Partner Dashboard)
 redirect_urls = [
   "https://announcement-bar-app.onrender.com/auth/callback",
   "https://announcement-bar-app.onrender.com/auth/shopify/callback",
