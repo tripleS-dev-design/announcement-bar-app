@@ -1,24 +1,27 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useSearchParams } from "@remix-run/react";
 
+// ✅ handles EXACTS comme dans le Partner Dashboard
+const PLAN_HANDLES = {
+  monthly: "premium-monthly",
+  annual: "premium-annual",
+};
+
 export default function Pricing() {
   const [period, setPeriod] = useState("monthly");
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // 🚀 Si backend a détecté un dev store, il ajoute ?billing=dev
-  // => on redirige immédiatement vers /settings en conservant shop/host/etc.
+  // 🚀 bypass billing sur dev store
   useEffect(() => {
     if (params.get("billing") === "dev") {
       const shop = params.get("shop");
       const host = params.get("host");
       const rest = new URLSearchParams(location.search || "");
-      rest.delete("billing"); // on enlève juste le flag
-      // reconstruit la query proprement
+      rest.delete("billing");
       const qs = new URLSearchParams();
       if (shop) qs.set("shop", shop);
       if (host) qs.set("host", host);
-      // on garde les autres params utiles (embedded, hmac, etc.)
       for (const [k, v] of rest.entries()) {
         if (k !== "shop" && k !== "host") qs.set(k, v);
       }
@@ -26,12 +29,11 @@ export default function Pricing() {
     }
   }, [params, location.search]);
 
-  // Conserver tous les paramètres Shopify présents (shop, host, embedded, hmac, …)
+  // ✅ conserve tous les params + ajoute plan=<handle>
   const activateHref = useMemo(() => {
-    const params = new URLSearchParams(location.search || "");
-    params.set("plan", period); // "monthly" | "annual"
-    // IMPORTANT: route flat "billing.activate.jsx" => URL "/billing/activate"
-    return `/billing/activate?${params.toString()}`;
+    const qs = new URLSearchParams(location.search || "");
+    qs.set("plan", PLAN_HANDLES[period]); // <-- handle réel
+    return `/billing/activate?${qs.toString()}`;
   }, [location.search, period]);
 
   return (
@@ -171,7 +173,7 @@ export default function Pricing() {
           </div>
 
           {/* Bouton: conserve les params & ouvre au top */}
-          <a href={`/billing/activate${location.search}`} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+          <a href={activateHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
             <button style={{
               background: "linear-gradient(90deg, #000000, #4b4b4b)",
               color: "#fff",
