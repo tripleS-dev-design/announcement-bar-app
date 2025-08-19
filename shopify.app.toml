@@ -4,7 +4,6 @@ handle = "announcement-bar-app-18"
 
 # URL publique Render
 application_url = "https://announcement-bar-app.onrender.com"
-embedded = true
 
 [build]
 include_config_on_deploy = true
