@@ -3,8 +3,8 @@ import { authenticate } from "../shopify.server"; // garde ce chemin si shopify.
 
 // ⚠️ Mets ici exactement les mêmes noms que dans Partner -> Pricing
 const PLAN_NAME = {
-  monthly: "Premium Monthly Plan",
-  annual:  "Premium Annual Plan",
+  monthly: "Premium Monthly ",
+  annual:  "Premium Annual ",
 };
 
 export const loader = async ({ request }) => {
