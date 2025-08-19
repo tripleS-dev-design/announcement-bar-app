@@ -171,7 +171,7 @@ export default function Pricing() {
           </div>
 
           {/* Bouton: conserve les params & ouvre au top */}
-          <a href={activateHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+          <a href={`/billing/activate${location.search}`} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
             <button style={{
               background: "linear-gradient(90deg, #000000, #4b4b4b)",
               color: "#fff",
