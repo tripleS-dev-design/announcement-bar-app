@@ -1,6 +1,6 @@
 // app/routes/billing.activate.jsx
 import { redirect } from "@remix-run/node";
-import { authenticate } from "~/shopify.server";
+import { authenticate } from "../shopify.server";
 
 // Map handle -> nom EXACT du plan déclaré dans `billing` (shopify.server.js)
 const HANDLE_TO_PLAN = {
