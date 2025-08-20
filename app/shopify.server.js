@@ -29,7 +29,7 @@ export const PLAN_HANDLES = {
 
 // ✅ Les clés du billing = les handles exacts
 export const billing = {
-  [PLAN_HANDLES.monthly]: {
+  [premium-monthly]: {
     amount: 4.99,
     currencyCode: "USD",
     interval: "EVERY_30_DAYS",
