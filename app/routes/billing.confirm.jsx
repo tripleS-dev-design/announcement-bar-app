@@ -1,6 +1,6 @@
 // app/routes/billing.confirm.jsx
 import { redirect } from "@remix-run/node";
-import { authenticate } from "~/shopify.server";
+import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
