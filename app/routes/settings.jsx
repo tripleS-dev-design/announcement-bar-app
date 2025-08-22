@@ -1,74 +1,163 @@
 // app/routes/settings.jsx
 import React, { useState } from "react";
-import { Link, useLocation, useSearchParams } from "@remix-run/react";
+import { Link, useSearchParams } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { authenticate, PLAN_HANDLES } from "../shopify.server";
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Loader: autorise uniquement les shops avec un abonnement actif.
-// Redirige vers /pricing en conservant les paramètres (shop, host, etc.).
-// ───────────────────────────────────────────────────────────────────────────────
+/**
+ * 🔐 Server loader:
+ * - exige un abonnement actif (plans = handles exacts)
+ * - sinon -> redirige vers /pricing en conservant les query params
+ */
 export const loader = async ({ request }) => {
-  const { billing } = await authenticate.admin(request);
   const url = new URL(request.url);
-  const qs = url.searchParams.toString();
 
-  const hasPayment = await billing.check({
-    plans: Object.values(PLAN_HANDLES), // ["premium-monthly","premium-annual"]
-  });
+  try {
+    // ✅ import dynamique => jamais bundlé côté client
+    const { authenticate } = await import("../shopify.server");
+    const { billing } = await authenticate.admin(request);
 
-  if (!hasPayment) {
-    return redirect(`/pricing?${qs}`);
+    // ⚠️ Utiliser les HANDLES, pas les noms marketing
+    await billing.require({ plans: ["premium-monthly", "premium-annual"] });
+    return null;
+  } catch (_e) {
+    return redirect(`/pricing?${url.searchParams.toString()}`);
   }
-
-  return null;
 };
 
-// ====== le reste de TON composant inchangé (préviews, styles, etc.) ======
+/* ---------------- UI helpers (placeholders compila-bles) ---------------- */
+
+const GLOBAL_STYLES = `
+@keyframes shimmer {
+  0% { background-position: 0 0; } 100% { background-position: 800px 0; }
+}
+`;
+
+function OpeningPopup() {
+  // Place-holder (si tu as ton vrai composant, remplace)
+  return null;
+}
+
+function Card({ children, style }) {
+  return (
+    <div
+      style={{
+        backgroundColor: "#ffffff",
+        borderRadius: 12,
+        padding: 20,
+        marginBottom: 24,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 16,
+        alignItems: "center",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 const BUTTON_BASE = {
   border: "none",
-  borderRadius: "8px",
+  borderRadius: 8,
   padding: "12px 24px",
   fontWeight: "bold",
   cursor: "pointer",
   boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
 };
+
 const CONTAINER_STYLE = {
   maxWidth: "85%",
   margin: "0 auto",
   transform: "scale(0.95)",
   transformOrigin: "top center",
-  padding: "16px",
-};
-const CARD_STYLE = {
-  backgroundColor: "#ffffff",
-  borderRadius: "12px",
-  padding: "20px",
-  marginBottom: "24px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  display: "flex",
-  flexWrap: "wrap",
-  gap: "16px",
-  alignItems: "center",
+  padding: 16,
 };
 
-// ⚠️ Assure-toi que ces éléments existent dans ton projet :
-/* global GLOBAL_STYLES, OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown */
+// --- petites previews "fake" pour compiler proprement ---
+function PreviewAnnouncementBar() {
+  return (
+    <div
+      style={{
+        background:
+          "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(60,60,60,1) 100%)",
+        color: "#fff",
+        padding: 12,
+        borderRadius: 8,
+        textAlign: "center",
+        width: 320,
+      }}
+    >
+      Announcement Bar Preview
+    </div>
+  );
+}
+
+function PreviewPopup() {
+  return (
+    <div
+      style={{
+        width: 320,
+        height: 160,
+        borderRadius: 12,
+        border: "1px solid #eee",
+        display: "grid",
+        placeItems: "center",
+        background: "#fafafa",
+      }}
+    >
+      Popup Preview
+    </div>
+  );
+}
+
+function PreviewCountdown() {
+  return (
+    <div style={{ display: "flex", gap: 8 }}>
+      {["12", "34", "56"].map((n) => (
+        <div
+          key={n}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 10,
+            background: "#000",
+            color: "#fff",
+            display: "grid",
+            placeItems: "center",
+            fontWeight: "bold",
+          }}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* -------------------------------- Page -------------------------------- */
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
-  const location = useLocation();
   const [params] = useSearchParams();
 
-  // shop: "example.myshopify.com" -> store = "example"
+  // Récupère "shop" depuis l’URL (fourni par Shopify)
   const shopParam = params.get("shop") || "";
-  const store = shopParam.replace(".myshopify.com", "");
+  const shopSub =
+    shopParam.replace("https://", "").replace("http://", "").replace(".myshopify.com", "") ||
+    ""; // ex: selya11904
 
-  // Éditeur de thème (format admin.shopify.com recommandé)
-  const baseEditorUrl = store
-    ? `https://admin.shopify.com/store/${store}/themes/current/editor?context=apps`
-    : "";
+  // Clé publique (client_id) — laisse la tienne ici
+  const APP_KEY = "be79dab79ff6bb4be47d4e66577b6c50";
+
+  // Lien éditeur de thème (si shop est présent)
+  const baseEditorUrl = shopSub
+    ? `https://${shopSub}.myshopify.com/admin/themes/current/editor?context=apps`
+    : "#";
+
+  const makeBlockUrl = (blockId) =>
+    shopSub ? `${baseEditorUrl}&addAppBlockId=${APP_KEY}/${blockId}` : "#";
 
   const blocks = [
     {
@@ -95,27 +184,29 @@ export default function Settings() {
     <>
       <style>{GLOBAL_STYLES}</style>
       <OpeningPopup />
+
       <div style={CONTAINER_STYLE}>
+        {/* Bandeau d’accueil */}
         <div
           style={{
             background:
               "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
             backgroundSize: "800px 100%",
-            borderRadius: "12px",
-            padding: "24px",
-            marginBottom: "32px",
+            borderRadius: 12,
+            padding: 24,
+            marginBottom: 32,
             color: "#fff",
             textAlign: "center",
             animation: "shimmer 3s infinite linear",
           }}
         >
-          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+          <p style={{ fontSize: 18, fontWeight: "bold" }}>
             “Welcome to Triple Announcement Bar! Let’s boost your sales with
             powerful bars, popups, and countdowns.”
           </p>
           <div
             style={{
-              marginTop: "16px",
+              marginTop: 16,
               display: "flex",
               justifyContent: "flex-end",
             }}
@@ -125,7 +216,7 @@ export default function Settings() {
               onChange={(e) => setLang(e.target.value)}
               style={{
                 padding: "6px 12px",
-                borderRadius: "6px",
+                borderRadius: 6,
                 border: "1px solid #ccc",
               }}
             >
@@ -136,63 +227,53 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Cartes des blocks */}
         {blocks.map((block) => (
-          <div key={block.id} style={CARD_STYLE}>
-            <div style={{ flex: 1, minWidth: "220px" }}>
-              <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>
-                {block.title}
-              </h2>
-              <p style={{ marginBottom: "12px", color: "#555" }}>
+          <Card key={block.id}>
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <h2 style={{ fontSize: 20, marginBottom: 8 }}>{block.title}</h2>
+              <p style={{ marginBottom: 12, color: "#555" }}>
                 {block.description}
               </p>
 
-              {baseEditorUrl ? (
-                <a
-                  href={`${baseEditorUrl}&addAppBlockId=be79dab79ff6bb4be47d4e66577b6c50/${block.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <button
-                    style={{
-                      ...BUTTON_BASE,
-                      backgroundColor: "#000",
-                      color: "#fff",
-                    }}
-                  >
-                    Add Premium Block
-                  </button>
-                </a>
-              ) : (
+              <a
+                href={makeBlockUrl(block.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!shopSub}
+              >
                 <button
-                  disabled
-                  title="Missing shop param"
                   style={{
                     ...BUTTON_BASE,
-                    backgroundColor: "#999",
+                    backgroundColor: "#000",
                     color: "#fff",
+                    opacity: shopSub ? 1 : 0.5,
+                    cursor: shopSub ? "pointer" : "not-allowed",
                   }}
+                  disabled={!shopSub}
                 >
                   Add Premium Block
                 </button>
-              )}
+              </a>
             </div>
-            <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
-          </div>
+
+            <div style={{ flex: 1, minWidth: 220 }}>{block.preview}</div>
+          </Card>
         ))}
       </div>
 
-      <Link to={{ pathname: "/pricing", search: location.search }}>
+      <Link to={`/pricing?${params.toString()}`}>
         <button
           style={{
             position: "fixed",
-            bottom: "24px",
+            bottom: 24,
             left: "50%",
             transform: "translateX(-50%)",
             ...BUTTON_BASE,
             backgroundColor: "#000",
             color: "#fff",
             padding: "12px 28px",
-            borderRadius: "30px",
+            borderRadius: 30,
           }}
         >
           Pricing
