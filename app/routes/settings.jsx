@@ -1,32 +1,30 @@
 // app/routes/settings.jsx
 import React, { useState } from "react";
-import { Link } from "@remix-run/react";
+import { Link, useLocation, useSearchParams } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server"; // ajuste si besoin
+import { authenticate, PLAN_HANDLES } from "../shopify.server";
 
-// ⚡️ NOMS EXACTS des plans comme définis dans ton Partner Dashboard
-const PLANS = ["Premium Monthly Plan", "Premium Annual Plan"];
-
-/**
- * Loader côté serveur :
- * - Sur DEV store -> passe sans facturation
- * - Sur client AVEC abonnement -> passe
- * - Sur client SANS abonnement -> redirect vers /pricing
- */
+// ───────────────────────────────────────────────────────────────────────────────
+// Loader: autorise uniquement les shops avec un abonnement actif.
+// Redirige vers /pricing en conservant les paramètres (shop, host, etc.).
+// ───────────────────────────────────────────────────────────────────────────────
 export const loader = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
   const url = new URL(request.url);
-  const qs = url.searchParams.toString(); // conserve shop, host, etc.
+  const qs = url.searchParams.toString();
 
-  try {
-    await billing.require({ plans: PLANS });
-    return null; // OK, affiche Settings
-  } catch (_e) {
+  const hasPayment = await billing.check({
+    plans: Object.values(PLAN_HANDLES), // ["premium-monthly","premium-annual"]
+  });
+
+  if (!hasPayment) {
     return redirect(`/pricing?${qs}`);
   }
+
+  return null;
 };
 
-// ====== le reste de TON composant inchangé ======
+// ====== le reste de TON composant inchangé (préviews, styles, etc.) ======
 
 const BUTTON_BASE = {
   border: "none",
@@ -55,12 +53,23 @@ const CARD_STYLE = {
   alignItems: "center",
 };
 
-// … tes composants OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown, GLOBAL_STYLES, etc.
+// ⚠️ Assure-toi que ces éléments existent dans ton projet :
+/* global GLOBAL_STYLES, OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown */
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
-  const shop = "selya11904";
-  const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
+  const location = useLocation();
+  const [params] = useSearchParams();
+
+  // shop: "example.myshopify.com" -> store = "example"
+  const shopParam = params.get("shop") || "";
+  const store = shopParam.replace(".myshopify.com", "");
+
+  // Éditeur de thème (format admin.shopify.com recommandé)
+  const baseEditorUrl = store
+    ? `https://admin.shopify.com/store/${store}/themes/current/editor?context=apps`
+    : "";
+
   const blocks = [
     {
       id: "announcement-bar-premium",
@@ -136,28 +145,43 @@ export default function Settings() {
               <p style={{ marginBottom: "12px", color: "#555" }}>
                 {block.description}
               </p>
-              <a
-                href={`${baseEditorUrl}&addAppBlockId=be79dab79ff6bb4be47d4e66577b6c50/${block.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+
+              {baseEditorUrl ? (
+                <a
+                  href={`${baseEditorUrl}&addAppBlockId=be79dab79ff6bb4be47d4e66577b6c50/${block.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button
+                    style={{
+                      ...BUTTON_BASE,
+                      backgroundColor: "#000",
+                      color: "#fff",
+                    }}
+                  >
+                    Add Premium Block
+                  </button>
+                </a>
+              ) : (
                 <button
+                  disabled
+                  title="Missing shop param"
                   style={{
                     ...BUTTON_BASE,
-                    backgroundColor: "#000",
+                    backgroundColor: "#999",
                     color: "#fff",
                   }}
                 >
                   Add Premium Block
                 </button>
-              </a>
+              )}
             </div>
             <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
           </div>
         ))}
       </div>
 
-      <Link to="/pricing">
+      <Link to={{ pathname: "/pricing", search: location.search }}>
         <button
           style={{
             position: "fixed",
