@@ -1,6 +1,6 @@
 // app/routes/pricing.jsx
 import { useEffect, useMemo } from "react";
-import { Link, useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
 // Handles EXACTS (identiques à ceux déclarés côté serveur)
@@ -176,7 +176,16 @@ export default function Pricing() {
     </div>
   );
 
-  const backToAppHref = `/settings${location.search || ""}`;
+  // URL retour : ne garde que shop/host et sort de l’iframe
+  const backToAppHref = useMemo(() => {
+    const src = new URLSearchParams(location.search || "");
+    const qs = new URLSearchParams();
+    const shop = src.get("shop");
+    const host = src.get("host");
+    if (shop) qs.set("shop", shop);
+    if (host) qs.set("host", host);
+    return qs.toString() ? `/settings?${qs.toString()}` : "/settings";
+  }, [location.search]);
 
   return (
     <div
@@ -333,7 +342,7 @@ export default function Pricing() {
 
       {/* Bouton retour page principale */}
       <div style={{ textAlign: "center", marginTop: "28px" }}>
-        <Link to={backToAppHref}>
+        <a href={backToAppHref} target="_top" rel="noopener noreferrer">
           <button
             style={{
               marginTop: "12px",
@@ -348,7 +357,7 @@ export default function Pricing() {
           >
             Back to app
           </button>
-        </Link>
+        </a>
       </div>
     </div>
   );
