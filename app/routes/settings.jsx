@@ -3,13 +3,11 @@ import { useEffect, useMemo } from "react";
 import { useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
-// Handles EXACTS (identiques à ceux déclarés côté serveur)
 const PLAN_HANDLES = {
   monthly: "premium-monthly",
   annual: "premium-annual",
 };
 
-// --- SERVER: détecter le plan actif (import dynamique pour éviter l'erreur vite) ---
 export const loader = async ({ request }) => {
   const { authenticate } = await import("../shopify.server");
   const { admin } = await authenticate.admin(request);
@@ -52,7 +50,6 @@ export const loader = async ({ request }) => {
   return json({ currentHandle });
 };
 
-// --- CLIENT: UI + marquage du plan actif & bouton retour ---
 export default function Pricing() {
   const { currentHandle } = useLoaderData();
   const location = useLocation();
@@ -75,7 +72,6 @@ export default function Pricing() {
     }
   }, [params, location.search]);
 
-  // conserve tous les params + ajoute plan=<handle>
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
@@ -91,7 +87,6 @@ export default function Pricing() {
     [location.search]
   );
 
-  // styles
   const cardStyle = {
     backgroundColor: "#0f0f0f",
     color: "#fff",
@@ -180,15 +175,11 @@ export default function Pricing() {
     </div>
   );
 
-  // URL retour : ne garde que shop/host et sort de l’iframe
+  // ⬇️ IMPORTANT : retour via la route racine `/` (et pas /settings)
+  // La route `_index` décide toute seule de te renvoyer vers /settings ou /pricing.
   const backToAppHref = useMemo(() => {
-    const src = new URLSearchParams(location.search || "");
-    const qs = new URLSearchParams();
-    const shop = src.get("shop");
-    const host = src.get("host");
-    if (shop) qs.set("shop", shop);
-    if (host) qs.set("host", host);
-    return qs.toString() ? `/settings?${qs.toString()}` : "/settings";
+    const qs = new URLSearchParams(location.search || "");
+    return qs.toString() ? `/?${qs.toString()}` : "/";
   }, [location.search]);
 
   return (
@@ -219,7 +210,6 @@ export default function Pricing() {
         Unlock All Features with the Premium Plan
       </div>
 
-      {/* Deux plans côte à côte */}
       <div
         style={{
           display: "grid",
@@ -344,7 +334,7 @@ export default function Pricing() {
         </div>
       </div>
 
-      {/* Bouton retour page principale */}
+      {/* Back to app */}
       <div style={{ textAlign: "center", marginTop: "28px" }}>
         <a href={backToAppHref} target="_top" rel="noopener noreferrer">
           <button
@@ -357,7 +347,7 @@ export default function Pricing() {
               borderRadius: "9999px",
               fontWeight: "bold",
               boxShadow: "0 0 12px rgba(0,0,0,0.4)",
-              cursor: "pointer", // 👈 curseur main
+              cursor: "pointer",
             }}
           >
             Back to app
@@ -367,3 +357,4 @@ export default function Pricing() {
     </div>
   );
 }
+
