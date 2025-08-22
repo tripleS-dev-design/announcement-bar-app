@@ -6,6 +6,7 @@ import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
   AppDistribution,
+  BillingInterval,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
@@ -19,44 +20,40 @@ for (const k of requiredEnv) {
   }
 }
 
-const appUrl = process.env.SHOPIFY_APP_URL;
-
-// Handles EXACTS (identiques à ceux du Partner Dashboard)
 export const PLAN_HANDLES = {
   monthly: "premium-monthly",
-  annual:  "premium-annual",
+  annual: "premium-annual",
 };
 
-// Définition des plans (les CLÉS sont les handles)
+// Les clés de cet objet SONT les handles de plan
 export const billing = {
   [PLAN_HANDLES.monthly]: {
     amount: 4.99,
     currencyCode: "USD",
-    interval: "EVERY_30_DAYS",
+    interval: BillingInterval.Every30Days,
     trialDays: 14,
   },
   [PLAN_HANDLES.annual]: {
     amount: 39.99,
     currencyCode: "USD",
-    interval: "ANNUAL",
+    interval: BillingInterval.Annual,
     trialDays: 14,
   },
 };
 
-const shopify = shopifyApp({
+export const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
   apiVersion: ApiVersion.January25,
-  scopes: process.env.SCOPES.split(",").map((s) => s.trim()).filter(Boolean),
 
-  appUrl,
+  appUrl: process.env.SHOPIFY_APP_URL,
+  scopes: process.env.SCOPES.split(",").map((s) => s.trim()).filter(Boolean),
   authPathPrefix: "/auth",
 
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
 
-  // IMPORTANT: on passe la config billing ci-dessus
-  billing,
+  billing, // ⬅️ important
 
   future: {
     unstable_newEmbeddedAuthStrategy: true,
@@ -65,11 +62,10 @@ const shopify = shopifyApp({
 });
 
 export default shopify;
-export const apiVersion = ApiVersion.January25;
-export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
 export const authenticate = shopify.authenticate;
 export const unauthenticated = shopify.unauthenticated;
+export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
-// (on exporte aussi `billing` et `PLAN_HANDLES` ci-dessus)
+export const apiVersion = ApiVersion.January25;
