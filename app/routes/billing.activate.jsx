@@ -4,8 +4,8 @@ import { authenticate } from "../shopify.server";
 
 // Conversion handle -> nom EXACT du plan dans shopify.server.js
 const HANDLE_TO_PLAN = {
-  "premium-monthly": "Premium Monthly",
-  "premium-annual":  "Premium Annual",
+  "premium-monthly",
+  "premium-annual",
 };
 
 export const loader = async ({ request }) => {
