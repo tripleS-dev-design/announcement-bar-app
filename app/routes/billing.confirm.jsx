@@ -6,14 +6,16 @@ export const loader = async ({ request }) => {
   try {
     const { billing } = await authenticate.admin(request);
 
-    // Vérifie qu'un des deux plans est actif; sinon Shopify renverra vers l’acceptation
+    // ✅ Les plans doivent être les CLEFS exactes de ton objet `billing`
     await billing.require({
-      plans: ["Premium-Monthly", "Premium-Annual"],
+      plans: ["premium-monthly", "premium-annual"],
     });
 
-    // Retour vers l’UI
+    // Retour vers l’UI (ta page settings)
     const url = new URL(request.url);
-    const to = new URL("/settings", url.origin);
+    const appUrl = process.env.SHOPIFY_APP_URL || process.env.HOST || url.origin;
+    const to = new URL("/settings", appUrl);
+    // repasse les query params si tu veux
     for (const [k, v] of url.searchParams) to.searchParams.set(k, v);
 
     return redirect(to.toString());
