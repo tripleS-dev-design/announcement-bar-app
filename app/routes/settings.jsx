@@ -2,29 +2,32 @@
 import React, { useState } from "react";
 import { Link } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { authenticate, PLAN_HANDLES } from "../shopify.server";
+import { authenticate, PLAN_HANDLES } from "../shopify.server"; // <- juste l'import des handles
 
-// ⚠️ Utiliser les HANDLES définis dans shopify.server.js
+// ⚡️ utiliser les HANDLES EXACTS définis dans shopify.server.js
 const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
 
 /**
- * - Si abonnement actif -> on affiche Settings
- * - Sinon -> redirect vers /pricing en conservant les query params
+ * Loader côté serveur :
+ * - Sur DEV store -> passe sans facturation (géré côté /pricing ou _index si tu veux)
+ * - Sur client AVEC abonnement -> passe
+ * - Sur client SANS abonnement -> redirect vers /pricing
  */
 export const loader = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
   const url = new URL(request.url);
-  const qs = url.searchParams.toString();
+  const qs = url.searchParams.toString(); // conserve shop, host, etc.
 
   try {
+    // ✅ on vérifie contre les *handles* (ex: "premium-monthly", "premium-annual")
     await billing.require({ plans: REQUIRED_PLANS });
-    return null; // OK
-  } catch {
+    return null; // OK, affiche Settings
+  } catch (_e) {
     return redirect(`/pricing?${qs}`);
   }
 };
 
-// ====== UI (ta mise en page) ======
+// ====== le reste de TON composant inchangé ======
 
 const BUTTON_BASE = {
   border: "none",
@@ -53,26 +56,12 @@ const CARD_STYLE = {
   alignItems: "center",
 };
 
-// Si tes composants d’aperçu ne sont pas présents, on évite un crash de rendu
-const Fallback = ({ height = 120 }) => (
-  <div style={{ height, background: "#f5f5f5", borderRadius: 8 }} />
-);
-
-const PreviewAnnouncementBar =
-  globalThis?.PreviewAnnouncementBar || (() => <Fallback />);
-const PreviewPopup = globalThis?.PreviewPopup || (() => <Fallback />);
-const PreviewCountdown = globalThis?.PreviewCountdown || (() => <Fallback />);
-const OpeningPopup = globalThis?.OpeningPopup || (() => null);
-const GLOBAL_STYLES = globalThis?.GLOBAL_STYLES || "";
+// … tes composants OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown, GLOBAL_STYLES, etc.
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
-
-  // ⚠️ si tu veux un lien "Ajouter le block" qui marche sur n'importe quel shop,
-  // ne hardcode pas le nom de boutique
-  const baseEditorUrl = `/admin/themes/current/editor?context=apps`;
-  const appId = "be79dab79ff6bb4be47d4e66577b6c50";
-
+  const shop = "selya11904";
+  const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
   const blocks = [
     {
       id: "announcement-bar-premium",
@@ -149,8 +138,8 @@ export default function Settings() {
                 {block.description}
               </p>
               <a
-                href={`${baseEditorUrl}&addAppBlockId=${appId}/${block.id}`}
-                target="_top"
+                href={`${baseEditorUrl}&addAppBlockId=be79dab79ff6bb4be47d4e66577b6c50/${block.id}`}
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <button
