@@ -9,11 +9,9 @@ const PLAN_HANDLES = {
   annual: "premium-annual",
 };
 
-// --- SERVER: détecter le plan actif (sans importer du server code côté client) ---
+// --- SERVER: détecter le plan actif (import dynamique pour éviter l'erreur vite) ---
 export const loader = async ({ request }) => {
-  // import dynamique pour éviter “Server-only module referenced by client”
   const { authenticate } = await import("../shopify.server");
-
   const { admin } = await authenticate.admin(request);
 
   let currentHandle = null;
@@ -48,19 +46,19 @@ export const loader = async ({ request }) => {
     if (interval === "ANNUAL") currentHandle = PLAN_HANDLES.annual;
     if (interval === "EVERY_30_DAYS") currentHandle = PLAN_HANDLES.monthly;
   } catch {
-    // pas bloquant : si on ne lit pas, on laisse null
+    // lecture abonnement non bloquante
   }
 
   return json({ currentHandle });
 };
 
-// --- CLIENT: UI identique + marquage du plan actif & bouton retour ---
+// --- CLIENT: UI + marquage du plan actif & bouton retour ---
 export default function Pricing() {
   const { currentHandle } = useLoaderData();
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // bypass billing sur dev store (inchangé)
+  // bypass billing sur dev store
   useEffect(() => {
     if (params.get("billing") === "dev") {
       const shop = params.get("shop");
@@ -135,21 +133,27 @@ export default function Pricing() {
         <li>Button positionable left, center, or right</li>
       </ul>
 
-      <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>High-conversion Popup</p>
+      <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>
+        High-conversion Popup
+      </p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three visuals: standard, simple light effect, pro radial-glow</li>
         <li>Image or solid color background, text alignment, font size/style adjustable</li>
         <li>Display delay, customizable call-to-action button</li>
       </ul>
 
-      <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>Dynamic Countdown</p>
+      <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>
+        Dynamic Countdown
+      </p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three formats: simple, square, animated circle</li>
         <li>Fully customizable background, border & text colors</li>
         <li>Optional glowing effect, days/hours/minutes/seconds timer</li>
       </ul>
 
-      <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>Seamless Integration</p>
+      <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>
+        Seamless Integration
+      </p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Add and configure directly from Shopify Theme Editor</li>
         <li>Real-time preview of each block</li>
@@ -353,6 +357,7 @@ export default function Pricing() {
               borderRadius: "9999px",
               fontWeight: "bold",
               boxShadow: "0 0 12px rgba(0,0,0,0.4)",
+              cursor: "pointer", // 👈 curseur main
             }}
           >
             Back to app
