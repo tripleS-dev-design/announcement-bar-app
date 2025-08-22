@@ -1,4 +1,4 @@
-// shopify.server.js
+// app/shopify.server.js
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,7 +11,7 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
-// --- Vérifs des variables d'environnement indispensables ---
+// Vérifs ENV minimales
 const requiredEnv = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "SHOPIFY_APP_URL", "SCOPES"];
 for (const k of requiredEnv) {
   if (!process.env[k] || process.env[k].trim() === "") {
@@ -21,13 +21,13 @@ for (const k of requiredEnv) {
 
 const appUrl = process.env.SHOPIFY_APP_URL;
 
-// ✅ Handles EXACTS (doivent correspondre aux “Handle” que tu vois dans le Partner Dashboard)
+// Handles EXACTS (identiques à ceux du Partner Dashboard)
 export const PLAN_HANDLES = {
   monthly: "premium-monthly",
   annual:  "premium-annual",
 };
 
-// ✅ Définition des plans de facturation : les CLÉS sont les handles
+// Définition des plans (les CLÉS sont les handles)
 export const billing = {
   [PLAN_HANDLES.monthly]: {
     amount: 4.99,
@@ -46,7 +46,7 @@ export const billing = {
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  apiVersion: ApiVersion.January25, // OK d'utiliser Jan 2025 pour l'Admin API
+  apiVersion: ApiVersion.January25,
   scopes: process.env.SCOPES.split(",").map((s) => s.trim()).filter(Boolean),
 
   appUrl,
@@ -55,10 +55,9 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
 
-  // Très important : on passe l'objet billing ci-dessus
+  // IMPORTANT: on passe la config billing ci-dessus
   billing,
 
-  // Active l’auth “jetons de visite” (session tokens) et retire le REST si tu n’en as pas besoin
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
@@ -73,3 +72,4 @@ export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
+// (on exporte aussi `billing` et `PLAN_HANDLES` ci-dessus)
