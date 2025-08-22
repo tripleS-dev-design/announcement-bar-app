@@ -1,27 +1,20 @@
 // app/routes/settings.jsx
 import React, { useState, useEffect } from "react";
-import { useLocation } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 
-// ✅ handles exacts comme dans shopify.server (on les écrit ici pour éviter l'import côté client)
-const REQUIRED_PLANS = ["premium-monthly", "premium-annual"];
-
-/**
- * Loader:
- * - Si le shop a un abonnement actif -> OK
- * - Sinon -> redirige vers /pricing en conservant les query params (shop, host, etc.)
- */
+// ✅ Tout le code serveur est importé DANS le loader (import dynamique)
 export const loader = async ({ request }) => {
-  // ⬇️ import dynamique = pas référencé côté client
-  const { authenticate } = await import("../shopify.server");
-  const { billing } = await authenticate.admin(request);
+  const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
+  const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
 
+  const { billing } = await authenticate.admin(request);
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
 
   try {
     await billing.require({ plans: REQUIRED_PLANS });
-    return null; // affiche la page Settings
+    return null; // OK → on affiche la page
   } catch {
     return redirect(`/pricing?${qs}`);
   }
@@ -31,7 +24,6 @@ export const loader = async ({ request }) => {
 //        TON UI INTACT
 // ==============================
 
-// Style constants
 const BUTTON_BASE = {
   border: "none",
   borderRadius: "8px",
@@ -59,7 +51,6 @@ const CARD_STYLE = {
   alignItems: "center",
 };
 
-// Keyframes for animations
 const GLOBAL_STYLES = `
 @keyframes shimmer {
   0% { background-position: -400px 0; }
@@ -129,7 +120,8 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
       color: "#fff",
-      text: "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
+      text:
+        "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
       buttonText: "Shop Now",
       link: "#",
     },
@@ -144,7 +136,8 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
       color: "#000",
-      text: "Clearance – Prices Slashed! Don't Miss Out on Major Savings!",
+      text:
+        "Clearance – Prices Slashed! Don't Miss Out on Major Savings!",
       buttonText: "Browse",
       link: "#",
     },
@@ -245,7 +238,7 @@ function calcRemaining(deadline) {
   return `${h}:${m}:${s}`;
 }
 
-// Timer styles professional palette
+// Timer styles
 function StyledTimer({ value, variant }) {
   const base = {
     fontFamily: "sans-serif",
@@ -270,7 +263,7 @@ function StyledTimer({ value, variant }) {
     },
     circle: {
       ...base,
-      border: "3px solid "#2b6cb0",
+      border: "3px solid #2b6cb0", // ✅ corrigé
       color: "#2b6cb0",
       borderRadius: "50%",
       boxShadow: "0 0 12px rgba(43,108,176,0.6)",
@@ -337,16 +330,9 @@ function PreviewCountdown() {
 }
 
 export default function Settings() {
-  const location = useLocation(); // ⬅️ pour récupérer shop/host
   const [lang, setLang] = useState("en");
-
-  // ⚠️ Tu as mis un shop en dur pour l'URL Theme Editor : je le laisse tel quel
   const shop = "selya11904";
   const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
-
-  // href Pricing qui préserve shop/host (important en app embarquée)
-  const pricingHref = (location.search && `/pricing${location.search}`) || "/pricing";
-
   const blocks = [
     {
       id: "announcement-bar-premium",
@@ -438,8 +424,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ✅ Bouton Pricing qui garde shop/host et force la navigation top-level */}
-      <a href={pricingHref} target="_top" rel="noopener noreferrer">
+      <Link to="/pricing">
         <button
           style={{
             position: "fixed",
@@ -456,7 +441,7 @@ export default function Settings() {
         >
           Pricing
         </button>
-      </a>
+      </Link>
 
       {/* WhatsApp floating button */}
       <a
