@@ -1,33 +1,30 @@
-
 // app/routes/settings.jsx
 import React, { useState } from "react";
 import { Link } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server"; // ajuste si besoin
+import { authenticate, PLAN_HANDLES } from "../shopify.server";
 
-// ⚡️ NOMS EXACTS des plans comme définis dans ton Partner Dashboard
-const PLANS = ["Premium Monthly Plan", "Premium Annual Plan"];
+// ⚠️ Utiliser les HANDLES définis dans shopify.server.js
+const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
 
 /**
- * Loader côté serveur :
- * - Sur DEV store -> passe sans facturation
- * - Sur client AVEC abonnement -> passe
- * - Sur client SANS abonnement -> redirect vers /pricing
+ * - Si abonnement actif -> on affiche Settings
+ * - Sinon -> redirect vers /pricing en conservant les query params
  */
 export const loader = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
   const url = new URL(request.url);
-  const qs = url.searchParams.toString(); // conserve shop, host, etc.
+  const qs = url.searchParams.toString();
 
   try {
-    await billing.require({ plans: PLANS });
-    return null; // OK, affiche Settings
-  } catch (_e) {
+    await billing.require({ plans: REQUIRED_PLANS });
+    return null; // OK
+  } catch {
     return redirect(`/pricing?${qs}`);
   }
 };
 
-// ====== le reste de TON composant inchangé ======
+// ====== UI (ta mise en page) ======
 
 const BUTTON_BASE = {
   border: "none",
@@ -56,12 +53,26 @@ const CARD_STYLE = {
   alignItems: "center",
 };
 
-// … tes composants OpeningPopup, PreviewAnnouncementBar, PreviewPopup, PreviewCountdown, GLOBAL_STYLES, etc.
+// Si tes composants d’aperçu ne sont pas présents, on évite un crash de rendu
+const Fallback = ({ height = 120 }) => (
+  <div style={{ height, background: "#f5f5f5", borderRadius: 8 }} />
+);
+
+const PreviewAnnouncementBar =
+  globalThis?.PreviewAnnouncementBar || (() => <Fallback />);
+const PreviewPopup = globalThis?.PreviewPopup || (() => <Fallback />);
+const PreviewCountdown = globalThis?.PreviewCountdown || (() => <Fallback />);
+const OpeningPopup = globalThis?.OpeningPopup || (() => null);
+const GLOBAL_STYLES = globalThis?.GLOBAL_STYLES || "";
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
-  const shop = "selya11904";
-  const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
+
+  // ⚠️ si tu veux un lien "Ajouter le block" qui marche sur n'importe quel shop,
+  // ne hardcode pas le nom de boutique
+  const baseEditorUrl = `/admin/themes/current/editor?context=apps`;
+  const appId = "be79dab79ff6bb4be47d4e66577b6c50";
+
   const blocks = [
     {
       id: "announcement-bar-premium",
@@ -138,8 +149,8 @@ export default function Settings() {
                 {block.description}
               </p>
               <a
-                href={`${baseEditorUrl}&addAppBlockId=be79dab79ff6bb4be47d4e66577b6c50/${block.id}`}
-                target="_blank"
+                href={`${baseEditorUrl}&addAppBlockId=${appId}/${block.id}`}
+                target="_top"
                 rel="noopener noreferrer"
               >
                 <button
