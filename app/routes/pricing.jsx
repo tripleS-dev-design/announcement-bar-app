@@ -1,40 +1,30 @@
 // app/routes/pricing.jsx
-import { redirect } from "@remix-run/node";
-import { useMemo, useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation, useSearchParams } from "@remix-run/react";
-import { authenticate } from "../shopify.server";
-import { PLAN_HANDLES } from "../shopify.server";
 
-// SERVER: vérifie et éventuellement déclenche la souscription si ?plan= présent
-export async function loader({ request }) {
-  const { billing } = await authenticate.admin(request);
-  const url = new URL(request.url);
-  const plan = url.searchParams.get("plan");
+// Pas d'import de ../shopify.server ici !
+// Handles EXACTS des plans (identiques au Partner Dashboard)
+const PLAN_HANDLES = {
+  monthly: "premium-monthly",
+  annual: "premium-annual",
+};
 
-  // Déjà abonné ? on sort de /pricing
-  const hasPayment = await billing.check({
-    plans: Object.values(PLAN_HANDLES),
-  });
-  if (hasPayment) {
-    return redirect(`/settings?${url.searchParams.toString()}`);
-  }
+// (optionnel) un loader neutre pour satisfaire Remix, sans code serveur
+export const loader = () => null;
 
-  // La demande de souscription se fait dans /billing/activate (géré par un autre fichier)
-  return null;
-}
-
-// CLIENT: UI inchangée (liens -> /billing/activate)
 export default function Pricing() {
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // Bypass de test si tu veux (optionnel)
+  // Bypass pour dev-store: /pricing?billing=dev&shop=...&host=...
   useEffect(() => {
     if (params.get("billing") === "dev") {
       const shop = params.get("shop");
       const host = params.get("host");
+
       const rest = new URLSearchParams(location.search || "");
       rest.delete("billing");
+
       const qs = new URLSearchParams();
       if (shop) qs.set("shop", shop);
       if (host) qs.set("host", host);
@@ -45,6 +35,7 @@ export default function Pricing() {
     }
   }, [params, location.search]);
 
+  // Conserve tous les query params et ajoute plan=<handle>
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
@@ -60,6 +51,7 @@ export default function Pricing() {
     [location.search]
   );
 
+  // --- UI ---
   const cardStyle = {
     backgroundColor: "#0f0f0f",
     color: "#fff",
@@ -70,7 +62,6 @@ export default function Pricing() {
     textAlign: "center",
     border: "1px solid #fff",
   };
-
   const priceStyle = { fontSize: "28px", fontWeight: "bold", margin: "10px 0" };
   const oldPriceStyle = { textDecoration: "line-through", color: "#888", marginBottom: "16px" };
 
@@ -145,9 +136,12 @@ export default function Pricing() {
           alignItems: "start",
         }}
       >
+        {/* Monthly */}
         <div style={cardStyle}>
           <h3 style={{ fontSize: "20px", marginBottom: "6px" }}>Premium Plan — Monthly</h3>
-          <p style={priceStyle}>$4.99 <span style={{ fontSize: "13px" }}>/month</span></p>
+          <p style={priceStyle}>
+            $4.99 <span style={{ fontSize: "13px" }}>/month</span>
+          </p>
           <p style={oldPriceStyle}>$14.99</p>
 
           <Features />
@@ -172,9 +166,12 @@ export default function Pricing() {
           </a>
         </div>
 
+        {/* Annual */}
         <div style={cardStyle}>
           <h3 style={{ fontSize: "20px", marginBottom: "6px" }}>Premium Plan — Annual</h3>
-          <p style={priceStyle}>$39.99 <span style={{ fontSize: "13px" }}>/year</span></p>
+          <p style={priceStyle}>
+            $39.99 <span style={{ fontSize: "13px" }}>/year</span>
+          </p>
           <p style={oldPriceStyle}>$89.99</p>
 
           <Features />
