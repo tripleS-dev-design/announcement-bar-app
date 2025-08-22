@@ -1,11 +1,10 @@
 // app/routes/settings.jsx
 import React, { useState, useEffect } from "react";
-import { Link } from "@remix-run/react";
+import { useLocation } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { authenticate, PLAN_HANDLES } from "../shopify.server"; // server-only (utilisé UNIQUEMENT dans le loader)
 
-// ✅ plans exigés: on utilise les HANDLES déclarés dans shopify.server.js
-const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
+// ✅ handles exacts comme dans shopify.server (on les écrit ici pour éviter l'import côté client)
+const REQUIRED_PLANS = ["premium-monthly", "premium-annual"];
 
 /**
  * Loader:
@@ -13,7 +12,10 @@ const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
  * - Sinon -> redirige vers /pricing en conservant les query params (shop, host, etc.)
  */
 export const loader = async ({ request }) => {
+  // ⬇️ import dynamique = pas référencé côté client
+  const { authenticate } = await import("../shopify.server");
   const { billing } = await authenticate.admin(request);
+
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
 
@@ -134,7 +136,8 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
       color: "#fff",
-      text: "Flash Sale Alert! Everything Must Go – Save Big Before It’s Gone!",
+      text:
+        "Flash Sale Alert! Everything Must Go – Save Big Before It’s Gone!",
       buttonText: "Grab Deal",
       link: "#",
     },
@@ -267,7 +270,7 @@ function StyledTimer({ value, variant }) {
     },
     circle: {
       ...base,
-      border: "3px solid #2b6cb0",
+      border: "3px solid "#2b6cb0",
       color: "#2b6cb0",
       borderRadius: "50%",
       boxShadow: "0 0 12px rgba(43,108,176,0.6)",
@@ -334,9 +337,16 @@ function PreviewCountdown() {
 }
 
 export default function Settings() {
+  const location = useLocation(); // ⬅️ pour récupérer shop/host
   const [lang, setLang] = useState("en");
+
+  // ⚠️ Tu as mis un shop en dur pour l'URL Theme Editor : je le laisse tel quel
   const shop = "selya11904";
   const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
+
+  // href Pricing qui préserve shop/host (important en app embarquée)
+  const pricingHref = (location.search && `/pricing${location.search}`) || "/pricing";
+
   const blocks = [
     {
       id: "announcement-bar-premium",
@@ -428,7 +438,8 @@ export default function Settings() {
         ))}
       </div>
 
-      <Link to="/pricing">
+      {/* ✅ Bouton Pricing qui garde shop/host et force la navigation top-level */}
+      <a href={pricingHref} target="_top" rel="noopener noreferrer">
         <button
           style={{
             position: "fixed",
@@ -440,13 +451,14 @@ export default function Settings() {
             color: "#fff",
             padding: "12px 28px",
             borderRadius: "30px",
+            cursor: "pointer",
           }}
         >
           Pricing
         </button>
-      </Link>
+      </a>
 
-      {/* WhatsApp floating button (un seul lien, pas d'imbrication) */}
+      {/* WhatsApp floating button */}
       <a
         href="https://wa.me/+212630079763"
         target="_blank"
