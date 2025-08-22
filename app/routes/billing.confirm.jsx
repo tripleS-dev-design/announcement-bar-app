@@ -8,7 +8,7 @@ export const loader = async ({ request }) => {
 
     // Vérifie qu'un des deux plans est actif; sinon Shopify renverra vers l’acceptation
     await billing.require({
-      plans: ["Premium Monthly", "Premium Annual"],
+      plans: ["Premium-Monthly", "Premium-Annual"],
     });
 
     // Retour vers l’UI
