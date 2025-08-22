@@ -2,26 +2,24 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, useSearchParams } from "@remix-run/react";
 
-// Pas d'import de ../shopify.server ici !
-// Handles EXACTS des plans (identiques au Partner Dashboard)
+// ⚠️ Pas d'import serveur ici
 const PLAN_HANDLES = {
   monthly: "premium-monthly",
   annual: "premium-annual",
 };
 
-// (optionnel) un loader neutre pour satisfaire Remix, sans code serveur
+// Loader neutre pour Remix (pas de code serveur)
 export const loader = () => null;
 
 export default function Pricing() {
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // Bypass pour dev-store: /pricing?billing=dev&shop=...&host=...
+  // Dev store bypass: /pricing?billing=dev&shop=...&host=...
   useEffect(() => {
     if (params.get("billing") === "dev") {
       const shop = params.get("shop");
       const host = params.get("host");
-
       const rest = new URLSearchParams(location.search || "");
       rest.delete("billing");
 
@@ -35,7 +33,7 @@ export default function Pricing() {
     }
   }, [params, location.search]);
 
-  // Conserve tous les query params et ajoute plan=<handle>
+  // Conserve tous les params + ajoute plan=<handle>
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
@@ -50,6 +48,17 @@ export default function Pricing() {
     () => makeActivateHref(PLAN_HANDLES.annual),
     [location.search]
   );
+
+  // Lien "Back to app": on ne conserve que shop/host pour éviter les boucles
+  const backToAppHref = useMemo(() => {
+    const src = new URLSearchParams(location.search || "");
+    const shop = src.get("shop");
+    const host = src.get("host");
+    const qs = new URLSearchParams();
+    if (shop) qs.set("shop", shop);
+    if (host) qs.set("host", host);
+    return qs.toString() ? `/settings?${qs.toString()}` : "/settings";
+  }, [location.search]);
 
   // --- UI ---
   const cardStyle = {
@@ -68,28 +77,24 @@ export default function Pricing() {
   const Features = () => (
     <div style={{ textAlign: "left", color: "#fff", fontSize: "13px", marginBottom: "20px", lineHeight: 1.5 }}>
       <h4 style={{ marginBottom: "8px", fontWeight: "bold" }}>Premium Features</h4>
-
       <p style={{ margin: "4px 0", fontWeight: "bold" }}>Highly-customizable Announcement Bar</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three styles: standard scrolling, multilingual carousel, professional light-glow</li>
         <li>Image or color background, semi-transparent overlay, adjustable text shadow</li>
         <li>Button positionable left, center, or right</li>
       </ul>
-
       <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>High-conversion Popup</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three visuals: standard, simple light effect, pro radial-glow</li>
         <li>Image or solid color background, text alignment, font size/style adjustable</li>
         <li>Display delay, customizable call-to-action button</li>
       </ul>
-
       <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>Dynamic Countdown</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three formats: simple, square, animated circle</li>
         <li>Fully customizable background, border & text colors</li>
         <li>Optional glowing effect, days/hours/minutes/seconds timer</li>
       </ul>
-
       <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>Seamless Integration</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Add and configure directly from Shopify Theme Editor</li>
@@ -195,6 +200,27 @@ export default function Pricing() {
             </button>
           </a>
         </div>
+      </div>
+
+      {/* Back to app */}
+      <div style={{ textAlign: "center", marginTop: "28px" }}>
+        <a href={backToAppHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+          <button
+            style={{
+              marginTop: "12px",
+              background: "#000",
+              color: "#fff",
+              padding: "12px 20px",
+              border: "none",
+              borderRadius: "9999px",
+              fontWeight: "bold",
+              boxShadow: "0 0 12px rgba(0,0,0,0.4)",
+              cursor: "pointer",
+            }}
+          >
+            Back to app
+          </button>
+        </a>
       </div>
     </div>
   );
