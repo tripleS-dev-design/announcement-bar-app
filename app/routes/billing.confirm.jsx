@@ -10,28 +10,27 @@ export const loader = async ({ request }) => {
   try {
     const { billing } = await authenticate.admin(request); // peut renvoyer un Response(302)
 
-    // Les HANDLES (clés de l'objet `billing`)
     await billing.require({ plans: ["premium-monthly", "premium-annual"] });
 
     const appUrl = process.env.SHOPIFY_APP_URL || process.env.HOST || url.origin;
     const to = new URL("/settings", appUrl);
-    // (optionnel) propager les params utiles
     if (shop) to.searchParams.set("shop", shop);
     if (host) to.searchParams.set("host", host);
-
     return redirect(to.toString());
   } catch (err) {
-    // 🛡️ Si le SDK demande login (302 vers /auth/login), on sort de l'iframe proprement
+    // ✅ ré-auth top-level propre
     if (err instanceof Response && err.status === 302) {
-      const location = err.headers.get("Location") || "/auth/login";
-      const loginUrl = new URL(location, process.env.SHOPIFY_APP_URL || url.origin);
-      if (shop && !loginUrl.searchParams.get("shop")) loginUrl.searchParams.set("shop", shop);
-      if (host && !loginUrl.searchParams.get("host")) loginUrl.searchParams.set("host", host);
+      const appOrigin = process.env.SHOPIFY_APP_URL || url.origin;
 
-      const exit = new URL("/auth/exit-iframe", process.env.SHOPIFY_APP_URL || url.origin);
+      // 1) Destination demandée par Shopify (peut être /auth/login ou une URL admin absolue)
+      const loc = err.headers.get("Location") || "/auth/login";
+      const finalTarget = new URL(loc, appOrigin).toString();
+
+      // 2) Sortir de l’iframe (⚠️ NE PAS encoder finalTarget)
+      const exit = new URL("/auth/exit-iframe", appOrigin);
       if (shop) exit.searchParams.set("shop", shop);
       if (host) exit.searchParams.set("host", host);
-      exit.searchParams.set("exitIframe", encodeURIComponent(loginUrl.toString()));
+      exit.searchParams.set("exitIframe", finalTarget); // <-- pas de encodeURIComponent
 
       return redirect(exit.toString());
     }
