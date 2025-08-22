@@ -11,7 +11,7 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
-// --- Vérifs env ---
+// --- Vérifs des variables d'environnement indispensables ---
 const requiredEnv = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "SHOPIFY_APP_URL", "SCOPES"];
 for (const k of requiredEnv) {
   if (!process.env[k] || process.env[k].trim() === "") {
@@ -21,15 +21,15 @@ for (const k of requiredEnv) {
 
 const appUrl = process.env.SHOPIFY_APP_URL;
 
-// ✅ Handles EXACTS des plans (ceux du Partner Dashboard)
+// ✅ Handles EXACTS (doivent correspondre aux “Handle” que tu vois dans le Partner Dashboard)
 export const PLAN_HANDLES = {
   monthly: "premium-monthly",
-  annual: "premium-annual",
+  annual:  "premium-annual",
 };
 
-// ✅ Les clés du billing = les handles exacts
+// ✅ Définition des plans de facturation : les CLÉS sont les handles
 export const billing = {
-  [PLAN_HANDLES.Monthly]: {
+  [PLAN_HANDLES.monthly]: {
     amount: 4.99,
     currencyCode: "USD",
     interval: "EVERY_30_DAYS",
@@ -46,7 +46,7 @@ export const billing = {
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  apiVersion: ApiVersion.January25,
+  apiVersion: ApiVersion.January25, // OK d'utiliser Jan 2025 pour l'Admin API
   scopes: process.env.SCOPES.split(",").map((s) => s.trim()).filter(Boolean),
 
   appUrl,
@@ -55,8 +55,10 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
 
-  billing, // ← très important : les clés sont les handles
+  // Très important : on passe l'objet billing ci-dessus
+  billing,
 
+  // Active l’auth “jetons de visite” (session tokens) et retire le REST si tu n’en as pas besoin
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
