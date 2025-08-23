@@ -354,27 +354,17 @@ export default function Settings() {
     },
   ];
 
-  // 🔁 Bouton Pricing: passe par /auth/login avec return_to=/pricing (résout le rebond d’auth)
   const location = useLocation();
-  const toPricing = () => {
+  // 🔗 Lien interne propre vers /pricing (conserve shop/host). Pas de _top, pas de /auth/login.
+  const pricingHref = (() => {
     const src = new URLSearchParams(location.search || "");
-    const s = src.get("shop");
-    const h = src.get("host");
-
-    // URL finale voulue dans l'app
-    const backQs = new URLSearchParams();
-    if (s) backQs.set("shop", s);
-    if (h) backQs.set("host", h);
-    const pricingPath = `/pricing${backQs.toString() ? `?${backQs}` : ""}`;
-
-    // On passe par la route d'auth avec return_to
-    const loginQs = new URLSearchParams();
-    if (s) loginQs.set("shop", s);
-    if (h) loginQs.set("host", h);
-    loginQs.set("return_to", pricingPath);
-
-    window.top.location.href = `/auth/login?${loginQs.toString()}`;
-  };
+    const shop = src.get("shop");
+    const host = src.get("host");
+    const qs = new URLSearchParams();
+    if (shop) qs.set("shop", shop);
+    if (host) qs.set("host", host);
+    return `/pricing${qs.toString() ? `?${qs}` : ""}`;
+  })();
 
   return (
     <>
@@ -446,9 +436,9 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ⬇️ Bouton Pricing corrigé (auth + return_to) */}
-      <button
-        onClick={toPricing}
+      {/* ⬇️ Bouton Pricing: lien interne (_self) */}
+      <a
+        href={pricingHref}
         style={{
           position: "fixed",
           bottom: "24px",
@@ -461,10 +451,12 @@ export default function Settings() {
           borderRadius: "30px",
           cursor: "pointer",
           zIndex: 9999,
+          textDecoration: "none",
+          display: "inline-block",
         }}
       >
         Pricing
-      </button>
+      </a>
 
       {/* WhatsApp floating button */}
       <a
