@@ -120,7 +120,8 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
       color: "#fff",
-      text: "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
+      text:
+        "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
       buttonText: "Shop Now",
       link: "#",
     },
@@ -262,7 +263,7 @@ function StyledTimer({ value, variant }) {
     },
     circle: {
       ...base,
-      border: "3px solid #2b6cb0",
+      border: "3px solid #2b6cb0", // ✅ corrigé
       color: "#2b6cb0",
       borderRadius: "50%",
       boxShadow: "0 0 12px rgba(43,108,176,0.6)",
@@ -330,21 +331,8 @@ function PreviewCountdown() {
 
 export default function Settings() {
   const [lang, setLang] = useState("en");
-  const location = useLocation(); // 👈 pour lire shop/host de l'URL
   const shop = "selya11904";
   const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
-
-  // URL /pricing qui conserve shop/host et sort de l'iframe
-  const pricingHref = (() => {
-    const src = new URLSearchParams(location.search || "");
-    const qs = new URLSearchParams();
-    const s = src.get("shop");
-    const h = src.get("host");
-    if (s) qs.set("shop", s);
-    if (h) qs.set("host", h);
-    return qs.toString() ? `/pricing?${qs.toString()}` : "/pricing";
-  })();
-
   const blocks = [
     {
       id: "announcement-bar-premium",
@@ -365,6 +353,19 @@ export default function Settings() {
       preview: <PreviewCountdown />,
     },
   ];
+
+  // 🔁 Bouton Pricing: ouvre /pricing au TOP, en conservant shop/host
+  const location = useLocation();
+  const toPricing = () => {
+    const src = new URLSearchParams(location.search || "");
+    const qs = new URLSearchParams();
+    const s = src.get("shop");
+    const h = src.get("host");
+    if (s) qs.set("shop", s);
+    if (h) qs.set("host", h);
+    const href = qs.toString() ? `/pricing?${qs.toString()}` : "/pricing";
+    window.top.location.href = href;
+  };
 
   return (
     <>
@@ -436,26 +437,25 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ✅ Bouton Pricing corrigé : vraie navigation en haut de page + shop/host */}
-      <a href={pricingHref} target="_top" rel="noopener noreferrer">
-        <button
-          style={{
-            position: "fixed",
-            bottom: "24px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            ...BUTTON_BASE,
-            backgroundColor: "#000",
-            color: "#fff",
-            padding: "12px 28px",
-            borderRadius: "30px",
-            cursor: "pointer",
-            zIndex: 9999,
-          }}
-        >
-          Pricing
-        </button>
-      </a>
+      {/* ⬇️ Bouton Pricing corrigé (top navigation) */}
+      <button
+        onClick={toPricing}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          ...BUTTON_BASE,
+          backgroundColor: "#000",
+          color: "#fff",
+          padding: "12px 28px",
+          borderRadius: "30px",
+          cursor: "pointer",
+          zIndex: 9999,
+        }}
+      >
+        Pricing
+      </button>
 
       {/* WhatsApp floating button */}
       <a
