@@ -1,17 +1,17 @@
 // app/routes/pricing.jsx
-import { useMemo } from "react";
-import { Link, useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
+import { useEffect, useMemo } from "react";
+import { useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
-// Handles EXACTS (identiques au Partner Dashboard)
+// Handles EXACTS
 const PLAN_HANDLES = {
   monthly: "premium-monthly",
   annual: "premium-annual",
 };
 
-// 🔎 SERVER: lire le plan actif SANS rediriger (juste pour marquer "Current")
+// --- SERVER: lire le plan actif pour taguer "Current" ---
 export const loader = async ({ request }) => {
-  const { authenticate } = await import("../shopify.server"); // import dynamique
+  const { authenticate } = await import("../shopify.server");
   const { admin } = await authenticate.admin(request);
 
   let currentHandle = null;
@@ -39,10 +39,11 @@ export const loader = async ({ request }) => {
     const subs = data?.data?.currentAppInstallation?.activeSubscriptions || [];
     const active = subs.find((s) => s.status === "ACTIVE");
     const interval = active?.lineItems?.[0]?.plan?.pricingDetails?.interval || null;
+
     if (interval === "ANNUAL") currentHandle = PLAN_HANDLES.annual;
     if (interval === "EVERY_30_DAYS") currentHandle = PLAN_HANDLES.monthly;
   } catch {
-    // lecture best-effort : on laisse currentHandle = null en cas d'erreur
+    // silencieux
   }
 
   return json({ currentHandle });
@@ -53,7 +54,16 @@ export default function Pricing() {
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // Lien d’activation: conserve tous les params et ajoute plan=<handle>
+  // Bypass dev: /pricing?billing=dev&shop=...&host=...
+  useEffect(() => {
+    if (params.get("billing") === "dev") {
+      const qs = new URLSearchParams(location.search || "");
+      qs.delete("billing");
+      window.location.replace(`/settings?${qs.toString()}`);
+    }
+  }, [params, location.search]);
+
+  // liens d’activation → on garde tous les params + plan
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
@@ -68,15 +78,11 @@ export default function Pricing() {
     [location.search]
   );
 
-  // Retour page principale: ne garde que shop/host (pas d’auto-redir ici)
+  // 🔙 Back to app → on garde TOUS les params, on enlève juste "plan"
   const backToAppHref = useMemo(() => {
-    const src = new URLSearchParams(location.search || "");
-    const shop = src.get("shop");
-    const host = src.get("host");
-    const qs = new URLSearchParams();
-    if (shop) qs.set("shop", shop);
-    if (host) qs.set("host", host);
-    return qs.toString() ? `/settings?${qs.toString()}` : "/settings";
+    const qs = new URLSearchParams(location.search || "");
+    qs.delete("plan");
+    return `/settings${qs.toString() ? `?${qs.toString()}` : ""}`;
   }, [location.search]);
 
   // --- UI ---
@@ -93,6 +99,30 @@ export default function Pricing() {
   };
   const priceStyle = { fontSize: "28px", fontWeight: "bold", margin: "10px 0" };
   const oldPriceStyle = { textDecoration: "line-through", color: "#888", marginBottom: "16px" };
+
+  const TagCurrent = () => (
+    <div
+      style={{
+        position: "absolute",
+        top: "-10px",
+        right: "-10px",
+        background: "#22c55e",
+        color: "#0a0a0a",
+        fontWeight: "bold",
+        padding: "6px 10px",
+        borderRadius: "9999px",
+        boxShadow: "0 0 12px rgba(34,197,94,0.6)",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="#0a0a0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      Current
+    </div>
+  );
 
   const Features = () => (
     <div style={{ textAlign: "left", color: "#fff", fontSize: "13px", marginBottom: "20px", lineHeight: 1.5 }}>
@@ -124,41 +154,14 @@ export default function Pricing() {
     </div>
   );
 
-  const TagCurrent = () => (
-    <div
-      style={{
-        position: "absolute",
-        top: "-10px",
-        right: "-10px",
-        background: "#22c55e",
-        color: "#000",
-        fontWeight: "bold",
-        padding: "6px 10px",
-        borderRadius: "9999px",
-        boxShadow: "0 0 12px rgba(34,197,94,0.6)",
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-      }}
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="12" fill="#16a34a" />
-        <path d="M7 12.5l3 3 7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      Current
-    </div>
-  );
-
   return (
     <div
-      className="pricing-root"
       style={{
         background: "#ffffff",
         color: "#0f0f0f",
         minHeight: "100vh",
         padding: "32px 16px",
         fontFamily: "'Inter', sans-serif",
-        position: "relative",
       }}
     >
       <div
@@ -194,9 +197,7 @@ export default function Pricing() {
             $4.99 <span style={{ fontSize: "13px" }}>/month</span>
           </p>
           <p style={oldPriceStyle}>$14.99</p>
-
           <Features />
-
           {currentHandle === PLAN_HANDLES.monthly ? (
             <button
               disabled
@@ -215,7 +216,10 @@ export default function Pricing() {
               Current plan
             </button>
           ) : (
-            <a href={activateMonthlyHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+            <a
+              href={activateMonthlyHref}
+              style={{ textDecoration: "none", display: "block" }}
+            >
               <button
                 style={{
                   background: "linear-gradient(90deg, #000000, #4b4b4b)",
@@ -244,9 +248,7 @@ export default function Pricing() {
             $39.99 <span style={{ fontSize: "13px" }}>/year</span>
           </p>
           <p style={oldPriceStyle}>$89.99</p>
-
           <Features />
-
           {currentHandle === PLAN_HANDLES.annual ? (
             <button
               disabled
@@ -265,7 +267,10 @@ export default function Pricing() {
               Current plan
             </button>
           ) : (
-            <a href={activateAnnualHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+            <a
+              href={activateAnnualHref}
+              style={{ textDecoration: "none", display: "block" }}
+            >
               <button
                 style={{
                   background: "linear-gradient(90deg, #000000, #4b4b4b)",
@@ -287,9 +292,12 @@ export default function Pricing() {
         </div>
       </div>
 
-      {/* Bouton retour page principale */}
+      {/* 🔙 Back to app — garde tous les params, pas de target _top */}
       <div style={{ textAlign: "center", marginTop: "28px" }}>
-        <Link to={backToAppHref}>
+        <a
+          href={backToAppHref}
+          style={{ textDecoration: "none", display: "inline-block" }}
+        >
           <button
             style={{
               marginTop: "12px",
@@ -305,7 +313,7 @@ export default function Pricing() {
           >
             Back to app
           </button>
-        </Link>
+        </a>
       </div>
     </div>
   );
