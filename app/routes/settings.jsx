@@ -263,7 +263,7 @@ function StyledTimer({ value, variant }) {
     },
     circle: {
       ...base,
-      border: "3px solid #2b6cb0", // ✅ corrigé
+      border: "3px solid #2b6cb0",
       color: "#2b6cb0",
       borderRadius: "50%",
       boxShadow: "0 0 12px rgba(43,108,176,0.6)",
@@ -354,17 +354,26 @@ export default function Settings() {
     },
   ];
 
-  // 🔁 Bouton Pricing: ouvre /pricing au TOP, en conservant shop/host
+  // 🔁 Bouton Pricing: passe par /auth/login avec return_to=/pricing (résout le rebond d’auth)
   const location = useLocation();
   const toPricing = () => {
     const src = new URLSearchParams(location.search || "");
-    const qs = new URLSearchParams();
     const s = src.get("shop");
     const h = src.get("host");
-    if (s) qs.set("shop", s);
-    if (h) qs.set("host", h);
-    const href = qs.toString() ? `/pricing?${qs.toString()}` : "/pricing";
-    window.top.location.href = href;
+
+    // URL finale voulue dans l'app
+    const backQs = new URLSearchParams();
+    if (s) backQs.set("shop", s);
+    if (h) backQs.set("host", h);
+    const pricingPath = `/pricing${backQs.toString() ? `?${backQs}` : ""}`;
+
+    // On passe par la route d'auth avec return_to
+    const loginQs = new URLSearchParams();
+    if (s) loginQs.set("shop", s);
+    if (h) loginQs.set("host", h);
+    loginQs.set("return_to", pricingPath);
+
+    window.top.location.href = `/auth/login?${loginQs.toString()}`;
   };
 
   return (
@@ -437,7 +446,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ⬇️ Bouton Pricing corrigé (top navigation) */}
+      {/* ⬇️ Bouton Pricing corrigé (auth + return_to) */}
       <button
         onClick={toPricing}
         style={{
