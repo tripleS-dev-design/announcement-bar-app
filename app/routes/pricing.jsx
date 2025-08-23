@@ -1,7 +1,7 @@
 // app/routes/pricing.jsx
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
+import { Link, useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 
 // Handles EXACTS (identiques au Partner Dashboard)
 const PLAN_HANDLES = {
@@ -9,13 +9,12 @@ const PLAN_HANDLES = {
   annual: "premium-annual",
 };
 
-// --- SERVER: lire le plan actif (import dynamique côté server) ---
+// 🔎 SERVER: lire le plan actif SANS rediriger (juste pour marquer "Current")
 export const loader = async ({ request }) => {
-  const { authenticate } = await import("../shopify.server");
+  const { authenticate } = await import("../shopify.server"); // import dynamique
   const { admin } = await authenticate.admin(request);
 
   let currentHandle = null;
-
   try {
     const resp = await admin.graphql(`
       query AppActiveSubs {
@@ -40,40 +39,21 @@ export const loader = async ({ request }) => {
     const subs = data?.data?.currentAppInstallation?.activeSubscriptions || [];
     const active = subs.find((s) => s.status === "ACTIVE");
     const interval = active?.lineItems?.[0]?.plan?.pricingDetails?.interval || null;
-
     if (interval === "ANNUAL") currentHandle = PLAN_HANDLES.annual;
     if (interval === "EVERY_30_DAYS") currentHandle = PLAN_HANDLES.monthly;
   } catch {
-    // si on ne peut pas lire, on laisse null
+    // lecture best-effort : on laisse currentHandle = null en cas d'erreur
   }
 
   return json({ currentHandle });
 };
 
-// --- CLIENT ---
 export default function Pricing() {
   const { currentHandle } = useLoaderData();
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // Bypass dev-store : /pricing?billing=dev&shop=...&host=...
-  useEffect(() => {
-    if (params.get("billing") === "dev") {
-      const shop = params.get("shop");
-      const host = params.get("host");
-      const rest = new URLSearchParams(location.search || "");
-      rest.delete("billing");
-      const qs = new URLSearchParams();
-      if (shop) qs.set("shop", shop);
-      if (host) qs.set("host", host);
-      for (const [k, v] of rest.entries()) {
-        if (k !== "shop" && k !== "host") qs.set(k, v);
-      }
-      window.top.location.href = `/settings?${qs.toString()}`;
-    }
-  }, [params, location.search]);
-
-  // Conserve les params + ajoute plan=<handle>
+  // Lien d’activation: conserve tous les params et ajoute plan=<handle>
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
@@ -88,17 +68,16 @@ export default function Pricing() {
     [location.search]
   );
 
-  // Back to app (forcé au top window)
-  const goBackToApp = () => {
+  // Retour page principale: ne garde que shop/host (pas d’auto-redir ici)
+  const backToAppHref = useMemo(() => {
     const src = new URLSearchParams(location.search || "");
     const shop = src.get("shop");
     const host = src.get("host");
     const qs = new URLSearchParams();
     if (shop) qs.set("shop", shop);
     if (host) qs.set("host", host);
-    const href = qs.toString() ? `/settings?${qs.toString()}` : "/settings";
-    window.top.location.href = href;
-  };
+    return qs.toString() ? `/settings?${qs.toString()}` : "/settings";
+  }, [location.search]);
 
   // --- UI ---
   const cardStyle = {
@@ -152,17 +131,21 @@ export default function Pricing() {
         top: "-10px",
         right: "-10px",
         background: "#22c55e",
-        color: "#0a0a0a",
+        color: "#000",
         fontWeight: "bold",
         padding: "6px 10px",
-        borderRadius: "8px",
+        borderRadius: "9999px",
         boxShadow: "0 0 12px rgba(34,197,94,0.6)",
         display: "flex",
         alignItems: "center",
         gap: "6px",
       }}
     >
-      <span>✔</span> Current plan
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="12" fill="#16a34a" />
+        <path d="M7 12.5l3 3 7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      Current
     </div>
   );
 
@@ -219,7 +202,7 @@ export default function Pricing() {
               disabled
               style={{
                 background: "#22c55e",
-                color: "#0a0a0a",
+                color: "#000",
                 padding: "10px 16px",
                 border: "none",
                 borderRadius: "8px",
@@ -229,7 +212,7 @@ export default function Pricing() {
                 cursor: "not-allowed",
               }}
             >
-              ✔ Current plan
+              Current plan
             </button>
           ) : (
             <a href={activateMonthlyHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
@@ -269,7 +252,7 @@ export default function Pricing() {
               disabled
               style={{
                 background: "#22c55e",
-                color: "#0a0a0a",
+                color: "#000",
                 padding: "10px 16px",
                 border: "none",
                 borderRadius: "8px",
@@ -279,7 +262,7 @@ export default function Pricing() {
                 cursor: "not-allowed",
               }}
             >
-              ✔ Current plan
+              Current plan
             </button>
           ) : (
             <a href={activateAnnualHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
@@ -304,24 +287,25 @@ export default function Pricing() {
         </div>
       </div>
 
-      {/* Back to app */}
+      {/* Bouton retour page principale */}
       <div style={{ textAlign: "center", marginTop: "28px" }}>
-        <button
-          onClick={goBackToApp}
-          style={{
-            marginTop: "12px",
-            background: "#000",
-            color: "#fff",
-            padding: "12px 20px",
-            border: "none",
-            borderRadius: "9999px",
-            fontWeight: "bold",
-            boxShadow: "0 0 12px rgba(0,0,0,0.4)",
-            cursor: "pointer",
-          }}
-        >
-          Back to app
-        </button>
+        <Link to={backToAppHref}>
+          <button
+            style={{
+              marginTop: "12px",
+              background: "#000",
+              color: "#fff",
+              padding: "12px 20px",
+              border: "none",
+              borderRadius: "9999px",
+              fontWeight: "bold",
+              boxShadow: "0 0 12px rgba(0,0,0,0.4)",
+              cursor: "pointer",
+            }}
+          >
+            Back to app
+          </button>
+        </Link>
       </div>
     </div>
   );
