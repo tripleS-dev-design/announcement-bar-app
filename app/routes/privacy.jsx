@@ -30,7 +30,7 @@ export default function Privacy() {
       <p>Contact us to access, correct, or delete your data related to this app.</p>
 
       <h2 style={{marginTop: 24}}>Contact</h2>
-      <p>Email: <a href="mailto:support@yourdomain.com">support@yourdomain.com</a></p>
+      <p>Email: <a href="mailto:ktami.sami@gmail.com">support@yourdomain.com</a></p>
     </main>
   );
 }
