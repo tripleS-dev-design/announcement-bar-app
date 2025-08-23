@@ -1,9 +1,9 @@
 // app/routes/settings.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 
-// ✅ Tout le code serveur est importé DANS le loader (import dynamique)
+// ✅ Tout le code serveur dans le loader (import dynamique)
 export const loader = async ({ request }) => {
   const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
   const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
@@ -75,7 +75,7 @@ function OpeningPopup() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 10000,
+        zIndex: 10000, // l’overlay
       }}
       role="dialog"
       aria-modal="true"
@@ -120,24 +120,21 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
       color: "#fff",
-      text:
-        "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
+      text: "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
       buttonText: "Shop Now",
       link: "#",
     },
     {
       bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
       color: "#fff",
-      text:
-        "Flash Sale Alert! Everything Must Go – Save Big Before It’s Gone!",
+      text: "Flash Sale Alert! Everything Must Go – Save Big Before It’s Gone!",
       buttonText: "Grab Deal",
       link: "#",
     },
     {
       bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
       color: "#000",
-      text:
-        "Clearance – Prices Slashed! Don't Miss Out on Major Savings!",
+      text: "Clearance – Prices Slashed! Don't Miss Out on Major Savings!",
       buttonText: "Browse",
       link: "#",
     },
@@ -355,16 +352,12 @@ export default function Settings() {
   ];
 
   const location = useLocation();
-  // 🔗 Lien interne propre vers /pricing (conserve shop/host). Pas de _top, pas de /auth/login.
-  const pricingHref = (() => {
-    const src = new URLSearchParams(location.search || "");
-    const shop = src.get("shop");
-    const host = src.get("host");
-    const qs = new URLSearchParams();
-    if (shop) qs.set("shop", shop);
-    if (host) qs.set("host", host);
-    return `/pricing${qs.toString() ? `?${qs}` : ""}`;
-  })();
+
+  // ✅ Conserve TOUS les query params (embedded, host, shop, hmac, etc.)
+  const pricingHref = useMemo(() => {
+    const qs = new URLSearchParams(location.search || "");
+    return `/pricing${qs.toString() ? `?${qs.toString()}` : ""}`;
+  }, [location.search]);
 
   return (
     <>
@@ -436,7 +429,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ⬇️ Bouton Pricing: lien interne (_self) */}
+      {/* 🔗 Bouton Pricing : lien interne, z-index plus haut que l’overlay */}
       <a
         href={pricingHref}
         style={{
@@ -450,7 +443,7 @@ export default function Settings() {
           padding: "12px 28px",
           borderRadius: "30px",
           cursor: "pointer",
-          zIndex: 9999,
+          zIndex: 10001, // > overlay (10000)
           textDecoration: "none",
           display: "inline-block",
         }}
