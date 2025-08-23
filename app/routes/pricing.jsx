@@ -1,21 +1,21 @@
 // app/routes/pricing.jsx
 import { useEffect, useMemo } from "react";
-import { useLocation, useSearchParams, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import { useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 
-// ⚠️ Handles EXACTS des plans (identiques au Partner Dashboard)
+// Handles EXACTS (identiques au Partner Dashboard)
 const PLAN_HANDLES = {
   monthly: "premium-monthly",
   annual: "premium-annual",
 };
 
-// --- SERVER: détecter le plan actif (import dynamique -> pas de “server-only” côté client)
+// --- SERVER: lire le plan actif (import dynamique côté server) ---
 export const loader = async ({ request }) => {
   const { authenticate } = await import("../shopify.server");
-
   const { admin } = await authenticate.admin(request);
 
   let currentHandle = null;
+
   try {
     const resp = await admin.graphql(`
       query AppActiveSubs {
@@ -39,48 +39,46 @@ export const loader = async ({ request }) => {
     const data = await resp.json();
     const subs = data?.data?.currentAppInstallation?.activeSubscriptions || [];
     const active = subs.find((s) => s.status === "ACTIVE");
-    const interval =
-      active?.lineItems?.[0]?.plan?.pricingDetails?.interval || null;
+    const interval = active?.lineItems?.[0]?.plan?.pricingDetails?.interval || null;
 
     if (interval === "ANNUAL") currentHandle = PLAN_HANDLES.annual;
     if (interval === "EVERY_30_DAYS") currentHandle = PLAN_HANDLES.monthly;
   } catch {
-    // pas bloquant si la lecture échoue
+    // si on ne peut pas lire, on laisse null
   }
 
   return json({ currentHandle });
 };
 
+// --- CLIENT ---
 export default function Pricing() {
   const { currentHandle } = useLoaderData();
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // Dev store bypass: /pricing?billing=dev&shop=...&host=...
+  // Bypass dev-store : /pricing?billing=dev&shop=...&host=...
   useEffect(() => {
     if (params.get("billing") === "dev") {
       const shop = params.get("shop");
       const host = params.get("host");
       const rest = new URLSearchParams(location.search || "");
       rest.delete("billing");
-
       const qs = new URLSearchParams();
       if (shop) qs.set("shop", shop);
       if (host) qs.set("host", host);
       for (const [k, v] of rest.entries()) {
         if (k !== "shop" && k !== "host") qs.set(k, v);
       }
-      window.location.replace(`/settings?${qs.toString()}`);
+      window.top.location.href = `/settings?${qs.toString()}`;
     }
   }, [params, location.search]);
 
-  // Conserve tous les params + ajoute plan=<handle>
+  // Conserve les params + ajoute plan=<handle>
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
     return `/billing/activate?${qs.toString()}`;
   };
-
   const activateMonthlyHref = useMemo(
     () => makeActivateHref(PLAN_HANDLES.monthly),
     [location.search]
@@ -90,16 +88,17 @@ export default function Pricing() {
     [location.search]
   );
 
-  // Lien "Back to app": on ne garde que shop/host pour éviter les boucles
-  const backToAppHref = useMemo(() => {
+  // Back to app (forcé au top window)
+  const goBackToApp = () => {
     const src = new URLSearchParams(location.search || "");
     const shop = src.get("shop");
     const host = src.get("host");
     const qs = new URLSearchParams();
     if (shop) qs.set("shop", shop);
     if (host) qs.set("host", host);
-    return qs.toString() ? `/settings?${qs.toString()}` : "/settings";
-  }, [location.search]);
+    const href = qs.toString() ? `/settings?${qs.toString()}` : "/settings";
+    window.top.location.href = href;
+  };
 
   // --- UI ---
   const cardStyle = {
@@ -119,28 +118,24 @@ export default function Pricing() {
   const Features = () => (
     <div style={{ textAlign: "left", color: "#fff", fontSize: "13px", marginBottom: "20px", lineHeight: 1.5 }}>
       <h4 style={{ marginBottom: "8px", fontWeight: "bold" }}>Premium Features</h4>
-
       <p style={{ margin: "4px 0", fontWeight: "bold" }}>Highly-customizable Announcement Bar</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three styles: standard scrolling, multilingual carousel, professional light-glow</li>
         <li>Image or color background, semi-transparent overlay, adjustable text shadow</li>
         <li>Button positionable left, center, or right</li>
       </ul>
-
       <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>High-conversion Popup</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three visuals: standard, simple light effect, pro radial-glow</li>
         <li>Image or solid color background, text alignment, font size/style adjustable</li>
         <li>Display delay, customizable call-to-action button</li>
       </ul>
-
       <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>Dynamic Countdown</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Three formats: simple, square, animated circle</li>
         <li>Fully customizable background, border & text colors</li>
         <li>Optional glowing effect, days/hours/minutes/seconds timer</li>
       </ul>
-
       <p style={{ margin: "12px 0 4px", fontWeight: "bold" }}>Seamless Integration</p>
       <ul style={{ paddingLeft: "20px", margin: "4px 0" }}>
         <li>Add and configure directly from Shopify Theme Editor</li>
@@ -157,61 +152,18 @@ export default function Pricing() {
         top: "-10px",
         right: "-10px",
         background: "#22c55e",
-        color: "#000",
+        color: "#0a0a0a",
         fontWeight: "bold",
         padding: "6px 10px",
-        borderRadius: "10px",
+        borderRadius: "8px",
         boxShadow: "0 0 12px rgba(34,197,94,0.6)",
         display: "flex",
         alignItems: "center",
         gap: "6px",
       }}
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M20 6L9 17l-5-5" stroke="#000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-      Current
+      <span>✔</span> Current plan
     </div>
-  );
-
-  const CurrentButton = () => (
-    <button
-      disabled
-      style={{
-        background: "#22c55e",
-        color: "#000",
-        padding: "10px 16px",
-        border: "none",
-        borderRadius: "8px",
-        fontWeight: "bold",
-        fontSize: "15px",
-        width: "100%",
-        cursor: "not-allowed",
-      }}
-    >
-      Current plan ✓
-    </button>
-  );
-
-  const ActivateButton = ({ href }) => (
-    <a href={href} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-      <button
-        style={{
-          background: "linear-gradient(90deg, #000000, #4b4b4b)",
-          color: "#fff",
-          padding: "10px 16px",
-          border: "none",
-          borderRadius: "8px",
-          fontWeight: "bold",
-          fontSize: "15px",
-          cursor: "pointer",
-          width: "100%",
-          boxShadow: "0 0 12px #fff",
-        }}
-      >
-        Activate Premium Now
-      </button>
-    </a>
   );
 
   return (
@@ -242,7 +194,6 @@ export default function Pricing() {
         Unlock All Features with the Premium Plan
       </div>
 
-      {/* Deux plans */}
       <div
         style={{
           display: "grid",
@@ -264,9 +215,41 @@ export default function Pricing() {
           <Features />
 
           {currentHandle === PLAN_HANDLES.monthly ? (
-            <CurrentButton />
+            <button
+              disabled
+              style={{
+                background: "#22c55e",
+                color: "#0a0a0a",
+                padding: "10px 16px",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "bold",
+                fontSize: "15px",
+                width: "100%",
+                cursor: "not-allowed",
+              }}
+            >
+              ✔ Current plan
+            </button>
           ) : (
-            <ActivateButton href={activateMonthlyHref} />
+            <a href={activateMonthlyHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "linear-gradient(90deg, #000000, #4b4b4b)",
+                  color: "#fff",
+                  padding: "10px 16px",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "15px",
+                  cursor: "pointer",
+                  width: "100%",
+                  boxShadow: "0 0 12px #fff",
+                }}
+              >
+                Activate Premium Now
+              </button>
+            </a>
           )}
         </div>
 
@@ -282,32 +265,63 @@ export default function Pricing() {
           <Features />
 
           {currentHandle === PLAN_HANDLES.annual ? (
-            <CurrentButton />
+            <button
+              disabled
+              style={{
+                background: "#22c55e",
+                color: "#0a0a0a",
+                padding: "10px 16px",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "bold",
+                fontSize: "15px",
+                width: "100%",
+                cursor: "not-allowed",
+              }}
+            >
+              ✔ Current plan
+            </button>
           ) : (
-            <ActivateButton href={activateAnnualHref} />
+            <a href={activateAnnualHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "linear-gradient(90deg, #000000, #4b4b4b)",
+                  color: "#fff",
+                  padding: "10px 16px",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "15px",
+                  cursor: "pointer",
+                  width: "100%",
+                  boxShadow: "0 0 12px #fff",
+                }}
+              >
+                Activate Premium Now
+              </button>
+            </a>
           )}
         </div>
       </div>
 
       {/* Back to app */}
       <div style={{ textAlign: "center", marginTop: "28px" }}>
-        <a href={backToAppHref} target="_top" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-          <button
-            style={{
-              marginTop: "12px",
-              background: "#000",
-              color: "#fff",
-              padding: "12px 20px",
-              border: "none",
-              borderRadius: "9999px",
-              fontWeight: "bold",
-              boxShadow: "0 0 12px rgba(0,0,0,0.4)",
-              cursor: "pointer",
-            }}
-          >
-            Back to app
-          </button>
-        </a>
+        <button
+          onClick={goBackToApp}
+          style={{
+            marginTop: "12px",
+            background: "#000",
+            color: "#fff",
+            padding: "12px 20px",
+            border: "none",
+            borderRadius: "9999px",
+            fontWeight: "bold",
+            boxShadow: "0 0 12px rgba(0,0,0,0.4)",
+            cursor: "pointer",
+          }}
+        >
+          Back to app
+        </button>
       </div>
     </div>
   );
