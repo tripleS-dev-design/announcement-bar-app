@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 
+// ✅ Loader: import serveur dynamique + redirection vers /pricing si pas abonné
 export const loader = async ({ request }) => {
   const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
   const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
@@ -13,11 +14,15 @@ export const loader = async ({ request }) => {
 
   try {
     await billing.require({ plans: REQUIRED_PLANS });
-    return null;
+    return null; // OK → on affiche Settings
   } catch {
     return redirect(`/pricing?${qs}`);
   }
 };
+
+// ==============================
+//        UI & styles
+// ==============================
 
 const BUTTON_BASE = {
   border: "none",
@@ -108,6 +113,7 @@ function OpeningPopup() {
   );
 }
 
+// Announcement Bar preview
 function PreviewAnnouncementBar() {
   const bars = [
     {
@@ -168,6 +174,7 @@ function PreviewAnnouncementBar() {
   );
 }
 
+// Popup preview
 function PreviewPopup() {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -218,6 +225,7 @@ function PreviewPopup() {
   );
 }
 
+// Countdown helpers
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -225,7 +233,6 @@ function calcRemaining(deadline) {
   const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
   return `${h}:${m}:${s}`;
 }
-
 function StyledTimer({ value, variant }) {
   const base = {
     fontFamily: "sans-serif",
@@ -258,7 +265,6 @@ function StyledTimer({ value, variant }) {
   };
   return <div style={styles[variant]}>{value}</div>;
 }
-
 function PreviewCountdown() {
   const TWO_HOURS = 2 * 3600000;
   const deadline = Date.now() + TWO_HOURS;
@@ -319,18 +325,14 @@ export default function Settings() {
   const [lang, setLang] = useState("en");
   const location = useLocation();
 
-  // garde tous les query params (embedded, host, shop, etc.)
-  const pricingHref = useMemo(() => {
-    const qs = location.search || "";
-    return `/pricing${qs}`;
-  }, [location.search]);
+  // 🔗 Conserver tous les query params pour rester bien embeddé dans Shopify
+  const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
+
+  // 🔗 Lien YouTube (bouton bas-droite) — remplace par ton URL si besoin
+  const YOUTUBE_URL = "https://www.youtube.com/watch?v=ysz5S6PUM-U";
 
   const shop = "selya11904";
   const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
-
-  // ⬇️ ID de la vidéo YouTube (utilisé pour l’embed et pour le bouton)
-  const VIDEO_TUTORIAL_ID = "ysz5S6PUM-U"; // remplace par ton ID
-  const youtubeHref = `https://www.youtube.com/watch?v=${VIDEO_TUTORIAL_ID}`;
 
   const blocks = [
     {
@@ -353,37 +355,13 @@ export default function Settings() {
     },
   ];
 
-  // Section bouton à gauche / YouTube à droite
-  const videoRowStyle = {
-    display: "grid",
-    gridTemplateColumns: "320px 1fr",
-    gap: "16px",
-    alignItems: "center",
-    marginBottom: "24px",
-  };
-  const videoBoxStyle = {
-    position: "relative",
-    width: "100%",
-    paddingTop: "56.25%",
-    borderRadius: "12px",
-    overflow: "hidden",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-    background: "#000",
-  };
-  const iframeStyle = {
-    position: "absolute",
-    inset: 0,
-    width: "100%",
-    height: "100%",
-    border: 0,
-  };
-
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
       <OpeningPopup />
+
+      {/* En-tête (sans bouton Pricing ici) */}
       <div style={CONTAINER_STYLE}>
-        {/* En-tête */}
         <div
           style={{
             background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
@@ -405,16 +383,8 @@ export default function Settings() {
               marginTop: "16px",
               display: "flex",
               justifyContent: "flex-end",
-              gap: "8px",
             }}
           >
-            <a href={pricingHref} style={{ textDecoration: "none" }}>
-              <button
-                style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff" }}
-              >
-                Pricing
-              </button>
-            </a>
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value)}
@@ -430,35 +400,6 @@ export default function Settings() {
               <option value="fr">Français</option>
               <option value="ar">العربية</option>
             </select>
-          </div>
-        </div>
-
-        {/* Bouton à gauche / YouTube à droite */}
-        <div style={videoRowStyle}>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <a href={pricingHref} style={{ textDecoration: "none", width: "100%" }}>
-              <button
-                style={{
-                  ...BUTTON_BASE,
-                  backgroundColor: "#000",
-                  color: "#fff",
-                  width: "100%",
-                  maxWidth: "280px",
-                }}
-              >
-                Pricing
-              </button>
-            </a>
-          </div>
-
-          <div style={videoBoxStyle}>
-            <iframe
-              title="App tutorial"
-              src={`https://www.youtube.com/embed/${VIDEO_TUTORIAL_ID}`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              style={iframeStyle}
-              allowFullScreen
-            />
           </div>
         </div>
 
@@ -489,7 +430,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* Pricing fixe au centre (bas) */}
+      {/* ✅ Pricing fixe au CENTRE en bas — un SEUL bouton */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
@@ -510,9 +451,9 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* ✅ Nouveau : YouTube en bas à droite (noir) */}
+      {/* ✅ YouTube NOIR en bas à DROITE */}
       <a
-        href={youtubeHref}
+        href={YOUTUBE_URL}
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -538,7 +479,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* WhatsApp en bas à gauche */}
+      {/* ✅ WhatsApp en bas à GAUCHE (inchangé) */}
       <a
         href="https://wa.me/+212630079763"
         target="_blank"
