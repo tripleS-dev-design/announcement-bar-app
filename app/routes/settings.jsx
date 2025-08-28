@@ -329,7 +329,7 @@ export default function Settings() {
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
 
   // 🔗 Lien YouTube (bouton bas-droite) — remplace par ton URL si besoin
-  const YOUTUBE_URL = "https://www.youtube.com/watch?v=ysz5S6PUM-U";
+  const YOUTUBE_URL = "https://www.youtube.com/watch?v=UJzd4Re21e0";
 
   const shop = "selya11904";
   const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
@@ -453,7 +453,7 @@ export default function Settings() {
 
       {/* ✅ YouTube NOIR en bas à DROITE */}
       <a
-        href="https://youtu.be/UJzd4Re21e0"
+         href={YOUTUBE_URL}
         target="_blank"
         rel="noopener noreferrer"
         style={{
