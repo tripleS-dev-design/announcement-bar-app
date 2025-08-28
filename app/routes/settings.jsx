@@ -62,6 +62,25 @@ const GLOBAL_STYLES = `
   100% { box-shadow: 0 0 12px rgba(59,130,246,0.5); }
 }`;
 
+// ==============================
+// Deep-link helper vers Theme Editor (ajout auto de block)
+// ==============================
+const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // ← ton UUID d’extension (celui qui marche pour le popup)
+
+function makeAddBlockUrl({ shop, extensionId, handle, template = "index", search = "" }) {
+  const url = new URL(`https://${shop}.myshopify.com/admin/themes/current/editor`);
+  // Conserver les query params existants (embedding Shopify)
+  const incoming = new URLSearchParams(search || "");
+  for (const [k, v] of incoming) url.searchParams.set(k, v);
+
+  // Paramètres pour ajouter le bloc automatiquement
+  url.searchParams.set("template", template);
+  url.searchParams.set("context", "apps");
+  url.searchParams.set("addAppBlockId", `${extensionId}/${handle}`);
+  url.searchParams.set("target", "newAppsSection");
+  return url.toString();
+}
+
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
@@ -328,29 +347,31 @@ export default function Settings() {
   // 🔗 Conserver tous les query params pour rester bien embeddé dans Shopify
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
 
-  // 🔗 Lien YouTube (bouton bas-droite) — remplace par ton URL si besoin
-  const YOUTUBE_URL = "https://www.youtube.com/watch?v=UJzd4Re21e0";
+  // 🔗 Lien YouTube (bouton bas-droite)
+  const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
   const shop = "selya11904";
-  const baseEditorUrl = `https://${shop}.myshopify.com/admin/themes/current/editor?context=apps`;
 
   const blocks = [
     {
-      id: "announcement-bar-premium",
+      id: "announcement-bar-premium", // handle EXACT du fichier .liquid
       title: "Premium Announcement Bar",
       description: "Animated or multilingual bar to grab attention.",
+      template: "index",
       preview: <PreviewAnnouncementBar />,
     },
     {
       id: "popup-premium",
       title: "Premium Popup",
       description: "Modern popup with promo code and glow animation.",
+      template: "index",
       preview: <PreviewPopup />,
     },
     {
       id: "countdown-premium",
       title: "Premium Countdown",
       description: "Three dynamic countdown styles.",
+      template: "index",
       preview: <PreviewCountdown />,
     },
   ];
@@ -409,8 +430,15 @@ export default function Settings() {
             <div style={{ flex: 1, minWidth: "220px" }}>
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
+
               <a
-                href={`${baseEditorUrl}&addAppBlockId=be79dab79ff6bb4be47d4e66577b6c50/${block.id}`}
+                href={makeAddBlockUrl({
+                  shop,
+                  extensionId: THEME_EXTENSION_ID,
+                  handle: block.id,
+                  template: block.template || "index",
+                  search: location.search || "",
+                })}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -453,7 +481,7 @@ export default function Settings() {
 
       {/* ✅ YouTube NOIR en bas à DROITE */}
       <a
-         href={YOUTUBE_URL}
+        href={YOUTUBE_URL}
         target="_blank"
         rel="noopener noreferrer"
         style={{
