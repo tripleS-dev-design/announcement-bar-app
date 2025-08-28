@@ -3,18 +3,17 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 
-// ✅ Loader: import serveur dynamique + redirection vers /pricing si pas abonné
+// ✅ Loader: redirection /pricing si pas abonné
 export const loader = async ({ request }) => {
   const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
   const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
-
   const { billing } = await authenticate.admin(request);
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
 
   try {
     await billing.require({ plans: REQUIRED_PLANS });
-    return null; // OK → on affiche Settings
+    return null;
   } catch {
     return redirect(`/pricing?${qs}`);
   }
@@ -52,32 +51,46 @@ const CARD_STYLE = {
 };
 
 const GLOBAL_STYLES = `
-@keyframes shimmer {
-  0% { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-@keyframes popupGlowPro {
-  0%   { box-shadow: 0 0 12px rgba(59,130,246,0.5); }
-  50%  { box-shadow: 0 0 30px rgba(59,130,246,0.9); }
-  100% { box-shadow: 0 0 12px rgba(59,130,246,0.5); }
-}`;
+@keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+@keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
+`;
 
 // ==============================
-// Deep-link helper vers Theme Editor (ajout auto de block)
+// Deep-link helper (section / block / embed)
 // ==============================
-const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // ← ton UUID d’extension (celui qui marche pour le popup)
+const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // ton extension UUID
 
-function makeAddBlockUrl({ shop, extensionId, handle, template = "index", search = "" }) {
+function makeThemeEditorLink({
+  shop,                 // ex: selya11904
+  search = "",
+  template = "index",
+  extensionId,
+  type,                 // "section" | "block" | "embed"
+  handle,              // ex: "announcement-bar-premium"
+}) {
   const url = new URL(`https://${shop}.myshopify.com/admin/themes/current/editor`);
-  // Conserver les query params existants (embedding Shopify)
-  const incoming = new URLSearchParams(search || "");
-  for (const [k, v] of incoming) url.searchParams.set(k, v);
 
-  // Paramètres pour ajouter le bloc automatiquement
+  // Conserver les query params Shopify (embed)
+  if (search) {
+    const incoming = new URLSearchParams(search);
+    for (const [k, v] of incoming) url.searchParams.set(k, v);
+  }
+
   url.searchParams.set("template", template);
   url.searchParams.set("context", "apps");
-  url.searchParams.set("addAppBlockId", `${extensionId}/${handle}`);
-  url.searchParams.set("target", "newAppsSection");
+
+  if (type === "section") {
+    url.searchParams.set("addAppSectionId", `${extensionId}/${handle}`);
+    url.searchParams.set("target", "newAppsSection");
+  } else if (type === "block") {
+    url.searchParams.set("addAppBlockId", `${extensionId}/${handle}`);
+    // Astuce : pour des blocks, l’éditeur doit être sur une section compatible.
+    // "target" peut être ignoré ou géré par Shopify.
+  } else if (type === "embed") {
+    // Si jamais ton "popup" est un app embed
+    url.searchParams.set("activateAppId", extensionId);
+  }
+
   return url.toString();
 }
 
@@ -132,7 +145,6 @@ function OpeningPopup() {
   );
 }
 
-// Announcement Bar preview
 function PreviewAnnouncementBar() {
   const bars = [
     {
@@ -193,7 +205,6 @@ function PreviewAnnouncementBar() {
   );
 }
 
-// Popup preview
 function PreviewPopup() {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -344,20 +355,20 @@ export default function Settings() {
   const [lang, setLang] = useState("en");
   const location = useLocation();
 
-  // 🔗 Conserver tous les query params pour rester bien embeddé dans Shopify
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
-
-  // 🔗 Lien YouTube (bouton bas-droite)
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
+  // ⚠️ Domaine myshopify (sans .myshopify.com)
   const shop = "selya11904";
 
+  // Déclare chaque bloc + son type exact
   const blocks = [
     {
-      id: "announcement-bar-premium", // handle EXACT du fichier .liquid
+      id: "announcement-bar-premium",
       title: "Premium Announcement Bar",
       description: "Animated or multilingual bar to grab attention.",
       template: "index",
+      type: "section", // <-- important: app SECTION
       preview: <PreviewAnnouncementBar />,
     },
     {
@@ -365,6 +376,7 @@ export default function Settings() {
       title: "Premium Popup",
       description: "Modern popup with promo code and glow animation.",
       template: "index",
+      type: "section", // si c'est un embed, mets "embed"
       preview: <PreviewPopup />,
     },
     {
@@ -372,6 +384,7 @@ export default function Settings() {
       title: "Premium Countdown",
       description: "Three dynamic countdown styles.",
       template: "index",
+      type: "section", // <-- important: app SECTION
       preview: <PreviewCountdown />,
     },
   ];
@@ -381,7 +394,6 @@ export default function Settings() {
       <style>{GLOBAL_STYLES}</style>
       <OpeningPopup />
 
-      {/* En-tête (sans bouton Pricing ici) */}
       <div style={CONTAINER_STYLE}>
         <div
           style={{
@@ -399,13 +411,7 @@ export default function Settings() {
             “Welcome to Triple Announcement Bar! Let’s boost your sales with
             powerful bars, popups, and countdowns.”
           </p>
-          <div
-            style={{
-              marginTop: "16px",
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value)}
@@ -424,7 +430,6 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Blocs existants */}
         {blocks.map((block) => (
           <div key={block.id} style={CARD_STYLE}>
             <div style={{ flex: 1, minWidth: "220px" }}>
@@ -432,12 +437,13 @@ export default function Settings() {
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
               <a
-                href={makeAddBlockUrl({
+                href={makeThemeEditorLink({
                   shop,
-                  extensionId: THEME_EXTENSION_ID,
-                  handle: block.id,
-                  template: block.template || "index",
                   search: location.search || "",
+                  template: block.template || "index",
+                  extensionId: THEME_EXTENSION_ID,
+                  type: block.type,
+                  handle: block.id,
                 })}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -458,7 +464,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ✅ Pricing fixe au CENTRE en bas — un SEUL bouton */}
+      {/* Pricing au centre en bas */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
@@ -479,7 +485,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* ✅ YouTube NOIR en bas à DROITE */}
+      {/* YouTube en bas à droite */}
       <a
         href={YOUTUBE_URL}
         target="_blank"
@@ -507,7 +513,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* ✅ WhatsApp en bas à GAUCHE (inchangé) */}
+      {/* WhatsApp en bas à gauche */}
       <a
         href="https://wa.me/+212630079763"
         target="_blank"
