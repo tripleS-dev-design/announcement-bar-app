@@ -453,7 +453,7 @@ export default function Settings() {
 
       {/* ✅ YouTube NOIR en bas à DROITE */}
       <a
-        href={YOUTUBE_URL}
+        href="https://youtu.be/UJzd4Re21e0"
         target="_blank"
         rel="noopener noreferrer"
         style={{
