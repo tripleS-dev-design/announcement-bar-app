@@ -4,10 +4,19 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
 
+// On expose l'API key côté client pour construire activateAppId=API_KEY/EXTENSION_ID
+export async function loader() {
+  return { apiKey: process.env.SHOPIFY_API_KEY };
+}
+
 export default function App() {
+  // dispo pour les routes enfants via useRouteLoaderData("root")
+  const { apiKey } = useLoaderData();
+
   return (
     <html lang="en">
       <head>
@@ -22,7 +31,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        {/* ✅ Fournit App Bridge et gestion des session tokens */}
+        {/* App Bridge + session tokens */}
         <AppProvider>
           <Outlet />
         </AppProvider>
