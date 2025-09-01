@@ -24,28 +24,42 @@ export const loader = async ({ request }) => {
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
 
-  // UUID de l’extension de thème
-  let extensionId = process.env.THEME_EXTENSION_ID || "be79dab79ff6bb4be47d4e66577b6c50";
-
-  // Fallback GraphQL si besoin
-  if (!extensionId) {
-    try {
-      const resp = await admin.graphql(`
-        query GetAppExtensions {
-          currentAppInstallation {
-            extensionRegistrations(first: 100) {
-              nodes { uuid type handle }
-            }
+  // ✅ Toujours récupérer le **UUID de l’extension** côté Shopify
+  // (ne pas utiliser le client_id d’app — ça cause "App embed does not exist")
+  let extensionId = "";
+  try {
+    const resp = await admin.graphql(`
+      query GetAppExtensions {
+        currentAppInstallation {
+          extensionRegistrations(first: 100) {
+            nodes { uuid type handle }
           }
         }
-      `);
-      const data = await resp.json();
-      const nodes = data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
-      const themeExt =
-        nodes.find(n => n.type === "THEME_APP_EXTENSION" && n.handle === "announcement-bar") ||
-        nodes.find(n => n.type === "THEME_APP_EXTENSION");
-      if (themeExt?.uuid) extensionId = themeExt.uuid;
-    } catch {}
+      }
+    `);
+    const data = await resp.json();
+    const nodes = data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
+    // essaie d'abord par handle connu, sinon prends n’importe quelle THEME_APP_EXTENSION
+    const themeExt =
+      nodes.find(n =>
+        n.type === "THEME_APP_EXTENSION" &&
+        (n.handle === "announcement-bar" ||
+         n.handle === "announcement_bar" ||
+         n.handle === "announcement-bar-app" ||
+         n.handle === "announcement-bar-app-18")
+      ) ||
+      nodes.find(n => n.type === "THEME_APP_EXTENSION");
+
+    if (themeExt?.uuid) {
+      extensionId = themeExt.uuid;
+    }
+  } catch {
+    // ignore, on tombera sur l'ENV si présent
+  }
+
+  // secours: ENV si jamais la requête GraphQL a échoué
+  if (!extensionId) {
+    extensionId = process.env.THEME_EXTENSION_ID || "";
   }
 
   return json({ shopSub, extensionId });
@@ -87,14 +101,14 @@ const GLOBAL_STYLES = `
 
 /* ==============================
    Deep-link helper (SECTION)
+   (on garde addAppSectionId + target=newAppsSection)
 ================================ */
 function makeThemeEditorLink({
   shopSub,             // ex: "selya11904"
   template = "index",
-  extensionId,         // UUID
+  extensionId,         // UUID (extensionRegistrations.uuid)
   handle,              // ex: "announcement-premium"
 }) {
-  // Toujours URL absolue vers l'éditeur du shop courant (pas relative)
   const base = `https://${shopSub}.myshopify.com/admin/themes/current/editor`;
   const p = new URLSearchParams({
     context: "apps",
@@ -447,7 +461,7 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* 🔗 Correction : lien absolu, shop courant, insertion auto de SECTION */}
+              {/* 🔗 Lien absolu vers l’éditeur + insertion automatique de SECTION */}
               <a
                 href={makeThemeEditorLink({
                   shopSub,
