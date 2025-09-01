@@ -1,5 +1,6 @@
 client_id = "be79dab79ff6bb4be47d4e66577b6c50"
 name = "Announcement-bar-app"
+embedded = true
 handle = "announcement-bar-app-18"
 
 # URL publique Render
