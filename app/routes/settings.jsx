@@ -1,3 +1,4 @@
+// app/routes/settings.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
@@ -58,10 +59,10 @@ const GLOBAL_STYLES = `
 /* =========================================
    Deep-link vers Theme Editor (store courant)
 ========================================= */
-/** ⚠️ Mets le VRAI UUID de ton extension (fichier extensions/.../shopify.extension.toml → uuid="...") */
+// ⚠️ Mets ici l’UUID réel de ton Theme App Extension
 const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50";
 
-/** Base64 URL-safe → texte */
+// Base64 URL-safe → texte
 function b64UrlDecode(s) {
   try {
     let str = s.replace(/-/g, "+").replace(/_/g, "/");
@@ -72,7 +73,7 @@ function b64UrlDecode(s) {
   }
 }
 
-/** Renvoie "https://{store}.myshopify.com/admin" à partir de ?host= */
+// https://{store}.myshopify.com/admin à partir de ?host=
 function getAdminBaseFromHost(location) {
   const hostParam = new URLSearchParams(location.search || "").get("host");
   if (!hostParam) return null;
@@ -80,6 +81,25 @@ function getAdminBaseFromHost(location) {
   if (!decoded) return null;
   const clean = decoded.replace(/\/+$/, "");
   return `https://${clean}`;
+}
+
+// 👉 ouvre l’éditeur + INSÈRE automatiquement la section
+function openThemeEditor({ id, template = "index", type = "section" }, location) {
+  const qs = new URLSearchParams();
+  qs.set("context", "apps");
+  qs.set("template", template);
+
+  if (type === "section") {
+    qs.set("addAppSectionId", `${THEME_EXTENSION_ID}/${id}`);
+    qs.set("target", "newAppsSection"); // force l’insertion directe
+  } else if (type === "block") {
+    qs.set("addAppBlockId", `${THEME_EXTENSION_ID}/${id}`);
+  }
+  // NE PAS envoyer activateAppId si tu n’as pas d’App Embed
+
+  const adminBase = getAdminBaseFromHost(location);
+  const url = (adminBase || "/admin") + `/themes/current/editor?${qs.toString()}`;
+  window.top.location.href = url;
 }
 
 /* ========================
@@ -347,34 +367,33 @@ export default function Settings() {
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
   // ⚠️ id = handle EXACT du fichier section .liquid (sans .liquid)
+  // (Assure-toi que tes fichiers sont dans extensions/announcement-bar/sections/)
   const blocks = [
-    { id: "announcement-bar-premium", title: "Premium Announcement Bar", description: "Animated or multilingual bar to grab attention.", template: "index", type: "section", preview: <PreviewAnnouncementBar /> },
-    { id: "popup-premium",            title: "Premium Popup",            description: "Modern popup with promo code and glow animation.", template: "index", type: "section", preview: <PreviewPopup /> },
-    { id: "countdown-premium",        title: "Premium Countdown",        description: "Three dynamic countdown styles.",                template: "index", type: "section", preview: <PreviewCountdown /> },
+    {
+      id: "announcement-premium",
+      title: "Premium Announcement Bar",
+      description: "Animated or multilingual bar to grab attention.",
+      template: "index",
+      type: "section",
+      preview: <PreviewAnnouncementBar />,
+    },
+    {
+      id: "popup-premium",
+      title: "Premium Popup",
+      description: "Modern popup with promo code and glow animation.",
+      template: "index",
+      type: "section",
+      preview: <PreviewPopup />,
+    },
+    {
+      id: "timer-premium",
+      title: "Premium Countdown",
+      description: "Three dynamic countdown styles.",
+      template: "index",
+      type: "section",
+      preview: <PreviewCountdown />,
+    },
   ];
-
-  // ✅ Ouvre l’éditeur du thème sur le store courant (sans activateAppId si ce n’est pas un embed)
-  const openThemeEditor = (block) => {
-    const qs = new URLSearchParams();
-    qs.set("context", "apps");
-    qs.set("template", block.template || "index");
-
-    if (block.type === "section") {
-      qs.set("addAppSectionId", `${THEME_EXTENSION_ID}/${block.id}`);
-    } else if (block.type === "block") {
-      qs.set("addAppBlockId", `${THEME_EXTENSION_ID}/${block.id}`);
-    } else if (block.type === "embed") {
-      // Seulement si tu as VRAIMENT un App Embed :
-      // qs.set("activateAppId", `${THEME_EXTENSION_ID}`);
-    }
-
-    const adminBase = getAdminBaseFromHost(location);
-    const targetUrl = adminBase
-      ? `${adminBase}/themes/current/editor?${qs.toString()}`
-      : `/admin/themes/current/editor?${qs.toString()}`;
-
-    window.top.location.href = targetUrl;
-  };
 
   return (
     <>
@@ -423,8 +442,9 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
+              {/* --- TON BOUTON PRINCIPAL: Add Premium Block (ne pas supprimer) --- */}
               <button
-                onClick={() => openThemeEditor(block)}
+                onClick={() => openThemeEditor(block, location)}
                 style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff" }}
               >
                 Add Premium Block
@@ -435,7 +455,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* Pricing */}
+      {/* --- BOUTON Pricing (fixe, centre en bas) --- */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
@@ -454,6 +474,56 @@ export default function Settings() {
         >
           Pricing
         </button>
+      </a>
+
+      {/* --- BOUTON YouTube (fixe, bas droite) --- */}
+      <a
+        href={YOUTUBE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          textDecoration: "none",
+          zIndex: 999,
+        }}
+        aria-label="YouTube tutorial"
+      >
+        <button
+          style={{
+            ...BUTTON_BASE,
+            backgroundColor: "#000",
+            color: "#fff",
+            padding: "12px 20px",
+            borderRadius: "30px",
+            cursor: "pointer",
+          }}
+        >
+          YouTube
+        </button>
+      </a>
+
+      {/* --- BOUTON WhatsApp (fixe, bas gauche) --- */}
+      <a
+        href="https://wa.me/+212630079763"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          left: "24px",
+          backgroundColor: "#000",
+          borderRadius: "50%",
+          padding: "14px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+          zIndex: 999,
+        }}
+        aria-label="WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#fff" viewBox="0 0 448 512">
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4-186 186-186s186 83.4 186 186-83.4 186-186 186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z"/>
+        </svg>
       </a>
     </>
   );
