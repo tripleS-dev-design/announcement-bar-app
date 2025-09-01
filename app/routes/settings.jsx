@@ -14,6 +14,7 @@ export const loader = async ({ request }) => {
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
 
+  // ⛔️ si pas d’abonnement, on redirige vers /pricing (comme avant)
   try {
     await billing.require({ plans: REQUIRED_PLANS });
   } catch {
@@ -24,9 +25,11 @@ export const loader = async ({ request }) => {
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
 
-  // ✅ Toujours récupérer le **UUID de l’extension** côté Shopify
-  // (ne pas utiliser le client_id d’app — ça cause "App embed does not exist")
-  let extensionId = "";
+  // On prend d’abord ce que tu as en ENV, mais on vérifiera via GraphQL
+  let extensionIdEnv = process.env.THEME_EXTENSION_ID || "";
+  let extensionId = extensionIdEnv;
+
+  // ✅ Vérifie les extensions enregistrées et prend le bon UUID THEME_APP_EXTENSION
   try {
     const resp = await admin.graphql(`
       query GetAppExtensions {
@@ -39,27 +42,18 @@ export const loader = async ({ request }) => {
     `);
     const data = await resp.json();
     const nodes = data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
-    // essaie d'abord par handle connu, sinon prends n’importe quelle THEME_APP_EXTENSION
-    const themeExt =
-      nodes.find(n =>
-        n.type === "THEME_APP_EXTENSION" &&
-        (n.handle === "announcement-bar" ||
-         n.handle === "announcement_bar" ||
-         n.handle === "announcement-bar-app" ||
-         n.handle === "announcement-bar-app-18")
-      ) ||
-      nodes.find(n => n.type === "THEME_APP_EXTENSION");
+    const themeNodes = nodes.filter((n) => n.type === "THEME_APP_EXTENSION");
 
-    if (themeExt?.uuid) {
-      extensionId = themeExt.uuid;
-    }
+    // on préfère celle dont le handle = dossier de ton extension
+    const preferred =
+      themeNodes.find((n) => n.handle === "announcement-bar") || themeNodes[0];
+
+    // si l'ENV ne correspond pas à une extension de thème, on remplace par le bon uuid
+    const envMatches = themeNodes.some((n) => n.uuid === extensionIdEnv);
+    extensionId = envMatches ? extensionIdEnv : preferred?.uuid || "";
   } catch {
-    // ignore, on tombera sur l'ENV si présent
-  }
-
-  // secours: ENV si jamais la requête GraphQL a échoué
-  if (!extensionId) {
-    extensionId = process.env.THEME_EXTENSION_ID || "";
+    // en cas d’erreur réseau, on garde la valeur ENV
+    extensionId = extensionIdEnv || "";
   }
 
   return json({ shopSub, extensionId });
@@ -101,15 +95,15 @@ const GLOBAL_STYLES = `
 
 /* ==============================
    Deep-link helper (SECTION)
-   (on garde addAppSectionId + target=newAppsSection)
+   -> admin.shopify.com + addAppSectionId = <uuid>/<handle>
 ================================ */
 function makeThemeEditorLink({
   shopSub,             // ex: "selya11904"
   template = "index",
-  extensionId,         // UUID (extensionRegistrations.uuid)
-  handle,              // ex: "announcement-premium"
+  extensionId,         // UUID vérifié au loader
+  handle,              // "announcement-premium" | "popup-premium" | "timer-premium"
 }) {
-  const base = `https://${shopSub}.myshopify.com/admin/themes/current/editor`;
+  const base = `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
   const p = new URLSearchParams({
     context: "apps",
     template,
@@ -461,7 +455,7 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* 🔗 Lien absolu vers l’éditeur + insertion automatique de SECTION */}
+              {/* 🔗 Lien absolu, shop courant, insertion auto de SECTION */}
               <a
                 href={makeThemeEditorLink({
                   shopSub,
