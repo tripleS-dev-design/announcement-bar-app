@@ -3,19 +3,16 @@ import React, { useMemo } from "react";
 import { json } from "@remix-run/node";
 import { useLoaderData, useLocation } from "@remix-run/react";
 
-/* ==============================
-   Loader: récupère shop + UUID
-   - Priorité: env THEME_EXTENSION_ID
-   - Fallback: Admin GraphQL
-================================ */
+/* Loader: récupère le sous-domaine shop + fixe l'UUID de l'extension */
 export const loader = async ({ request }) => {
   const { authenticate } = await import("../shopify.server");
   const { admin, session } = await authenticate.admin(request);
 
-  const shopDomain = session.shop || ""; // ex: selya11904.myshopify.com
-  const shopSub = shopDomain.replace(".myshopify.com", "");
+  const shopDomain = session.shop || "";                  // ex: selya11904.myshopify.com
+  const shopSub = shopDomain.replace(".myshopify.com", ""); // ex: selya11904
 
-  let extensionId = process.env.THEME_EXTENSION_ID || "";
+  // Ton UUID (prioritaire), sinon .env, sinon GraphQL
+  let extensionId = "be79dab79ff6bb4be47d4e66577b6c50" || process.env.THEME_EXTENSION_ID;
 
   if (!extensionId) {
     try {
@@ -40,15 +37,11 @@ export const loader = async ({ request }) => {
   return json({ shopSub, extensionId });
 };
 
-/* ==============================
-   Helpers: liens vers l’éditeur
-   (on INSÈRE une SECTION d’app)
-================================ */
+/* Helpers: liens vers l’éditeur + insertion automatique de SECTION */
 function themeEditorBase({ shopSub, themeId }) {
   const themePart = themeId ? `themes/${themeId}` : "themes/current";
   return `https://${shopSub}.myshopify.com/admin/${themePart}/editor`;
 }
-
 function linkAddSection({ shopSub, template = "index", extensionId, handle, themeId }) {
   const base = themeEditorBase({ shopSub, themeId });
   const p = new URLSearchParams({
@@ -60,6 +53,7 @@ function linkAddSection({ shopSub, template = "index", extensionId, handle, them
   return `${base}?${p.toString()}`;
 }
 
+/* Styles (garde tes 3 boutons: Pricing / YouTube / WhatsApp) */
 const BUTTON_BASE = {
   border: "none",
   borderRadius: "10px",
@@ -69,42 +63,18 @@ const BUTTON_BASE = {
   boxShadow: "0 6px 18px rgba(0,0,0,.18)",
 };
 
-/* ==============================
-   Définition de tes 3 sections
-   (handles = noms de fichiers .liquid)
-================================ */
 const BLOCKS = [
-  {
-    handle: "announcement-premium",
-    title: "Premium Announcement Bar",
-    desc: "Animated or multilingual bar to grab attention.",
-    template: "index",
-  },
-  {
-    handle: "popup-premium",
-    title: "Premium Popup",
-    desc: "Modern popup with promo code and glow animation.",
-    template: "index",
-  },
-  {
-    handle: "timer-premium",
-    title: "Premium Countdown",
-    desc: "Three dynamic countdown styles.",
-    template: "index",
-  },
+  { handle: "announcement-premium", title: "Premium Announcement Bar", desc: "Animated or multilingual bar to grab attention.", template: "index" },
+  { handle: "popup-premium",        title: "Premium Popup",            desc: "Modern popup with promo code and glow animation.", template: "index" },
+  { handle: "timer-premium",        title: "Premium Countdown",        desc: "Three dynamic countdown styles.", template: "index" },
 ];
 
-/* ==============================
-   UI
-================================ */
 export default function Settings() {
   const { shopSub, extensionId } = useLoaderData();
   const location = useLocation();
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
-
-  const missing = !extensionId || extensionId.length < 16;
 
   return (
     <>
@@ -123,22 +93,6 @@ export default function Settings() {
           <p style={{ opacity: 0.9, marginTop: 6 }}>
             Click “Add Premium Block” to open the Theme Editor and <b>auto-insert</b> the section.
           </p>
-          {missing && (
-            <div
-              style={{
-                marginTop: 10,
-                background: "#2a1f10",
-                color: "#f0df9b",
-                border: "1px solid rgba(200,162,77,.35)",
-                borderRadius: 10,
-                padding: "10px 14px",
-                fontWeight: 700,
-              }}
-            >
-              THEME_EXTENSION_ID manquant. Ajoute-le dans ton <code>.env</code> ou réessaie après avoir ouvert l’app
-              depuis l’Admin (on tentera le fallback GraphQL).
-            </div>
-          )}
         </header>
 
         {BLOCKS.map((b) => (
@@ -161,7 +115,7 @@ export default function Settings() {
               <div style={{ color: "#555", marginTop: 6 }}>{b.desc}</div>
             </div>
 
-            {/* Bouton principal — ajoute la SECTION */}
+            {/* Bouton principal — ajoute la SECTION automatiquement */}
             <a
               href={linkAddSection({
                 shopSub,
@@ -180,7 +134,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* Bouton Pricing (centre bas) */}
+      {/* Pricing (centre bas) */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
