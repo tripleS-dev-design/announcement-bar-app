@@ -8,7 +8,7 @@ import {
 } from "@remix-run/react";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
 
-// On expose l'API key côté client pour construire activateAppId=API_KEY/EXTENSION_ID
+// Expose l'API key côté client (pour construire activateAppId=API_KEY/EXT_ID)
 export async function loader() {
   return { apiKey: process.env.SHOPIFY_API_KEY };
 }
@@ -31,7 +31,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        {/* App Bridge + session tokens */}
+        {/* App Bridge provider (depuis @shopify/shopify-app-remix) */}
         <AppProvider>
           <Outlet />
         </AppProvider>
