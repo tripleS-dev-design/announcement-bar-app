@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useRouteLoaderData } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
 
 // ✅ Loader: redirection /pricing si pas abonné
 export const loader = async ({ request }) => {
@@ -57,9 +55,9 @@ const GLOBAL_STYLES = `
 `;
 
 // ==============================
-//  App Bridge deep-link (store courant)
+//  Deep-link vers Theme Editor (sans shop codé en dur)
 // ==============================
-const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // UUID de l'extension de thème
+const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // UUID de ton extension de thème
 
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -321,7 +319,6 @@ function PreviewCountdown() {
 export default function Settings() {
   const [lang, setLang] = useState("en");
   const location = useLocation();
-  const app = useAppBridge();
   const { apiKey } = useRouteLoaderData("root") || {}; // SHOPIFY_API_KEY depuis root
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
@@ -362,6 +359,7 @@ export default function Settings() {
     params.set("template", block.template || "index");
 
     // Active ton app/extension dans l'éditeur
+    // IMPORTANT: APP_API_KEY/EXTENSION_ID
     params.set("activateAppId", `${apiKey}/${THEME_EXTENSION_ID}`);
 
     if (block.type === "section") {
@@ -371,15 +369,10 @@ export default function Settings() {
     }
     // embed: activateAppId suffit
 
-    const path = `/themes/current/editor?${params.toString()}`;
+    const path = `/admin/themes/current/editor?${params.toString()}`;
 
-    try {
-      const redirect = Redirect.create(app);
-      redirect.dispatch(Redirect.Action.ADMIN_PATH, { path });
-    } catch (e) {
-      // Fallback si App Bridge indispo
-      window.top.location.href = `/admin${path}`;
-    }
+    // Pas d’App Bridge ici -> simple et robuste pour le reviewer
+    window.top.location.href = path;
   };
 
   return (
