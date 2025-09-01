@@ -1,4 +1,3 @@
 name = "announcement-bar"
 type = "theme"
-
-
+handle = "announcement-bar"
