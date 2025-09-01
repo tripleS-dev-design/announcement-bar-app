@@ -1,23 +1,53 @@
 // app/routes/settings.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import { useLocation } from "@remix-run/react";
-import { redirect } from "@remix-run/node";
+import { useLocation, useLoaderData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
 
 /* ========================
-   Loader: accès premium
+   Loader: accès + UUID auto
 ======================== */
 export const loader = async ({ request }) => {
   const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
   const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
-  const { billing } = await authenticate.admin(request);
+  const { admin, billing } = await authenticate.admin(request);
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
 
   try {
     await billing.require({ plans: REQUIRED_PLANS });
-    return null;
   } catch {
     return redirect(`/pricing?${qs}`);
+  }
+
+  // 🔎 Récupère l’UUID de la Theme App Extension via Admin GraphQL
+  try {
+    const resp = await admin.graphql(/* GraphQL */ `
+      query GetAppExtensions {
+        currentAppInstallation {
+          extensionRegistrations(first: 100) {
+            nodes {
+              uuid
+              type
+              handle
+              title
+            }
+          }
+        }
+      }
+    `);
+    const data = await resp.json();
+    const nodes =
+      data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
+
+    // Prends l’extension de type THEME_APP_EXTENSION avec handle "announcement-bar"
+    const themeExt =
+      nodes.find((n) => n.type === "THEME_APP_EXTENSION" && n.handle === "announcement-bar") ||
+      nodes.find((n) => n.type === "THEME_APP_EXTENSION");
+
+    return json({ extensionUuid: themeExt?.uuid || null });
+  } catch {
+    // Si la requête échoue, on renvoie null et on gèrera côté client
+    return json({ extensionUuid: null });
   }
 };
 
@@ -50,7 +80,6 @@ const CARD_STYLE = {
   gap: "16px",
   alignItems: "center",
 };
-
 const GLOBAL_STYLES = `
 @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
 @keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
@@ -59,15 +88,12 @@ const GLOBAL_STYLES = `
 /* =========================================
    Deep-link vers Theme Editor (store courant)
 ========================================= */
-// ⚠️ Mets ici l’UUID réel de ton Theme App Extension
-const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50";
-
 // Base64 URL-safe → texte
 function b64UrlDecode(s) {
   try {
     let str = s.replace(/-/g, "+").replace(/_/g, "/");
     while (str.length % 4) str += "=";
-    return atob(str);
+    return typeof atob !== "undefined" ? atob(str) : Buffer.from(str, "base64").toString("binary");
   } catch {
     return "";
   }
@@ -84,18 +110,23 @@ function getAdminBaseFromHost(location) {
 }
 
 // 👉 ouvre l’éditeur + INSÈRE automatiquement la section
-function openThemeEditor({ id, template = "index", type = "section" }, location) {
+function openThemeEditor({ id, template = "index", type = "section" }, location, extensionUuid) {
+  if (!extensionUuid) {
+    alert("Extension ID not resolved yet. Please refresh the page after the app loads.");
+    return;
+  }
+
   const qs = new URLSearchParams();
   qs.set("context", "apps");
   qs.set("template", template);
 
   if (type === "section") {
-    qs.set("addAppSectionId", `${THEME_EXTENSION_ID}/${id}`);
-    qs.set("target", "newAppsSection"); // force l’insertion directe
+    // 👇 clé magique : ajoute la section automatiquement
+    qs.set("addAppSectionId", `${extensionUuid}/${id}`);
+    qs.set("target", "newAppsSection");
   } else if (type === "block") {
-    qs.set("addAppBlockId", `${THEME_EXTENSION_ID}/${id}`);
+    qs.set("addAppBlockId", `${extensionUuid}/${id}`);
   }
-  // NE PAS envoyer activateAppId si tu n’as pas d’App Embed
 
   const adminBase = getAdminBaseFromHost(location);
   const url = (adminBase || "/admin") + `/themes/current/editor?${qs.toString()}`;
@@ -360,39 +391,17 @@ function PreviewCountdown() {
    Page Settings
 ======================== */
 export default function Settings() {
+  const { extensionUuid } = useLoaderData();
   const [lang, setLang] = useState("en");
   const location = useLocation();
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  // ⚠️ id = handle EXACT du fichier section .liquid (sans .liquid)
-  // (Assure-toi que tes fichiers sont dans extensions/announcement-bar/sections/)
   const blocks = [
-    {
-      id: "announcement-premium",
-      title: "Premium Announcement Bar",
-      description: "Animated or multilingual bar to grab attention.",
-      template: "index",
-      type: "section",
-      preview: <PreviewAnnouncementBar />,
-    },
-    {
-      id: "popup-premium",
-      title: "Premium Popup",
-      description: "Modern popup with promo code and glow animation.",
-      template: "index",
-      type: "section",
-      preview: <PreviewPopup />,
-    },
-    {
-      id: "timer-premium",
-      title: "Premium Countdown",
-      description: "Three dynamic countdown styles.",
-      template: "index",
-      type: "section",
-      preview: <PreviewCountdown />,
-    },
+    { id: "announcement-premium", title: "Premium Announcement Bar", description: "Animated or multilingual bar to grab attention.", template: "index", type: "section", preview: <PreviewAnnouncementBar /> },
+    { id: "popup-premium",        title: "Premium Popup",            description: "Modern popup with promo code and glow animation.", template: "index", type: "section", preview: <PreviewPopup /> },
+    { id: "timer-premium",        title: "Premium Countdown",        description: "Three dynamic countdown styles.",                  template: "index", type: "section", preview: <PreviewCountdown /> },
   ];
 
   return (
@@ -434,6 +443,11 @@ export default function Settings() {
               <option value="ar">العربية</option>
             </select>
           </div>
+          {!extensionUuid && (
+            <p style={{ marginTop: 12, color: "#ffd966" }}>
+              Heads up: extension ID not resolved yet. Reload this page or re-open the app from the store Admin.
+            </p>
+          )}
         </div>
 
         {blocks.map((block) => (
@@ -442,9 +456,9 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* --- TON BOUTON PRINCIPAL: Add Premium Block (ne pas supprimer) --- */}
+              {/* --- BOUTON PRINCIPAL: Add Premium Block --- */}
               <button
-                onClick={() => openThemeEditor(block, location)}
+                onClick={() => openThemeEditor(block, location, extensionUuid)}
                 style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff" }}
               >
                 Add Premium Block
@@ -528,3 +542,4 @@ export default function Settings() {
     </>
   );
 }
+
