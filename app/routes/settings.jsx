@@ -1,488 +1,198 @@
 // app/routes/settings.jsx
-import React, { useState, useEffect, useMemo } from "react";
-import { useLocation, useLoaderData } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
+import React, { useMemo } from "react";
+import { json } from "@remix-run/node";
+import { useLoaderData, useLocation } from "@remix-run/react";
 
-/* ========================
-   Loader: accès + UUID auto
-======================== */
+/* ==============================
+   Loader: récupère shop + UUID
+   - Priorité: env THEME_EXTENSION_ID
+   - Fallback: Admin GraphQL
+================================ */
 export const loader = async ({ request }) => {
-  const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
-  const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
-  const { admin, billing } = await authenticate.admin(request);
-  const url = new URL(request.url);
-  const qs = url.searchParams.toString();
+  const { authenticate } = await import("../shopify.server");
+  const { admin, session } = await authenticate.admin(request);
 
-  try {
-    await billing.require({ plans: REQUIRED_PLANS });
-  } catch {
-    return redirect(`/pricing?${qs}`);
-  }
+  const shopDomain = session.shop || ""; // ex: selya11904.myshopify.com
+  const shopSub = shopDomain.replace(".myshopify.com", "");
 
-  // 🔎 Récupère l’UUID de la Theme App Extension via Admin GraphQL
-  try {
-    const resp = await admin.graphql(/* GraphQL */ `
-      query GetAppExtensions {
-        currentAppInstallation {
-          extensionRegistrations(first: 100) {
-            nodes {
-              uuid
-              type
-              handle
-              title
+  let extensionId = process.env.THEME_EXTENSION_ID || "";
+
+  if (!extensionId) {
+    try {
+      const resp = await admin.graphql(`
+        query GetAppExtensions {
+          currentAppInstallation {
+            extensionRegistrations(first: 100) {
+              nodes { uuid type handle }
             }
           }
         }
-      }
-    `);
-    const data = await resp.json();
-    const nodes =
-      data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
-
-    // Prends l’extension de type THEME_APP_EXTENSION avec handle "announcement-bar"
-    const themeExt =
-      nodes.find((n) => n.type === "THEME_APP_EXTENSION" && n.handle === "announcement-bar") ||
-      nodes.find((n) => n.type === "THEME_APP_EXTENSION");
-
-    return json({ extensionUuid: themeExt?.uuid || null });
-  } catch {
-    // Si la requête échoue, on renvoie null et on gèrera côté client
-    return json({ extensionUuid: null });
+      `);
+      const data = await resp.json();
+      const nodes = data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
+      const themeExt =
+        nodes.find(n => n.type === "THEME_APP_EXTENSION" && n.handle === "announcement-bar") ||
+        nodes.find(n => n.type === "THEME_APP_EXTENSION");
+      if (themeExt?.uuid) extensionId = themeExt.uuid;
+    } catch {}
   }
+
+  return json({ shopSub, extensionId });
 };
 
-/* ========================
-   Styles
-======================== */
+/* ==============================
+   Helpers: liens vers l’éditeur
+   (on INSÈRE une SECTION d’app)
+================================ */
+function themeEditorBase({ shopSub, themeId }) {
+  const themePart = themeId ? `themes/${themeId}` : "themes/current";
+  return `https://${shopSub}.myshopify.com/admin/${themePart}/editor`;
+}
+
+function linkAddSection({ shopSub, template = "index", extensionId, handle, themeId }) {
+  const base = themeEditorBase({ shopSub, themeId });
+  const p = new URLSearchParams({
+    context: "apps",
+    template,
+    target: "newAppsSection",
+    addAppSectionId: `${extensionId}/${handle}`,
+  });
+  return `${base}?${p.toString()}`;
+}
+
 const BUTTON_BASE = {
   border: "none",
-  borderRadius: "8px",
-  padding: "12px 24px",
-  fontWeight: "bold",
+  borderRadius: "10px",
+  padding: "12px 20px",
+  fontWeight: 800,
   cursor: "pointer",
-  boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+  boxShadow: "0 6px 18px rgba(0,0,0,.18)",
 };
-const CONTAINER_STYLE = {
-  maxWidth: "85%",
-  margin: "0 auto",
-  transform: "scale(0.95)",
-  transformOrigin: "top center",
-  padding: "16px",
-};
-const CARD_STYLE = {
-  backgroundColor: "#ffffff",
-  borderRadius: "12px",
-  padding: "20px",
-  marginBottom: "24px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  display: "flex",
-  flexWrap: "wrap",
-  gap: "16px",
-  alignItems: "center",
-};
-const GLOBAL_STYLES = `
-@keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
-@keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
-`;
 
-/* =========================================
-   Deep-link vers Theme Editor (store courant)
-========================================= */
-// Base64 URL-safe → texte
-function b64UrlDecode(s) {
-  try {
-    let str = s.replace(/-/g, "+").replace(/_/g, "/");
-    while (str.length % 4) str += "=";
-    return typeof atob !== "undefined" ? atob(str) : Buffer.from(str, "base64").toString("binary");
-  } catch {
-    return "";
-  }
-}
+/* ==============================
+   Définition de tes 3 sections
+   (handles = noms de fichiers .liquid)
+================================ */
+const BLOCKS = [
+  {
+    handle: "announcement-premium",
+    title: "Premium Announcement Bar",
+    desc: "Animated or multilingual bar to grab attention.",
+    template: "index",
+  },
+  {
+    handle: "popup-premium",
+    title: "Premium Popup",
+    desc: "Modern popup with promo code and glow animation.",
+    template: "index",
+  },
+  {
+    handle: "timer-premium",
+    title: "Premium Countdown",
+    desc: "Three dynamic countdown styles.",
+    template: "index",
+  },
+];
 
-// https://{store}.myshopify.com/admin à partir de ?host=
-function getAdminBaseFromHost(location) {
-  const hostParam = new URLSearchParams(location.search || "").get("host");
-  if (!hostParam) return null;
-  const decoded = b64UrlDecode(hostParam); // "storename.myshopify.com/admin"
-  if (!decoded) return null;
-  const clean = decoded.replace(/\/+$/, "");
-  return `https://${clean}`;
-}
-
-// 👉 ouvre l’éditeur + INSÈRE automatiquement la section
-function openThemeEditor({ id, template = "index", type = "section" }, location, extensionUuid) {
-  if (!extensionUuid) {
-    alert("Extension ID not resolved yet. Please refresh the page after the app loads.");
-    return;
-  }
-
-  const qs = new URLSearchParams();
-  qs.set("context", "apps");
-  qs.set("template", template);
-
-  if (type === "section") {
-    // 👇 clé magique : ajoute la section automatiquement
-    qs.set("addAppSectionId", `${extensionUuid}/${id}`);
-    qs.set("target", "newAppsSection");
-  } else if (type === "block") {
-    qs.set("addAppBlockId", `${extensionUuid}/${id}`);
-  }
-
-  const adminBase = getAdminBaseFromHost(location);
-  const url = (adminBase || "/admin") + `/themes/current/editor?${qs.toString()}`;
-  window.top.location.href = url;
-}
-
-/* ========================
-   UI de démo / préviews
-======================== */
-function OpeningPopup() {
-  const [visible, setVisible] = useState(true);
-  if (!visible) return null;
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.8)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 10000,
-      }}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        style={{
-          background: "radial-gradient(circle at center, #1a1a1a, #000)",
-          padding: "32px",
-          borderRadius: "16px",
-          textAlign: "center",
-          color: "#fff",
-          maxWidth: "400px",
-          width: "90%",
-          boxShadow: "0 0 30px rgba(255,255,255,0.1)",
-        }}
-      >
-        <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
-          How to use the Premium Blocks
-        </h2>
-        <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
-          Go to your <strong>Theme Editor</strong> and click on{" "}
-          <strong>Add block</strong> in the App section.
-        </p>
-        <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
-          Choose any premium block: Announcement Bar, Popup, or Countdown.
-        </p>
-        <button
-          onClick={() => setVisible(false)}
-          style={{ ...BUTTON_BASE, backgroundColor: "#fff", color: "#000" }}
-        >
-          Got it!
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function PreviewAnnouncementBar() {
-  const bars = [
-    {
-      bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
-      color: "#fff",
-      text: "Limited-Time Sale! Enjoy up to 50% off",
-      buttonText: "Shop Now",
-      link: "#",
-    },
-    {
-      bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
-      color: "#fff",
-      text: "Flash Sale! Everything Must Go!",
-      buttonText: "Grab Deal",
-      link: "#",
-    },
-    {
-      bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
-      color: "#000",
-      text: "Clearance — Don’t miss out!",
-      buttonText: "Browse",
-      link: "#",
-    },
-  ];
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      {bars.map((bar, i) => (
-        <div
-          key={i}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: bar.bg,
-            color: bar.color,
-            padding: "10px 16px",
-            borderRadius: "8px",
-            fontWeight: "bold",
-          }}
-        >
-          <a
-            href={bar.link}
-            style={{
-              ...BUTTON_BASE,
-              backgroundColor: "#fff",
-              color: "#333",
-              padding: "8px 16px",
-              fontSize: "14px",
-              border: "1px solid rgba(0,0,0,0.1)",
-            }}
-          >
-            {bar.buttonText}
-          </a>
-          <span style={{ flex: 1, marginLeft: "16px" }}>{bar.text}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PreviewPopup() {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const show = () => {
-      setVisible(true);
-      setTimeout(() => setVisible(false), 2000);
-    };
-    show();
-    const iv = setInterval(show, 4000);
-    return () => clearInterval(iv);
-  }, []);
-  return (
-    <div
-      style={{
-        position: "relative",
-        margin: "0 auto",
-        transition: "all 0.2s ease",
-        transform: visible ? "scale(1)" : "scale(0.85)",
-        opacity: visible ? 1 : 0,
-        padding: "24px",
-        maxWidth: "320px",
-        backgroundColor: "#bfdbfe",
-        borderLeft: "6px solid #3b82f6",
-        borderRadius: "12px",
-        animation: visible ? "popupGlowPro 0.5s infinite ease-in-out" : "none",
-      }}
-    >
-      <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>🎁 Exclusive Offer</h3>
-      <p style={{ margin: 0, fontSize: "14px", color: "#1e3a8a" }}>
-        Get <strong>20% OFF</strong> with code <strong>WELCOME20</strong>
-      </p>
-      <button
-        style={{
-          ...BUTTON_BASE,
-          marginTop: "12px",
-          backgroundColor: "#1e3a8a",
-          color: "#bfdbfe",
-        }}
-      >
-        Apply Now
-      </button>
-    </div>
-  );
-}
-
-// Countdown helpers
-function calcRemaining(deadline) {
-  const diff = Math.max(deadline - Date.now(), 0);
-  const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-  return `${h}:${m}:${s}`;
-}
-function StyledTimer({ value, variant }) {
-  const base = {
-    fontFamily: "sans-serif",
-    padding: "8px 12px",
-    minWidth: "40px",
-    textAlign: "center",
-  };
-  const styles = {
-    standard: {
-      ...base,
-      backgroundColor: "#f0f0f0",
-      color: "#333333",
-      borderRadius: "6px",
-      boxShadow: "0 0 8px rgba(59,130,246,0.3)",
-    },
-    rectangle: {
-      ...base,
-      backgroundColor: "#2d3748",
-      color: "#e2e8f0",
-      borderRadius: "4px",
-      boxShadow: "0 0 10px rgba(107,146,255,0.4)",
-    },
-    circle: {
-      ...base,
-      border: "3px solid #2b6cb0",
-      color: "#2b6cb0",
-      borderRadius: "50%",
-      boxShadow: "0 0 12px rgba(43,108,176,0.6)",
-    },
-  };
-  return <div style={styles[variant]}>{value}</div>;
-}
-function PreviewCountdown() {
-  const TWO_HOURS = 2 * 3600000;
-  const deadline = Date.now() + TWO_HOURS;
-  const [time, setTime] = useState(calcRemaining(deadline));
-  useEffect(() => {
-    const iv = setInterval(() => setTime(calcRemaining(deadline)), 1000);
-    return () => clearInterval(iv);
-  }, [deadline]);
-  const parts = time.split(":");
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-        maxWidth: "360px",
-        margin: "0 auto",
-      }}
-    >
-      {[
-        ["Standard", "standard"],
-        ["Rectangle", "rectangle"],
-        ["Circle", "circle"],
-      ].map(([title, variant], i) => (
-        <div
-          key={i}
-          style={{
-            backgroundColor: "#f9f9f9",
-            borderRadius: "12px",
-            padding: "16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            width: "100%",
-          }}
-        >
-          <span style={{ fontSize: "16px", fontWeight: "bold", color: "#111" }}>
-            {title}
-          </span>
-          <div style={{ display: "flex", gap: "8px" }}>
-            {parts.map((p, idx) => (
-              <StyledTimer key={idx} value={p} variant={variant} />
-            ))}
-          </div>
-          <button
-            style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff", padding: "8px 16px" }}
-          >
-            Add
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ========================
-   Page Settings
-======================== */
+/* ==============================
+   UI
+================================ */
 export default function Settings() {
-  const { extensionUuid } = useLoaderData();
-  const [lang, setLang] = useState("en");
+  const { shopSub, extensionId } = useLoaderData();
   const location = useLocation();
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  const blocks = [
-    { id: "announcement-premium", title: "Premium Announcement Bar", description: "Animated or multilingual bar to grab attention.", template: "index", type: "section", preview: <PreviewAnnouncementBar /> },
-    { id: "popup-premium",        title: "Premium Popup",            description: "Modern popup with promo code and glow animation.", template: "index", type: "section", preview: <PreviewPopup /> },
-    { id: "timer-premium",        title: "Premium Countdown",        description: "Three dynamic countdown styles.",                  template: "index", type: "section", preview: <PreviewCountdown /> },
-  ];
+  const missing = !extensionId || extensionId.length < 16;
 
   return (
     <>
-      <style>{GLOBAL_STYLES}</style>
-      <OpeningPopup />
-
-      <div style={CONTAINER_STYLE}>
-        <div
+      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "18px 16px 90px" }}>
+        <header
           style={{
-            background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
-            backgroundSize: "800px 100%",
-            borderRadius: "12px",
-            padding: "24px",
-            marginBottom: "32px",
+            background: "linear-gradient(135deg,#0a0a0a 35%,#1a1a1a 60%,#2a2a2a 100%)",
             color: "#fff",
-            textAlign: "center",
-            animation: "shimmer 3s infinite linear",
+            borderRadius: 16,
+            padding: 22,
+            marginBottom: 18,
+            border: "1px solid rgba(200,162,77,.35)",
           }}
         >
-          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-            “Welcome to Triple Announcement Bar! Let’s boost your sales with
-            powerful bars, popups, and countdowns.”
+          <h2 style={{ margin: 0, fontWeight: 900 }}>Announcement-bar-app — Settings</h2>
+          <p style={{ opacity: 0.9, marginTop: 6 }}>
+            Click “Add Premium Block” to open the Theme Editor and <b>auto-insert</b> the section.
           </p>
-          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
+          {missing && (
+            <div
               style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
+                marginTop: 10,
+                background: "#2a1f10",
+                color: "#f0df9b",
+                border: "1px solid rgba(200,162,77,.35)",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontWeight: 700,
               }}
             >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
-          </div>
-          {!extensionUuid && (
-            <p style={{ marginTop: 12, color: "#ffd966" }}>
-              Heads up: extension ID not resolved yet. Reload this page or re-open the app from the store Admin.
-            </p>
+              THEME_EXTENSION_ID manquant. Ajoute-le dans ton <code>.env</code> ou réessaie après avoir ouvert l’app
+              depuis l’Admin (on tentera le fallback GraphQL).
+            </div>
           )}
-        </div>
+        </header>
 
-        {blocks.map((block) => (
-          <div key={block.id} style={CARD_STYLE}>
-            <div style={{ flex: 1, minWidth: "220px" }}>
-              <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
-              <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
+        {BLOCKS.map((b) => (
+          <article
+            key={b.handle}
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 12,
+              padding: 18,
+              marginBottom: 14,
+              boxShadow: "0 2px 8px rgba(0,0,0,.08)",
+              display: "grid",
+              gridTemplateColumns: "1fr auto",
+              gap: 14,
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800 }}>{b.title}</div>
+              <div style={{ color: "#555", marginTop: 6 }}>{b.desc}</div>
+            </div>
 
-              {/* --- BOUTON PRINCIPAL: Add Premium Block --- */}
-              <button
-                onClick={() => openThemeEditor(block, location, extensionUuid)}
-                style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff" }}
-              >
+            {/* Bouton principal — ajoute la SECTION */}
+            <a
+              href={linkAddSection({
+                shopSub,
+                template: b.template,
+                extensionId,
+                handle: b.handle,
+              })}
+              target="_top"
+              rel="noreferrer"
+            >
+              <button style={{ ...BUTTON_BASE, background: "#000", color: "#fff" }}>
                 Add Premium Block
               </button>
-            </div>
-            <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
-          </div>
+            </a>
+          </article>
         ))}
       </div>
 
-      {/* --- BOUTON Pricing (fixe, centre en bas) --- */}
+      {/* Bouton Pricing (centre bas) */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
             position: "fixed",
-            bottom: "24px",
+            bottom: 24,
             left: "50%",
             transform: "translateX(-50%)",
             ...BUTTON_BASE,
             backgroundColor: "#000",
             color: "#fff",
             padding: "12px 28px",
-            borderRadius: "30px",
-            cursor: "pointer",
+            borderRadius: 30,
             zIndex: 999,
           }}
         >
@@ -490,56 +200,40 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* --- BOUTON YouTube (fixe, bas droite) --- */}
+      {/* YouTube (bas droite) */}
       <a
         href={YOUTUBE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          textDecoration: "none",
-          zIndex: 999,
-        }}
+        style={{ position: "fixed", bottom: 24, right: 24, textDecoration: "none", zIndex: 999 }}
         aria-label="YouTube tutorial"
       >
-        <button
-          style={{
-            ...BUTTON_BASE,
-            backgroundColor: "#000",
-            color: "#fff",
-            padding: "12px 20px",
-            borderRadius: "30px",
-            cursor: "pointer",
-          }}
-        >
+        <button style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff", borderRadius: 30 }}>
           YouTube
         </button>
       </a>
 
-      {/* --- BOUTON WhatsApp (fixe, bas gauche) --- */}
+      {/* WhatsApp (bas gauche) */}
       <a
         href="https://wa.me/+212630079763"
         target="_blank"
         rel="noopener noreferrer"
         style={{
           position: "fixed",
-          bottom: "24px",
-          left: "24px",
+          bottom: 24,
+          left: 24,
           backgroundColor: "#000",
           borderRadius: "50%",
-          padding: "14px",
+          padding: 14,
           boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
           zIndex: 999,
         }}
         aria-label="WhatsApp"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#fff" viewBox="0 0 448 512">
-          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4-186 186-186s186 83.4 186 186-83.4 186-186 186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z"/>
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4-186 186-186s186 83.4 186 186-83.4 186-186 186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z" />
         </svg>
       </a>
     </>
   );
 }
-
