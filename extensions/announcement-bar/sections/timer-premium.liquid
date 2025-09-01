@@ -1,0 +1,95 @@
+<style>
+  .countdown-container{width:100vw!important;position:relative;left:50%;margin-left:-50vw;padding:18px 10px;text-align:center;color:{{ section.settings.text_color }};font-size:{{ section.settings.font_size }}px;font-weight:bold;display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;
+    {% if section.settings.background_image != blank %}background-image:url({{ section.settings.background_image | img_url: '2048x2048' }});background-size:cover;background-position:center;{% else %}background-color:{{ section.settings.bg_color }};{% endif %}}
+  .countdown-label{margin-right:18px;font-size:calc({{ section.settings.font_size }}px + 2px);white-space:nowrap}
+  .countdown-timer{display:flex;flex-wrap:nowrap;justify-content:center;gap:12px;flex:1;min-width:0}
+  .countdown-block{padding:10px 12px;min-width:{{ section.settings.block_width }};min-height:{{ section.settings.block_height }};display:flex;align-items:center;justify-content:center;color:{{ section.settings.text_color }};
+    {% if section.settings.block_background_image != blank %}background-image:url({{ section.settings.block_background_image | img_url: 'master' }});background-size:cover;background-position:center;{% else %}background-color:{{ section.settings.timer_bg }};{% endif %}
+    border:{{ section.settings.border_size }} solid {{ section.settings.border_color }};font-size:{{ section.settings.font_size }}px}
+  .countdown-rectangle .countdown-block{border-radius:8px}
+  .countdown-circle .countdown-block{border-radius:50%}
+  .glow-effect .countdown-block{animation:glow 1.5s infinite alternate}
+  @keyframes glow{from{box-shadow:0 0 8px {{ section.settings.border_color }}} to{box-shadow:0 0 20px {{ section.settings.border_color }}}}
+  .countdown-button-container{margin-left:18px;flex-shrink:0}
+  .countdown-button{background:{{ section.settings.button_color }};color:{{ section.settings.button_text_color }};padding:7px 14px;border-radius:4px;font-weight:bold;text-decoration:none;white-space:nowrap}
+  @media (max-width:600px){
+    .countdown-container{padding:8px 6px;flex-wrap:wrap;justify-content:center;gap:8px}
+    .countdown-label{font-size:calc({{ section.settings.font_size }}px * .65);margin-right:0;width:100%;text-align:center}
+    .countdown-timer{gap:8px;flex-wrap:nowrap;justify-content:center;width:100%;margin-bottom:8px}
+    .countdown-block{padding:6px 8px;min-width:calc({{ section.settings.block_width | replace: 'px','' }} / 2.5) + "px";min-height:calc({{ section.settings.block_height | replace: 'px','' }} / 2.5) + "px";font-size:calc({{ section.settings.font_size }}px * .65)}
+    .countdown-button-container{margin-left:0;width:100%;text-align:center}
+    .countdown-button{padding:6px 12px;font-size:calc({{ section.settings.font_size }}px * .65);display:inline-block;width:auto;white-space:nowrap}
+  }
+</style>
+
+<div class="shopify-section countdown-container countdown-{{ section.settings.style }}{% if section.settings.glow_effect %} glow-effect{% endif %}">
+  <div class="countdown-label">{{ section.settings.text }}</div>
+  <div id="countdown-{{ section.id }}" class="countdown-timer"></div>
+
+  {% if section.settings.button_text != blank %}
+    <div class="countdown-button-container">
+      <a href="{{ section.settings.button_link }}" class="countdown-button">{{ section.settings.button_text }}</a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function(){
+    const endTime = new Date("{{ section.settings.end_date }}").getTime();
+    const display = document.getElementById("countdown-{{ section.id }}");
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function updateCountdown(){
+      const now = Date.now();
+      let diff = endTime - now;
+      if(diff <= 0){ clearInterval(timer); diff = 0; }
+      const d = Math.floor(diff / (1000*60*60*24));
+      const h = Math.floor((diff / (1000*60*60)) % 24);
+      const m = Math.floor((diff / (1000*60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      const parts = [];
+      if ({{ section.settings.show_days }})    parts.push(`<div class="countdown-block">${pad(d)}${'{{ section.settings.label_days }}'}</div>`);
+      if ({{ section.settings.show_hours }})   parts.push(`<div class="countdown-block">${pad(h)}${'{{ section.settings.label_hours }}'}</div>`);
+      if ({{ section.settings.show_minutes }}) parts.push(`<div class="countdown-block">${pad(m)}${'{{ section.settings.label_minutes }}'}</div>`);
+      if ({{ section.settings.show_seconds }}) parts.push(`<div class="countdown-block">${pad(s)}${'{{ section.settings.label_seconds }}'}</div>`);
+      display.innerHTML = parts.join("");
+    }
+    const timer = setInterval(updateCountdown, 1000); updateCountdown();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Premium Countdown",
+  "settings": [
+    { "type": "text", "id": "end_date", "label": "End date (ISO)", "default": "2025-12-31T23:59:59Z", "info": "Format YYYY-MM-DDThh:mm:ssZ" },
+    { "type": "select", "id": "style", "label": "Timer style", "default": "standard", "options": [ { "value": "standard", "label": "Standard" }, { "value": "rectangle", "label": "Rectangle" }, { "value": "circle", "label": "Circle" } ] },
+    { "type": "checkbox", "id": "glow_effect", "label": "Enable glow effect", "default": true },
+    { "type": "text", "id": "text", "label": "Label before timer", "default": "🔥 Limited-time offer ends in" },
+    { "type": "image_picker", "id": "background_image", "label": "Container background image" },
+    { "type": "color", "id": "bg_color", "label": "Container background color", "default": "#ffffff" },
+
+    { "type": "checkbox", "id": "show_days", "label": "Show days", "default": true },
+    { "type": "text", "id": "label_days", "label": "Days label", "default": "d" },
+    { "type": "checkbox", "id": "show_hours", "label": "Show hours", "default": true },
+    { "type": "text", "id": "label_hours", "label": "Hours label", "default": "h" },
+    { "type": "checkbox", "id": "show_minutes", "label": "Show minutes", "default": true },
+    { "type": "text", "id": "label_minutes", "label": "Minutes label", "default": "m" },
+    { "type": "checkbox", "id": "show_seconds", "label": "Show seconds", "default": true },
+    { "type": "text", "id": "label_seconds", "label": "Seconds label", "default": "s" },
+
+    { "type": "image_picker", "id": "block_background_image", "label": "Digits background image" },
+    { "type": "color", "id": "timer_bg", "label": "Digits background color", "default": "#ffffff" },
+    { "type": "text", "id": "border_size", "label": "Border size (e.g. 2px)", "default": "2px" },
+    { "type": "color", "id": "border_color", "label": "Border color", "default": "#ff0000" },
+    { "type": "range", "id": "font_size", "label": "Font size (px)", "min": 12, "max": 50, "step": 1, "default": 18 },
+    { "type": "text", "id": "block_width", "label": "Digit width (e.g. 70px)", "default": "70px" },
+    { "type": "text", "id": "block_height", "label": "Digit height (e.g. 70px)", "default": "70px" },
+
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Get offer" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "button_color", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#ffffff" }
+  ],
+  "presets": [{ "name": "Premium Countdown" }]
+}
+{% endschema %}
