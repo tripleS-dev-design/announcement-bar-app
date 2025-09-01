@@ -57,7 +57,29 @@ const GLOBAL_STYLES = `
 // ==============================
 //  Deep-link vers Theme Editor (sans shop codé en dur)
 // ==============================
-const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // UUID de ton extension de thème
+
+// ⚠️ Mets ici le UUID de TON extension (prends `uuid` dans `extensions/.../shopify.extension.toml`)
+const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50";
+
+// Décodage Base64-URL (Shopify envoie host en base64 URL-safe)
+function b64UrlDecode(s) {
+  try {
+    let str = s.replace(/-/g, "+").replace(/_/g, "/");
+    while (str.length % 4) str += "=";
+    return atob(str);
+  } catch {
+    return "";
+  }
+}
+// Ex: host → "storename.myshopify.com/admin"
+function getAdminBaseFromHost(location) {
+  const hostParam = new URLSearchParams(location.search || "").get("host");
+  if (!hostParam) return null;
+  const decoded = b64UrlDecode(hostParam);
+  if (!decoded) return null;
+  const clean = decoded.replace(/\/+$/, "");
+  return `https://${clean}`;
+}
 
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -352,27 +374,28 @@ export default function Settings() {
     },
   ];
 
-  // 🔗 Ouvre l'éditeur du thème du store COURANT (sans shop codé en dur)
+  // 🔗 Ouvre l'éditeur du thème du store COURANT (URL absolue vers l'Admin)
   const openThemeEditor = (block) => {
-    const params = new URLSearchParams(location.search || "");
-    params.set("context", "apps");
-    params.set("template", block.template || "index");
-
-    // Active ton app/extension dans l'éditeur
-    // IMPORTANT: APP_API_KEY/EXTENSION_ID
-    params.set("activateAppId", `${apiKey}/${THEME_EXTENSION_ID}`);
+    const qs = new URLSearchParams();
+    qs.set("context", "apps");
+    qs.set("template", block.template || "index");
+    // Active ton app/extension dans l'éditeur (APP_API_KEY/EXTENSION_UUID)
+    qs.set("activateAppId", `${apiKey}/${THEME_EXTENSION_ID}`);
 
     if (block.type === "section") {
-      params.set("addAppSectionId", `${THEME_EXTENSION_ID}/${block.id}`);
+      qs.set("addAppSectionId", `${THEME_EXTENSION_ID}/${block.id}`);
     } else if (block.type === "block") {
-      params.set("addAppBlockId", `${THEME_EXTENSION_ID}/${block.id}`);
+      qs.set("addAppBlockId", `${THEME_EXTENSION_ID}/${block.id}`);
     }
     // embed: activateAppId suffit
 
-    const path = `/admin/themes/current/editor?${params.toString()}`;
+    const adminBase = getAdminBaseFromHost(location);
+    const targetUrl = adminBase
+      ? `${adminBase}/themes/current/editor?${qs.toString()}`
+      : `/admin/themes/current/editor?${qs.toString()}`; // fallback
 
-    // Pas d’App Bridge ici -> simple et robuste pour le reviewer
-    window.top.location.href = path;
+    // Ouvre l'éditeur (dans la fenêtre parent si embarqué)
+    window.top.location.href = targetUrl;
   };
 
   return (
@@ -501,7 +524,7 @@ export default function Settings() {
         aria-label="WhatsApp"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#fff" viewBox="0 0 448 512">
-          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4-186 186-186s186 83.4 186 186-83.4 186-186 186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z"/>
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4 186 186 186s186-83.4 186-186-83.4-186-186-186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z"/>
         </svg>
       </a>
     </>
