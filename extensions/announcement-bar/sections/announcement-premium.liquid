@@ -1,0 +1,139 @@
+{% comment %}
+  Premium Announcement Bar (EN default)
+{% endcomment %}
+
+<style>
+  .announcement-bar-premium {
+    display: flex; align-items: center; gap: 16px; position: relative;
+    width: 100vw; margin-left: calc(-50vw + 50%);
+    padding: {{ section.settings.padding_vertical }}px {{ section.settings.padding_horizontal }}px;
+    overflow: hidden; z-index: 999;
+
+    {% if section.settings.background_image != blank %}
+      background-image: url("{{ section.settings.background_image | img_url: '2048x2048' }}") !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+    {% endif %}
+    background-color: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: {{ section.settings.font_weight }};
+  }
+  .announcement-content { flex: 1; min-width: 0; text-align: {{ section.settings.text_align }}; }
+
+  .announcement-bar-premium.standard .scrolling-text {
+    white-space: nowrap; padding-left: 100%;
+    animation: scroll-{{ section.id }} {{ section.settings.speed }}s linear infinite;
+  }
+  @keyframes scroll-{{ section.id }} { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+
+  .announcement-bar-premium.carousel .carousel-container { display:flex; align-items:center; justify-content:space-between; }
+  .announcement-bar-premium.carousel .carousel-content { flex:1; min-width:0; text-align:center; animation: fade-{{ section.id }} .6s ease-in-out; }
+  @keyframes fade-{{ section.id }} { from{opacity:0} to{opacity:1} }
+  .announcement-bar-premium.carousel .carousel-button { cursor:pointer; font-size: {{ section.settings.font_size }}px; color: {{ section.settings.text_color }}; }
+
+  .announcement-bar-premium.light-pro { box-shadow: 0 0 {{ section.settings.pro_glow_size }}px {{ section.settings.pro_glow_color }} !important;
+    animation: glowPro-{{ section.id }} {{ section.settings.pro_glow_speed }}s infinite alternate; }
+  .announcement-bar-premium.light-pro::before {
+    content:""; position:absolute; top:50%; left:50%; width:150%; height:150%;
+    transform:translate(-50%,-50%); background: radial-gradient(circle at center, {{ section.settings.pro_glow_color }} 0%, transparent 70%);
+    opacity:.5; animation: pulsePro-{{ section.id }} {{ section.settings.pro_glow_speed }}s infinite ease-in-out;
+  }
+  @keyframes glowPro-{{ section.id }} { 0%{ box-shadow:0 0 {{ section.settings.pro_glow_size | divided_by:2 }}px {{ section.settings.pro_glow_color }} } 100%{ box-shadow:0 0 {{ section.settings.pro_glow_size }}px {{ section.settings.pro_glow_color }} } }
+  @keyframes pulsePro-{{ section.id }} { 0%,100%{ transform:translate(-50%,-50%) scale(.8); opacity:.4 } 50%{ transform:translate(-50%,-50%) scale(1); opacity:.7 } }
+
+  .announcement-button-container {
+    display:flex; justify-content:
+      {% case section.settings.button_position %}
+        {% when 'left' %} flex-start;
+        {% when 'center' %} center;
+        {% when 'right' %} flex-end;
+        {% else %} flex-end;
+      {% endcase %}
+    padding-left:12px; padding-right:12px; min-width:150px;
+  }
+  .announcement-button { background: {{ section.settings.button_color }}; color: {{ section.settings.button_text_color }};
+    padding:8px 12px; border-radius:4px; font-weight:bold; text-decoration:none; white-space:nowrap;
+    box-shadow:0 0 {{ section.settings.pro_glow_size | default:20 }}px {{ section.settings.pro_glow_color }};
+    animation: buttonGlowPulse {{ section.settings.pro_glow_speed | default:2 }}s ease-in-out infinite;
+  }
+</style>
+
+<div class="announcement-bar-premium {{ section.settings.bar_style }}">
+  <div class="announcement-content">
+    {% if section.settings.bar_style == "standard" %}
+      <div class="scrolling-text">{{ section.settings.icon }} {{ section.settings.text_1 }}</div>
+    {% elsif section.settings.bar_style == "carousel" %}
+      <div class="carousel-container">
+        <span class="carousel-button" onclick="prevSlide_{{ section.id }}()">‹</span>
+        <div id="carouselText-{{ section.id }}" class="carousel-content"></div>
+        <span class="carousel-button" onclick="nextSlide_{{ section.id }}()">›</span>
+      </div>
+    {% else %}
+      <div>{{ section.settings.icon }} {{ section.settings.text_1 }}</div>
+    {% endif %}
+  </div>
+
+  {% if section.settings.button_text != blank %}
+    <div class="announcement-button-container">
+      <a href="{{ section.settings.button_link }}" class="announcement-button">{{ section.settings.button_text }}</a>
+    </div>
+  {% endif %}
+</div>
+
+{% if section.settings.bar_style == "carousel" %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slides = [{{ section.settings.text_1 | json }}, {{ section.settings.text_2 | json }}, {{ section.settings.text_3 | json }}];
+    let idx = 0;
+    const el = document.getElementById("carouselText-{{ section.id }}");
+    const delay = {{ section.settings.speed }} * 1000;
+    function update(){ el && (el.innerText = slides[idx]); }
+    window["nextSlide_{{ section.id }}"] = () => (idx = (idx+1)%slides.length, update());
+    window["prevSlide_{{ section.id }}"] = () => (idx = (idx-1+slides.length)%slides.length, update());
+    update(); setInterval(window["nextSlide_{{ section.id }}"], delay);
+  });
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Premium Announcement Bar",
+  "settings": [
+    { "type":"select","id":"bar_style","label":"Style","default":"standard","options":[
+      { "value":"standard","label":"Marquee" },
+      { "value":"carousel","label":"Carousel" },
+      { "value":"light-pro","label":"Glow Pro" }
+    ]},
+    { "type":"text","id":"text_1","label":"Line 1","default":"🚀 Free shipping on all orders!" },
+    { "type":"text","id":"text_2","label":"Line 2","default":"🔥 Special offer today!" },
+    { "type":"text","id":"text_3","label":"Line 3","default":"🌍 Worldwide delivery" },
+    { "type":"text","id":"icon","label":"Icon (emoji)","default":"🚚" },
+    { "type":"image_picker","id":"background_image","label":"Background image (optional)" },
+    { "type":"color","id":"bg_color","label":"Background color","default":"#222222" },
+    { "type":"color","id":"text_color","label":"Text color","default":"#ffffff" },
+    { "type":"range","id":"font_size","label":"Text size (px)","min":10,"max":32,"step":1,"default":16 },
+    { "type":"select","id":"font_weight","label":"Weight","default":"normal","options":[
+      { "value":"normal","label":"Normal" }, { "value":"bold","label":"Bold" }
+    ]},
+    { "type":"select","id":"text_align","label":"Text align","default":"center","options":[
+      { "value":"left","label":"Left" }, { "value":"center","label":"Center" }, { "value":"right","label":"Right" }
+    ]},
+    { "type":"range","id":"speed","label":"Scroll / slide speed (s)","min":5,"max":30,"step":1,"default":10 },
+    { "type":"range","id":"padding_vertical","label":"Vertical padding (px)","min":0,"max":50,"step":1,"default":12 },
+    { "type":"range","id":"padding_horizontal","label":"Horizontal padding (px)","min":0,"max":50,"step":1,"default":0 },
+
+    { "type":"text","id":"button_text","label":"Button text","default":"Learn more" },
+    { "type":"url","id":"button_link","label":"Button link" },
+
+    { "type":"color","id":"button_color","label":"Button background","default":"#000000" },
+    { "type":"color","id":"button_text_color","label":"Button text color","default":"#ffffff" },
+
+    { "type":"color","id":"pro_glow_color","label":"Glow color","default":"#ffffff" },
+    { "type":"range","id":"pro_glow_size","label":"Glow size (px)","min":10,"max":100,"step":1,"default":30 },
+    { "type":"range","id":"pro_glow_speed","label":"Glow speed (s)","min":1,"max":10,"step":0.5,"default":2 }
+  ],
+  "presets": [{ "name": "Premium Announcement Bar" }]
+}
+{% endschema %}
