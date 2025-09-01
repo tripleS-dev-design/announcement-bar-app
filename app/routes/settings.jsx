@@ -4,17 +4,16 @@ import { useLocation, useLoaderData } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 
 /* ==============================
-   LOADER : shop + plan + UUID
+   LOADER : shop + plan + API KEY
 ================================ */
 export const loader = async ({ request }) => {
   const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
   const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
 
-  const { admin, billing, session } = await authenticate.admin(request);
+  const { billing, session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
 
-  // ⛔️ si pas d’abonnement, on redirige vers /pricing (comme avant)
   try {
     await billing.require({ plans: REQUIRED_PLANS });
   } catch {
@@ -25,42 +24,14 @@ export const loader = async ({ request }) => {
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
 
-  // On prend d’abord ce que tu as en ENV, mais on vérifiera via GraphQL
-  let extensionIdEnv = process.env.THEME_EXTENSION_ID || "";
-  let extensionId = extensionIdEnv;
+  // 🔑 API key (client_id) — public dans l’admin, nécessaire pour les deep links
+  const apiKey = process.env.SHOPIFY_API_KEY || "";
 
-  // ✅ Vérifie les extensions enregistrées et prend le bon UUID THEME_APP_EXTENSION
-  try {
-    const resp = await admin.graphql(`
-      query GetAppExtensions {
-        currentAppInstallation {
-          extensionRegistrations(first: 100) {
-            nodes { uuid type handle }
-          }
-        }
-      }
-    `);
-    const data = await resp.json();
-    const nodes = data?.data?.currentAppInstallation?.extensionRegistrations?.nodes || [];
-    const themeNodes = nodes.filter((n) => n.type === "THEME_APP_EXTENSION");
-
-    // on préfère celle dont le handle = dossier de ton extension
-    const preferred =
-      themeNodes.find((n) => n.handle === "announcement-bar") || themeNodes[0];
-
-    // si l'ENV ne correspond pas à une extension de thème, on remplace par le bon uuid
-    const envMatches = themeNodes.some((n) => n.uuid === extensionIdEnv);
-    extensionId = envMatches ? extensionIdEnv : preferred?.uuid || "";
-  } catch {
-    // en cas d’erreur réseau, on garde la valeur ENV
-    extensionId = extensionIdEnv || "";
-  }
-
-  return json({ shopSub, extensionId });
+  return json({ shopSub, apiKey });
 };
 
 /* ==============================
-   UI & styles
+   UI & styles (inchangés)
 ================================ */
 const BUTTON_BASE = {
   border: "none",
@@ -94,21 +65,29 @@ const GLOBAL_STYLES = `
 `;
 
 /* ==============================
-   Deep-link helper (SECTION)
-   -> admin.shopify.com + addAppSectionId = <uuid>/<handle>
+   Deep link helpers (corrigés)
+   👉 addAppBlockId = {API_KEY}/{handle}
 ================================ */
-function makeThemeEditorLink({
-  shopSub,             // ex: "selya11904"
+function editorBase({ shopSub }) {
+  // admin.shopify.com est le plus fiable
+  return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
+}
+
+/** Ouvre l’éditeur et PRÉ-REMPLIT l’ajout d’un App Block (le marchand confirme) */
+function makeAddBlockLink({
+  shopSub,
+  apiKey,
   template = "index",
-  extensionId,         // UUID vérifié au loader
-  handle,              // "announcement-premium" | "popup-premium" | "timer-premium"
+  handle, // ex: "announcement-premium" (nom du .liquid dans /blocks)
+  target = "newAppsSection", // "newAppsSection" | "mainSection" | "sectionGroup:header" | `sectionId:${id}`
 }) {
-  const base = `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
+  const base = editorBase({ shopSub });
   const p = new URLSearchParams({
     context: "apps",
     template,
-    target: "newAppsSection",
-    addAppSectionId: `${extensionId}/${handle}`,
+    addAppBlockId: `${apiKey}/${handle}`,
+    target,
+    enable_app_theme_extension_dev_preview: "1",
   });
   return `${base}?${p.toString()}`;
 }
@@ -376,36 +355,18 @@ function PreviewCountdown() {
    PAGE Settings
 ================================ */
 export default function Settings() {
-  const { shopSub, extensionId } = useLoaderData();
+  const { shopSub, apiKey } = useLoaderData();
   const [lang, setLang] = useState("en");
   const location = useLocation();
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  // Tes 3 blocks (handles = fichiers .liquid)
+  // Tes 3 blocks (handles = noms des fichiers .liquid dans /extensions/announcement-bar/blocks)
   const blocks = [
-    {
-      id: "announcement-premium",
-      title: "Premium Announcement Bar",
-      description: "Animated or multilingual bar to grab attention.",
-      template: "index",
-      preview: <PreviewAnnouncementBar />,
-    },
-    {
-      id: "popup-premium",
-      title: "Premium Popup",
-      description: "Modern popup with promo code and glow animation.",
-      template: "index",
-      preview: <PreviewPopup />,
-    },
-    {
-      id: "timer-premium",
-      title: "Premium Countdown",
-      description: "Three dynamic countdown styles.",
-      template: "index",
-      preview: <PreviewCountdown />,
-    },
+    { id: "announcement-premium", title: "Premium Announcement Bar", description: "Animated or multilingual bar to grab attention.", template: "index", preview: <PreviewAnnouncementBar /> },
+    { id: "popup-premium",        title: "Premium Popup",            description: "Modern popup with promo code and glow animation.",    template: "index", preview: <PreviewPopup /> },
+    { id: "timer-premium",        title: "Premium Countdown",        description: "Three dynamic countdown styles.",                     template: "index", preview: <PreviewCountdown /> },
   ];
 
   return (
@@ -455,13 +416,14 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* 🔗 Lien absolu, shop courant, insertion auto de SECTION */}
+              {/* ✅ Deep link corrigé : addAppBlockId = API_KEY/HANDLE */}
               <a
-                href={makeThemeEditorLink({
+                href={makeAddBlockLink({
                   shopSub,
+                  apiKey,
                   template: block.template || "index",
-                  extensionId,
                   handle: block.id,
+                  target: "newAppsSection",
                 })}
                 target="_top"
                 rel="noreferrer"
