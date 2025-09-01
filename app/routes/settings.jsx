@@ -1,7 +1,8 @@
-// app/routes/settings.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import { useLocation } from "@remix-run/react";
+import { useLocation, useRouteLoaderData } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
 
 // ✅ Loader: redirection /pricing si pas abonné
 export const loader = async ({ request }) => {
@@ -56,43 +57,9 @@ const GLOBAL_STYLES = `
 `;
 
 // ==============================
-// Deep-link helper (section / block / embed)
+//  App Bridge deep-link (store courant)
 // ==============================
-const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // ton extension UUID
-
-function makeThemeEditorLink({
-  shop,                 // ex: selya11904
-  search = "",
-  template = "index",
-  extensionId,
-  type,                 // "section" | "block" | "embed"
-  handle,              // ex: "announcement-bar-premium"
-}) {
-  const url = new URL(`https://${shop}.myshopify.com/admin/themes/current/editor`);
-
-  // Conserver les query params Shopify (embed)
-  if (search) {
-    const incoming = new URLSearchParams(search);
-    for (const [k, v] of incoming) url.searchParams.set(k, v);
-  }
-
-  url.searchParams.set("template", template);
-  url.searchParams.set("context", "apps");
-
-  if (type === "section") {
-    url.searchParams.set("addAppSectionId", `${extensionId}/${handle}`);
-    url.searchParams.set("target", "newAppsSection");
-  } else if (type === "block") {
-    url.searchParams.set("addAppBlockId", `${extensionId}/${handle}`);
-    // Astuce : pour des blocks, l’éditeur doit être sur une section compatible.
-    // "target" peut être ignoré ou géré par Shopify.
-  } else if (type === "embed") {
-    // Si jamais ton "popup" est un app embed
-    url.searchParams.set("activateAppId", extensionId);
-  }
-
-  return url.toString();
-}
+const THEME_EXTENSION_ID = "be79dab79ff6bb4be47d4e66577b6c50"; // UUID de l'extension de thème
 
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -354,12 +321,11 @@ function PreviewCountdown() {
 export default function Settings() {
   const [lang, setLang] = useState("en");
   const location = useLocation();
+  const app = useAppBridge();
+  const { apiKey } = useRouteLoaderData("root") || {}; // SHOPIFY_API_KEY depuis root
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
-
-  // ⚠️ Domaine myshopify (sans .myshopify.com)
-  const shop = "selya11904";
 
   // Déclare chaque bloc + son type exact
   const blocks = [
@@ -368,7 +334,7 @@ export default function Settings() {
       title: "Premium Announcement Bar",
       description: "Animated or multilingual bar to grab attention.",
       template: "index",
-      type: "section", // <-- important: app SECTION
+      type: "section", // app SECTION
       preview: <PreviewAnnouncementBar />,
     },
     {
@@ -376,7 +342,7 @@ export default function Settings() {
       title: "Premium Popup",
       description: "Modern popup with promo code and glow animation.",
       template: "index",
-      type: "section", // si c'est un embed, mets "embed"
+      type: "section", // si c'est un embed => "embed"
       preview: <PreviewPopup />,
     },
     {
@@ -384,10 +350,37 @@ export default function Settings() {
       title: "Premium Countdown",
       description: "Three dynamic countdown styles.",
       template: "index",
-      type: "section", // <-- important: app SECTION
+      type: "section", // app SECTION
       preview: <PreviewCountdown />,
     },
   ];
+
+  // 🔗 Ouvre l'éditeur du thème du store COURANT (sans shop codé en dur)
+  const openThemeEditor = (block) => {
+    const params = new URLSearchParams(location.search || "");
+    params.set("context", "apps");
+    params.set("template", block.template || "index");
+
+    // Active ton app/extension dans l'éditeur
+    params.set("activateAppId", `${apiKey}/${THEME_EXTENSION_ID}`);
+
+    if (block.type === "section") {
+      params.set("addAppSectionId", `${THEME_EXTENSION_ID}/${block.id}`);
+    } else if (block.type === "block") {
+      params.set("addAppBlockId", `${THEME_EXTENSION_ID}/${block.id}`);
+    }
+    // embed: activateAppId suffit
+
+    const path = `/themes/current/editor?${params.toString()}`;
+
+    try {
+      const redirect = Redirect.create(app);
+      redirect.dispatch(Redirect.Action.ADMIN_PATH, { path });
+    } catch (e) {
+      // Fallback si App Bridge indispo
+      window.top.location.href = `/admin${path}`;
+    }
+  };
 
   return (
     <>
@@ -436,28 +429,12 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              <a
-                href={makeThemeEditorLink({
-                  shop,
-                  search: location.search || "",
-                  template: block.template || "index",
-                  extensionId: THEME_EXTENSION_ID,
-                  type: block.type,
-                  handle: block.id,
-                })}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => openThemeEditor(block)}
+                style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff" }}
               >
-                <button
-                  style={{
-                    ...BUTTON_BASE,
-                    backgroundColor: "#000",
-                    color: "#fff",
-                  }}
-                >
-                  Add Premium Block
-                </button>
-              </a>
+                Add Premium Block
+              </button>
             </div>
             <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
           </div>
