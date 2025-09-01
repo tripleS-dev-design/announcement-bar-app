@@ -1,0 +1,161 @@
+{% comment %}
+  Premium Announcement Bar — App BLOCK (not section)
+  - Uses block.settings / block.id
+  - image_url (no img_url)
+{% endcomment %}
+
+<style>
+  .announcement-bar-premium {
+    display:flex; align-items:center; gap:16px; position:relative;
+    width:100vw; margin-left:calc(-50vw + 50%);
+    padding: {{ block.settings.padding_vertical }}px {{ block.settings.padding_horizontal }}px;
+    overflow:hidden; z-index:999;
+
+    {% if block.settings.background_image != blank %}
+      background-image:url("{{ block.settings.background_image | image_url: width: 2048 }}") !important;
+      background-repeat:no-repeat !important;
+      background-position:center center !important;
+      background-size:cover !important;
+    {% endif %}
+
+    background-color: {{ block.settings.bg_color }};
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: {{ block.settings.font_weight }};
+  }
+
+  .announcement-content{ flex:1; min-width:0; text-align: {{ block.settings.text_align }}; }
+
+  /* marquee */
+  .announcement-bar-premium.standard .scrolling-text{
+    white-space:nowrap; padding-left:100%;
+    animation: scroll-{{ block.id }} {{ block.settings.speed }}s linear infinite;
+  }
+  @keyframes scroll-{{ block.id }} { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+
+  /* carousel */
+  .announcement-bar-premium.carousel .carousel-container{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .announcement-bar-premium.carousel .carousel-content{ flex:1; min-width:0; text-align:center; animation: fade-{{ block.id }} .6s ease-in-out; }
+  @keyframes fade-{{ block.id }} { from{opacity:0} to{opacity:1} }
+  .announcement-bar-premium.carousel .carousel-button{ cursor:pointer; user-select:none; font-size: {{ block.settings.font_size }}px; color: {{ block.settings.text_color }}; }
+
+  /* glow pro */
+  .announcement-bar-premium.light-pro{
+    box-shadow:0 0 {{ block.settings.pro_glow_size }}px {{ block.settings.pro_glow_color }} !important;
+    animation: glowPro-{{ block.id }} {{ block.settings.pro_glow_speed }}s infinite alternate;
+  }
+  .announcement-bar-premium.light-pro::before{
+    content:""; position:absolute; top:50%; left:50%; width:150%; height:150%;
+    transform:translate(-50%,-50%);
+    background: radial-gradient(circle at center, {{ block.settings.pro_glow_color }} 0%, transparent 70%);
+    opacity:.5; pointer-events:none;
+    animation: pulsePro-{{ block.id }} {{ block.settings.pro_glow_speed }}s infinite ease-in-out;
+  }
+  @keyframes glowPro-{{ block.id }}{
+    0%{ box-shadow:0 0 {{ block.settings.pro_glow_size | divided_by: 2 }}px {{ block.settings.pro_glow_color }}; }
+    100%{ box-shadow:0 0 {{ block.settings.pro_glow_size }}px {{ block.settings.pro_glow_color }}; }
+  }
+  @keyframes pulsePro-{{ block.id }}{ 0%,100%{ transform:translate(-50%,-50%) scale(.8); opacity:.4 } 50%{ transform:translate(-50%,-50%) scale(1); opacity:.7 } }
+
+  .announcement-button-container{
+    display:flex; justify-content:
+      {% case block.settings.button_position %}
+        {% when 'left' %} flex-start;
+        {% when 'center' %} center;
+        {% when 'right' %} flex-end;
+        {% else %} flex-end;
+      {% endcase %};
+    padding-left:12px; padding-right:12px; min-width:150px;
+  }
+  .announcement-button{
+    background: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    padding:8px 12px; border-radius:4px; font-weight:bold; text-decoration:none; white-space:nowrap;
+    box-shadow:0 0 {{ block.settings.pro_glow_size | default: 20 }}px {{ block.settings.pro_glow_color }};
+    animation: buttonGlowPulse {{ block.settings.pro_glow_speed | default: 2 }}s ease-in-out infinite;
+  }
+</style>
+
+<div class="announcement-bar-premium {{ block.settings.bar_style }}" role="region" aria-label="Announcement">
+  <div class="announcement-content" aria-live="polite">
+    {% if block.settings.bar_style == "standard" %}
+      <div class="scrolling-text">{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
+    {% elsif block.settings.bar_style == "carousel" %}
+      <div class="carousel-container">
+        <button type="button" class="carousel-button" onclick="prevSlide_{{ block.id }}()" aria-label="Previous">‹</button>
+        <div id="carouselText-{{ block.id }}" class="carousel-content"></div>
+        <button type="button" class="carousel-button" onclick="nextSlide_{{ block.id }}()" aria-label="Next">›</button>
+      </div>
+    {% else %}
+      <div>{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
+    {% endif %}
+  </div>
+
+  {% if block.settings.button_text != blank %}
+    <div class="announcement-button-container">
+      <a href="{{ block.settings.button_link }}" class="announcement-button">{{ block.settings.button_text }}</a>
+    </div>
+  {% endif %}
+</div>
+
+{% if block.settings.bar_style == "carousel" %}
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const slides = [{{ block.settings.text_1 | json }}, {{ block.settings.text_2 | json }}, {{ block.settings.text_3 | json }}].filter(Boolean);
+    let idx = 0;
+    const el = document.getElementById("carouselText-{{ block.id }}");
+    const delay = Math.max(1, {{ block.settings.speed | default: 10 }}) * 1000;
+    function update(){ if(!el || slides.length===0) return; el.textContent = slides[idx]; }
+    window["nextSlide_{{ block.id }}"] = function(){ idx = (idx+1)%slides.length; update(); };
+    window["prevSlide_{{ block.id }}"] = function(){ idx = (idx-1+slides.length)%slides.length; update(); };
+    update(); if(slides.length>1) setInterval(window["nextSlide_{{ block.id }}"], delay);
+  });
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Premium Announcement Bar",
+  "target": "section",
+  "settings": [
+    { "type": "select", "id": "bar_style", "label": "Style", "default": "standard", "options": [
+      { "value": "standard",  "label": "Marquee" },
+      { "value": "carousel",  "label": "Carousel" },
+      { "value": "light-pro", "label": "Glow Pro" }
+    ]},
+
+    { "type": "text", "id": "text_1", "label": "Line 1", "default": "🚀 Free shipping on all orders!" },
+    { "type": "text", "id": "text_2", "label": "Line 2", "default": "🔥 Special offer today!" },
+    { "type": "text", "id": "text_3", "label": "Line 3", "default": "🌍 Worldwide delivery" },
+    { "type": "text", "id": "icon",   "label": "Icon (emoji)", "default": "🚚" },
+
+    { "type": "image_picker", "id": "background_image", "label": "Background image (optional)" },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#222222" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" },
+
+    { "type": "range", "id": "font_size", "label": "Text size (px)", "min": 10, "max": 32, "step": 1, "default": 16 },
+    { "type": "select", "id": "font_weight", "label": "Weight", "default": "normal", "options": [
+      { "value": "normal", "label": "Normal" }, { "value": "bold", "label": "Bold" }
+    ]},
+    { "type": "select", "id": "text_align", "label": "Text alignment", "default": "center", "options": [
+      { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }
+    ]},
+
+    { "type": "range", "id": "speed", "label": "Scroll / slide speed (s)", "min": 5, "max": 30, "step": 1, "default": 10 },
+    { "type": "range", "id": "padding_vertical", "label": "Vertical padding (px)", "min": 0, "max": 50, "step": 1, "default": 12 },
+    { "type": "range", "id": "padding_horizontal", "label": "Horizontal padding (px)", "min": 0, "max": 50, "step": 1, "default": 0 },
+
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Learn more" },
+    { "type": "url",  "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "button_color", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#ffffff" },
+    { "type": "select", "id": "button_position", "label": "Button position", "default": "right", "options": [
+      { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }
+    ]},
+
+    { "type": "color", "id": "pro_glow_color", "label": "Glow color", "default": "#ffffff" },
+    { "type": "range", "id": "pro_glow_size",  "label": "Glow size (px)", "min": 10, "max": 100, "step": 1, "default": 30 },
+    { "type": "range", "id": "pro_glow_speed", "label": "Glow speed (s)", "min": 1, "max": 10, "step": 0.5, "default": 2 }
+  ]
+}
+{% endschema %}
