@@ -392,21 +392,7 @@ export default function Settings() {
             powerful bars, popups, and countdowns.”
           </p>
           <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
-              }}
-            >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
+          
           </div>
         </div>
 
