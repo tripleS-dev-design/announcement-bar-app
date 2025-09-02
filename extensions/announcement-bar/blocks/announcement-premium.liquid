@@ -1,49 +1,64 @@
 {% comment %}
-  Premium Announcement Bar — App SECTION
-  Fix: button area isolated + stable layout across styles
+  Premium Announcement Bar — app section (CTA fixé à droite)
 {% endcomment %}
 
 <style>
   .announcement-bar-premium{
-    display:flex; align-items:center; gap:16px; position:relative;
+    position:relative; z-index:999; overflow:hidden;
     width:100vw; margin-left:calc(-50vw + 50%);
     padding: {{ block.settings.padding_vertical }}px {{ block.settings.padding_horizontal }}px;
-    overflow:hidden; z-index:999;
-
-    {% if block.settings.background_image != blank %}
-      background-image: url("{{ block.settings.background_image | image_url: width: 2048 }}");
-      background-repeat:no-repeat; background-position:center center; background-size:cover;
-    {% endif %}
     background-color: {{ block.settings.bg_color }};
     color: {{ block.settings.text_color }};
     font-size: {{ block.settings.font_size }}px;
     font-weight: {{ block.settings.font_weight }};
+    {% if block.settings.background_image != blank %}
+      background-image:url("{{ block.settings.background_image | image_url: width: 2048 }}");
+      background-repeat:no-repeat; background-position:center; background-size:cover;
+    {% endif %}
   }
 
-  /* NEW: split content vs actions to stabilize layout */
-  .announcement-content{ flex:1 1 auto; min-width:0; overflow:hidden; text-align: {{ block.settings.text_align }}; }
-  .announcement-actions{ flex:0 0 auto; padding-inline:12px; display:flex; align-items:center; }
+  /* nouveau conteneur interne: texte à gauche (flex:1), CTA à droite */
+  .announcement-bar-premium .abp-inner{
+    display:flex; align-items:center; gap:12px; width:100%;
+  }
+  .announcement-bar-premium .abp-text{
+    flex:1; min-width:0; overflow:hidden; text-align: {{ block.settings.text_align }};
+  }
+  .announcement-bar-premium .abp-cta{
+    margin-left:auto; flex-shrink:0;
+  }
 
-  /* marquee */
-  .announcement-bar-premium.standard .scrolling-track{ width:100%; overflow:hidden; }
+  /* bouton */
+  .announcement-button{
+    background: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    padding:8px 12px; border-radius:6px; font-weight:700; text-decoration:none; white-space:nowrap;
+    box-shadow:0 0 {{ block.settings.pro_glow_size | default: 18 }}px {{ block.settings.pro_glow_color }};
+    display:inline-block;
+  }
+
+  /* STYLES */
+  /* 1) Marquee */
   .announcement-bar-premium.standard .scrolling-text{
-    display:inline-block; white-space:nowrap;
-    padding-left:100%; will-change:transform;
+    display:inline-block;           /* IMPORTANT: ne pas prendre toute la ligne */
+    white-space:nowrap; padding-left:100%;
     animation: scroll-{{ block.id }} {{ block.settings.speed }}s linear infinite;
   }
-  @keyframes scroll-{{ block.id }}{ 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+  @keyframes scroll-{{ block.id }} { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
 
-  /* carousel */
+  /* 2) Carousel */
   .announcement-bar-premium.carousel .carousel-wrap{
-    display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+    display:inline-flex; align-items:center; gap:12px;
   }
   .announcement-bar-premium.carousel .carousel-content{
-    flex:1 1 auto; min-width:0; text-align:center; animation: fade-{{ block.id }} .6s ease-in-out;
+    display:inline-block; min-width:0; animation: fade-{{ block.id }} .6s ease-in-out;
   }
-  @keyframes fade-{{ block.id }}{ from{opacity:0} to{opacity:1} }
-  .announcement-bar-premium.carousel .nav-btn{ cursor:pointer; user-select:none; }
+  .announcement-bar-premium.carousel .nav-btn{
+    cursor:pointer; user-select:none; font-weight:700;
+  }
+  @keyframes fade-{{ block.id }} { from{opacity:0} to{opacity:1} }
 
-  /* glow pro overlay should not block clicks */
+  /* 3) Glow Pro */
   .announcement-bar-premium.light-pro{
     box-shadow:0 0 {{ block.settings.pro_glow_size }}px {{ block.settings.pro_glow_color }};
     animation: glowPro-{{ block.id }} {{ block.settings.pro_glow_speed }}s infinite alternate;
@@ -60,36 +75,40 @@
   }
   @keyframes pulsePro-{{ block.id }}{ 0%,100%{ transform:scale(.9); opacity:.35 } 50%{ transform:scale(1); opacity:.65 } }
 
-  .announcement-button{
-    background: {{ block.settings.button_color }};
-    color: {{ block.settings.button_text_color }};
-    padding:8px 12px; border-radius:6px; font-weight:700; text-decoration:none; white-space:nowrap;
-    box-shadow:0 0 {{ block.settings.pro_glow_size | default: 18 }}px {{ block.settings.pro_glow_color }};
+  /* petit ajustement mobile */
+  @media (max-width: 600px){
+    .announcement-bar-premium .abp-inner{ gap:8px; }
+    .announcement-button{ padding:6px 10px; }
   }
 </style>
 
 <div class="announcement-bar-premium {{ block.settings.bar_style }}">
-  <div class="announcement-content">
-    {% if block.settings.bar_style == 'standard' %}
-      <div class="scrolling-track">
-        <div class="scrolling-text">{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
-      </div>
-    {% elsif block.settings.bar_style == 'carousel' %}
-      <div class="carousel-wrap">
-        <span class="nav-btn" onclick="prev_{{ block.id }}()">‹</span>
-        <div id="carouselText-{{ block.id }}" class="carousel-content"></div>
-        <span class="nav-btn" onclick="next_{{ block.id }}()">›</span>
-      </div>
-    {% else %}
-      <div>{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
-    {% endif %}
-  </div>
+  <div class="abp-inner">
 
-  {% if block.settings.button_text != blank %}
-    <div class="announcement-actions">
-      <a href="{{ block.settings.button_link }}" class="announcement-button">{{ block.settings.button_text }}</a>
+    <div class="abp-text">
+      {% case block.settings.bar_style %}
+        {% when 'standard' %}
+          <div class="scrolling-text">{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
+
+        {% when 'carousel' %}
+          <div class="carousel-wrap">
+            <span class="nav-btn" onclick="prev_{{ block.id }}()">‹</span>
+            <div id="carouselText-{{ block.id }}" class="carousel-content"></div>
+            <span class="nav-btn" onclick="next_{{ block.id }}()">›</span>
+          </div>
+
+        {% else %}
+          <div>{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
+      {% endcase %}
     </div>
-  {% endif %}
+
+    {% if block.settings.button_text != blank %}
+      <div class="abp-cta">
+        <a href="{{ block.settings.button_link }}" class="announcement-button">{{ block.settings.button_text }}</a>
+      </div>
+    {% endif %}
+
+  </div>
 </div>
 
 {% if block.settings.bar_style == 'carousel' %}
@@ -111,38 +130,39 @@
   "name": "Premium Announcement Bar",
   "target": "section",
   "settings": [
-    { "type": "select", "id": "bar_style", "label": "Style", "default": "standard", "options": [
-      { "value": "standard", "label": "Marquee" },
-      { "value": "carousel", "label": "Carousel" },
-      { "value": "light-pro", "label": "Glow Pro" }
+    { "type":"select","id":"bar_style","label":"Style","default":"standard","options":[
+      { "value":"standard","label":"Marquee" },
+      { "value":"carousel","label":"Carousel" },
+      { "value":"light-pro","label":"Glow Pro" }
     ]},
-    { "type": "text", "id": "text_1", "label": "Line 1", "default": "🚀 Free shipping on all orders!" },
-    { "type": "text", "id": "text_2", "label": "Line 2", "default": "🔥 Special offer today!" },
-    { "type": "text", "id": "text_3", "label": "Line 3", "default": "🌍 Worldwide delivery" },
-    { "type": "text", "id": "icon", "label": "Icon (emoji)", "default": "🚚" },
+    { "type":"text","id":"text_1","label":"Line 1","default":"🚀 Free shipping on all orders!" },
+    { "type":"text","id":"text_2","label":"Line 2","default":"🔥 Special offer today!" },
+    { "type":"text","id":"text_3","label":"Line 3","default":"🌍 Worldwide delivery" },
+    { "type":"text","id":"icon","label":"Icon (emoji)","default":"🚚" },
 
-    { "type": "image_picker", "id": "background_image", "label": "Background image (optional)" },
-    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#222222" },
-    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" },
-    { "type": "range", "id": "font_size", "label": "Text size (px)", "min": 10, "max": 32, "step": 1, "default": 16 },
-    { "type": "select", "id": "font_weight", "label": "Weight", "default": "normal", "options": [
-      { "value": "normal", "label": "Normal" }, { "value": "bold", "label": "Bold" }
+    { "type":"image_picker","id":"background_image","label":"Background image (optional)" },
+    { "type":"color","id":"bg_color","label":"Background color","default":"#222222" },
+    { "type":"color","id":"text_color","label":"Text color","default":"#ffffff" },
+    { "type":"range","id":"font_size","label":"Text size (px)","min":10,"max":32,"step":1,"default":16 },
+    { "type":"select","id":"font_weight","label":"Weight","default":"bold","options":[
+      { "value":"normal","label":"Normal" }, { "value":"bold","label":"Bold" }
     ]},
-    { "type": "select", "id": "text_align", "label": "Text align", "default": "center", "options": [
-      { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }
+    { "type":"select","id":"text_align","label":"Text align","default":"center","options":[
+      { "value":"left","label":"Left" }, { "value":"center","label":"Center" }, { "value":"right","label":"Right" }
     ]},
-    { "type": "range", "id": "speed", "label": "Scroll / slide speed (s)", "min": 5, "max": 30, "step": 1, "default": 10 },
-    { "type": "range", "id": "padding_vertical", "label": "Vertical padding (px)", "min": 0, "max": 50, "step": 1, "default": 12 },
-    { "type": "range", "id": "padding_horizontal", "label": "Horizontal padding (px)", "min": 0, "max": 50, "step": 1, "default": 0 },
+    { "type":"range","id":"speed","label":"Scroll / slide speed (s)","min":5,"max":30,"step":1,"default":10 },
+    { "type":"range","id":"padding_vertical","label":"Vertical padding (px)","min":0,"max":50,"step":1,"default":12 },
+    { "type":"range","id":"padding_horizontal","label":"Horizontal padding (px)","min":0,"max":50,"step":1,"default":0 },
 
-    { "type": "text", "id": "button_text", "label": "Button text", "default": "Learn more" },
-    { "type": "url", "id": "button_link", "label": "Button link" },
-    { "type": "color", "id": "button_color", "label": "Button background", "default": "#000000" },
-    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#ffffff" },
+    { "type":"text","id":"button_text","label":"Button text","default":"Shop now" },
+    { "type":"url","id":"button_link","label":"Button link" },
+    { "type":"color","id":"button_color","label":"Button background","default":"#000000" },
+    { "type":"color","id":"button_text_color","label":"Button text color","default":"#ffffff" },
 
-    { "type": "color", "id": "pro_glow_color", "label": "Glow color", "default": "#ffffff" },
-    { "type": "range", "id": "pro_glow_size", "label": "Glow size (px)", "min": 10, "max": 100, "step": 1, "default": 30 },
-    { "type": "range", "id": "pro_glow_speed", "label": "Glow speed (s)", "min": 1, "max": 10, "step": 0.5, "default": 2 }
-  ]
+    { "type":"color","id":"pro_glow_color","label":"Glow color","default":"#ffffff" },
+    { "type":"range","id":"pro_glow_size","label":"Glow size (px)","min":10,"max":100,"step":1,"default":30 },
+    { "type":"range","id":"pro_glow_speed","label":"Glow speed (s)","min":1,"max":10,"step":0.5,"default":2 }
+  ],
+  "presets": [{ "name": "Premium Announcement Bar" }]
 }
 {% endschema %}
