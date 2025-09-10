@@ -1,30 +1,6 @@
 // app/routes/billing.activate.jsx
 import { redirect } from "@remix-run/node";
-import { authenticate } from "../shopify.server"; // server-only, OK ici
-
-// ---- Helpers ---------------------------------------------------------
-const truthy = (v) =>
-  typeof v === "string" &&
-  ["true", "1", "yes", "y", "on"].includes(v.toLowerCase());
-
-function computeIsTest(shop, nodeEnv) {
-  // 1) Si BILLING_TEST=true -> toujours test (utile en local)
-  if (truthy(process.env.BILLING_TEST || "")) return true;
-
-  // 2) Liste blanche de shops de dev (ex: "dev-a.myshopify.com,dev-b.myshopify.com")
-  const devList = (process.env.DEV_STORES || "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  if (devList.length && shop && devList.includes(shop.toLowerCase())) return true;
-
-  // 3) En non-production (local), on force test
-  if ((nodeEnv || "").toLowerCase() !== "production") return true;
-
-  // 4) Par défaut: live (prod)
-  return false;
-}
-// ---------------------------------------------------------------------
+import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
@@ -33,7 +9,8 @@ export const loader = async ({ request }) => {
   const plan = url.searchParams.get("plan") || "premium-monthly";
 
   try {
-    const { billing } = await authenticate.admin(request); // peut renvoyer Response(302)
+    // ⬇️ Récupère aussi "admin" pour interroger le plan du shop
+    const { admin, billing } = await authenticate.admin(request);
 
     // URL de retour COURTE (<= 255 chars)
     const appUrl = process.env.SHOPIFY_APP_URL || url.origin;
@@ -41,17 +18,40 @@ export const loader = async ({ request }) => {
     if (shop) returnUrl.searchParams.set("shop", shop);
     if (host) returnUrl.searchParams.set("host", host);
 
-    // isTest = false par défaut en prod / true uniquement pour tes shops DEV
-    const isTest = computeIsTest(shop, process.env.NODE_ENV);
+    // ⬇️ Vérifie avec Shopify si la boutique est un dev store
+    const planRes = await admin.graphql(`{ shop { plan { partnerDevelopment } } }`);
+    const planJson = await planRes.json();
+    const isDevStore = planJson?.data?.shop?.plan?.partnerDevelopment === true;
+
+    // ⬇️ RÈGLE FINALE : test UNIQUEMENT sur dev store
+    const isTest = isDevStore;
+
+    // (Optionnel mais conseillé) — si un abonnement test actif existe déjà, on l’annule avant de redemander
+    // pour éviter d’être "couvert" par un abo test :
+    /*
+    const active = await admin.graphql(`{
+      appSubscriptions(first: 20, status: ACTIVE) { edges { node { id test status } } }
+    }`).then(r => r.json());
+    for (const e of (active?.data?.appSubscriptions?.edges || [])) {
+      if (e.node?.test === true) {
+        await admin.graphql(
+          `mutation($id: ID!){
+            appSubscriptionCancel(id: $id) { appSubscription { id status } userErrors { message } }
+          }`,
+          { variables: { id: e.node.id } }
+        );
+      }
+    }
+    */
 
     await billing.request({
       plan,
-      isTest,
+      isTest, // ✅ false sur vraie boutique → plus de bannière "test"
       returnUrl: returnUrl.toString(),
+      // trialDays: 14 // si tu le gères ici; sinon via ta config de billing
     });
 
-    // Normalement, la ligne au-dessus provoque un 302 vers la page d’approbation Shopify.
-    // Si jamais on “retombe” ici, renvoie sur /pricing.
+    // Normalement, la ligne au-dessus 302 vers Shopify (page d’approbation)
     const fallback = new URL("/pricing", appUrl);
     if (shop) fallback.searchParams.set("shop", shop);
     if (host) fallback.searchParams.set("host", host);
