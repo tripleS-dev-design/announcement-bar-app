@@ -28,13 +28,13 @@ export const PLAN_HANDLES = {
 // Les clés de cet objet SONT les handles de plan
 export const billing = {
   [PLAN_HANDLES.monthly]: {
-    amount: 4.99,
+    amount: 0.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
     trialDays: 14,
   },
   [PLAN_HANDLES.annual]: {
-    amount: 39.99,
+    amount: 9.99,
     currencyCode: "USD",
     interval: BillingInterval.Annual,
     trialDays: 14,
