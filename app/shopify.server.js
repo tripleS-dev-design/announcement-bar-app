@@ -31,13 +31,13 @@ export const billing = {
     amount: 0.99,
     currencyCode: "USD",
     interval: BillingInterval.Every30Days,
-    trialDays: 14,
+    trialDays: 3,
   },
   [PLAN_HANDLES.annual]: {
     amount: 9.99,
     currencyCode: "USD",
     interval: BillingInterval.Annual,
-    trialDays: 14,
+    trialDays: 3,
   },
 };
 
