@@ -194,7 +194,7 @@ export default function Pricing() {
           {currentHandle === PLAN_HANDLES.monthly && <TagCurrent />}
           <h3 style={{ fontSize: "20px", marginBottom: "6px" }}>Premium Plan — Monthly</h3>
           <p style={priceStyle}>
-            $4.99 <span style={{ fontSize: "13px" }}>/month</span>
+            $0.99 <span style={{ fontSize: "13px" }}>/month</span>
           </p>
           <p style={oldPriceStyle}>$14.99</p>
           <Features />
@@ -245,7 +245,7 @@ export default function Pricing() {
           {currentHandle === PLAN_HANDLES.annual && <TagCurrent />}
           <h3 style={{ fontSize: "20px", marginBottom: "6px" }}>Premium Plan — Annual</h3>
           <p style={priceStyle}>
-            $39.99 <span style={{ fontSize: "13px" }}>/year</span>
+            $9.99 <span style={{ fontSize: "13px" }}>/year</span>
           </p>
           <p style={oldPriceStyle}>$89.99</p>
           <Features />
