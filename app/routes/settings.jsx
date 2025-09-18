@@ -481,7 +481,7 @@ export default function Settings() {
 
       {/* WhatsApp en bas à gauche */}
       <a
-        href="https://wa.me/+212630079763"
+        href="https://wa.me/+212681570887"
         target="_blank"
         rel="noopener noreferrer"
         style={{
