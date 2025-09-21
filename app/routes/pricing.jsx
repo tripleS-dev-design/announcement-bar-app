@@ -196,7 +196,6 @@ export default function Pricing() {
           <p style={priceStyle}>
             $0.99 <span style={{ fontSize: "13px" }}>/month</span>
           </p>
-          <p style={oldPriceStyle}>$14.99</p>
           <Features />
           {currentHandle === PLAN_HANDLES.monthly ? (
             <button
@@ -247,7 +246,6 @@ export default function Pricing() {
           <p style={priceStyle}>
             $9.99 <span style={{ fontSize: "13px" }}>/year</span>
           </p>
-          <p style={oldPriceStyle}>$89.99</p>
           <Features />
           {currentHandle === PLAN_HANDLES.annual ? (
             <button
