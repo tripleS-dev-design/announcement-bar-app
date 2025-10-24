@@ -20,11 +20,8 @@ export const loader = async ({ request }) => {
     return redirect(`/pricing?${qs}`);
   }
 
-  // shop courant (ex: "selya11904" à partir de "selya11904.myshopify.com")
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
-
-  // 🔑 API key (client_id) — public dans l’admin, nécessaire pour les deep links
   const apiKey = process.env.SHOPIFY_API_KEY || "";
 
   return json({ shopSub, apiKey });
@@ -69,17 +66,14 @@ const GLOBAL_STYLES = `
    👉 addAppBlockId = {API_KEY}/{handle}
 ================================ */
 function editorBase({ shopSub }) {
-  // admin.shopify.com est le plus fiable
   return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
 }
-
-/** Ouvre l’éditeur et PRÉ-REMPLIT l’ajout d’un App Block (le marchand confirme) */
 function makeAddBlockLink({
   shopSub,
   apiKey,
   template = "index",
-  handle, // ex: "announcement-premium" (nom du .liquid dans /blocks)
-  target = "newAppsSection", // "newAppsSection" | "mainSection" | "sectionGroup:header" | `sectionId:${id}`
+  handle,
+  target = "newAppsSection",
 }) {
   const base = editorBase({ shopSub });
   const p = new URLSearchParams({
@@ -93,7 +87,7 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Tes composants (inchangés)
+   Tes composants (existants)
 ================================ */
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -256,6 +250,7 @@ function PreviewPopup() {
   );
 }
 
+/* ====== Countdown existant ====== */
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -352,6 +347,186 @@ function PreviewCountdown() {
 }
 
 /* ==============================
+   🔥 Nouveaux PREVIEWS BLOCS
+================================ */
+
+/** 1) Icônes Réseaux Sociaux (style clean + hover) */
+function PreviewSocialIcons() {
+  const icons = [
+    { name: "Facebook", href: "#", path: "M279.14 288l14.22-92.66h-88.91V140.13..." },
+    { name: "Instagram", href: "#", path: "M224,202a54,54,0,1,0,54,54A54,54,0,0,0,224,202Z..." },
+    { name: "TikTok", href: "#", path: "M304 64h64a144 144 0 11-144 144V64h80z..." },
+    { name: "YouTube", href: "#", path: "M186.8 202.5l95.7 54.9-95.7 54.9z..." },
+  ];
+  return (
+    <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+      {icons.map((ico, i) => (
+        <a
+          key={i}
+          href={ico.href}
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            background:
+              "radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 60%),#111",
+            boxShadow: "0 6px 14px rgba(0,0,0,.2)",
+            transition: "transform .15s ease, box-shadow .15s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+          aria-label={ico.name}
+        >
+          <svg width="26" height="26" viewBox="0 0 448 512" fill="#fff" aria-hidden="true">
+            <path d={ico.path} />
+          </svg>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+/** 2) Bouton WhatsApp Sticky (en bloc autonome) */
+function PreviewWhatsAppSticky() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div
+        style={{
+          position: "relative",
+          width: 64,
+          height: 64,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 35% 35%, rgba(255,255,255,.25), transparent 60%), #25D366",
+          boxShadow: "0 10px 20px rgba(0,0,0,.15)",
+          display: "grid",
+          placeItems: "center",
+        }}
+        title="Sticky WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 448 512" fill="#fff">
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z" />
+        </svg>
+      </div>
+      <div>
+        <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
+        <div style={{ color: "#555" }}>Contact rapide — coin bas (mobile & desktop)</div>
+      </div>
+    </div>
+  );
+}
+
+/** 3) Carousel d’images circulaires (scroll auto) */
+function PreviewCircleScroller() {
+  const imgs = [
+    "https://picsum.photos/seed/a/200",
+    "https://picsum.photos/seed/b/200",
+    "https://picsum.photos/seed/c/200",
+    "https://picsum.photos/seed/d/200",
+    "https://picsum.photos/seed/e/200",
+  ];
+  return (
+    <div style={{ overflowX: "auto", display: "flex", gap: 12, paddingBottom: 6 }}>
+      {imgs.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt={`circle-${i}`}
+          width={88}
+          height={88}
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
+            boxShadow: "0 4px 10px rgba(0,0,0,.12)",
+            border: "2px solid rgba(0,0,0,.06)",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+    </div>
+  );
+}
+
+/** 4) Présentation Gold de produits (grille) */
+function PreviewGoldProducts() {
+  const items = [
+    { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/300" },
+    { title: "Product Two", price: "$49", img: "https://picsum.photos/seed/2/300" },
+    { title: "Product Three", price: "$59", img: "https://picsum.photos/seed/3/300" },
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: 12,
+        width: "100%",
+      }}
+    >
+      {items.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            background:
+              "linear-gradient(135deg, #2a2212 0%, #3b2f17 40%, #57411c 70%, #2a2212 100%)",
+            color: "#f8e7b9",
+            borderRadius: 12,
+            overflow: "hidden",
+            boxShadow: "0 6px 16px rgba(0,0,0,.2)",
+          }}
+        >
+          <div style={{ position: "relative" }}>
+            <img
+              src={p.img}
+              alt={p.title}
+              width={400}
+              height={300}
+              style={{ width: "100%", height: 140, objectFit: "cover" }}
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(60% 60% at 70% 20%, rgba(255,215,0,.25), transparent 60%)",
+              }}
+            />
+          </div>
+          <div style={{ padding: "10px 12px" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>{p.title}</div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: 14,
+              }}
+            >
+              <span>{p.price}</span>
+              <button
+                style={{
+                  ...BUTTON_BASE,
+                  padding: "6px 12px",
+                  backgroundColor: "#f8e7b9",
+                  color: "#3a2b12",
+                }}
+              >
+                View
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ==============================
    PAGE Settings
 ================================ */
 export default function Settings() {
@@ -362,11 +537,64 @@ export default function Settings() {
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  // Tes 3 blocks (handles = noms des fichiers .liquid dans /extensions/announcement-bar/blocks)
+  // Blocs existants + Nouveaux blocs (même design, en dessous)
   const blocks = [
-    { id: "announcement-premium", title: "Premium Announcement Bar", description: "Animated or multilingual bar to grab attention.", template: "index", preview: <PreviewAnnouncementBar /> },
-    { id: "popup-premium",        title: "Premium Popup",            description: "Modern popup with promo code and glow animation.",    template: "index", preview: <PreviewPopup /> },
-    { id: "timer-premium",        title: "Premium Countdown",        description: "Three dynamic countdown styles.",                     template: "index", preview: <PreviewCountdown /> },
+    // === EXISTANTS ===
+    {
+      id: "announcement-premium",
+      title: "Premium Announcement Bar",
+      description: "Animated or multilingual bar to grab attention.",
+      template: "index",
+      preview: <PreviewAnnouncementBar />,
+    },
+    {
+      id: "popup-premium",
+      title: "Premium Popup",
+      description: "Modern popup with promo code and glow animation.",
+      template: "index",
+      preview: <PreviewPopup />,
+    },
+    {
+      id: "timer-premium",
+      title: "Premium Countdown",
+      description: "Three dynamic countdown styles.",
+      template: "index",
+      preview: <PreviewCountdown />,
+    },
+
+    // === NOUVEAUX (sous les 3 premiers) ===
+    // 1) Icônes Social
+    {
+      id: "social-icons-premium",
+      title: "Social Icons",
+      description: "Icônes réseaux sociaux avec hover & style propre.",
+      template: "index",
+      preview: <PreviewSocialIcons />,
+    },
+    // 2) WhatsApp Sticky (bloc autonome)
+    {
+      id: "whatsapp-sticky-premium",
+      title: "WhatsApp Sticky Button",
+      description: "Bouton flottant contact rapide (coin bas).",
+      template: "index",
+      preview: <PreviewWhatsAppSticky />,
+    },
+    // 3) Carousel images circulaires
+    {
+      id: "circle-scroller-premium",
+      title: "Circle Image Scroller",
+      description: "Carousel horizontal d’images rondes (look stories).",
+      template: "index",
+      preview: <PreviewCircleScroller />,
+    },
+    // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
+    {
+      id: "gold-showcase-premium",
+      title: "Gold Products Showcase",
+      description: "Grille vitrine style gold pour présenter tes produits.",
+      template: "index",
+      preview: <PreviewGoldProducts />,
+    },
   ];
 
   return (
@@ -391,9 +619,7 @@ export default function Settings() {
             “Welcome to Triple Announcement Bar! Let’s boost your sales with
             powerful bars, popups, and countdowns.”
           </p>
-          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
-          
-          </div>
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
         </div>
 
         {blocks.map((block) => (
@@ -402,7 +628,7 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* ✅ Deep link corrigé : addAppBlockId = API_KEY/HANDLE */}
+              {/* ✅ Deep link : addAppBlockId = API_KEY/HANDLE */}
               <a
                 href={makeAddBlockLink({
                   shopSub,
@@ -453,7 +679,7 @@ export default function Settings() {
 
       {/* YouTube en bas à droite */}
       <a
-        href={YOUTUBE_URL}
+        href={"https://youtu.be/UJzd4Re21e0"}
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -479,7 +705,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* WhatsApp en bas à gauche */}
+      {/* WhatsApp global (existant). Le bloc “whatsapp-sticky-premium” est séparé */}
       <a
         href="https://wa.me/+212681570887"
         target="_blank"
