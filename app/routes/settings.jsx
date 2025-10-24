@@ -350,43 +350,71 @@ function PreviewCountdown() {
    🔥 Nouveaux PREVIEWS BLOCS
 ================================ */
 
-/** 1) Icônes Réseaux Sociaux (style clean + hover) */
+/** 1) Icônes Réseaux Sociaux (SVG simples & lisibles) */
 function PreviewSocialIcons() {
-  const icons = [
-    { name: "Facebook", href: "#", path: "M279.14 288l14.22-92.66h-88.91V140.13..." },
-    { name: "Instagram", href: "#", path: "M224,202a54,54,0,1,0,54,54A54,54,0,0,0,224,202Z..." },
-    { name: "TikTok", href: "#", path: "M304 64h64a144 144 0 11-144 144V64h80z..." },
-    { name: "YouTube", href: "#", path: "M186.8 202.5l95.7 54.9-95.7 54.9z..." },
-  ];
+  const Icon = ({ children, href = "#" }) => (
+    <a
+      href={href}
+      style={{
+        width: 52,
+        height: 52,
+        borderRadius: "50%",
+        display: "grid",
+        placeItems: "center",
+        background:
+          "radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 60%), #111",
+        boxShadow: "0 6px 14px rgba(0,0,0,.2)",
+        transition: "transform .15s ease, box-shadow .15s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+    >
+      {children}
+    </a>
+  );
+
   return (
-    <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-      {icons.map((ico, i) => (
-        <a
-          key={i}
-          href={ico.href}
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
-            display: "grid",
-            placeItems: "center",
-            background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 60%),#111",
-            boxShadow: "0 6px 14px rgba(0,0,0,.2)",
-            transition: "transform .15s ease, box-shadow .15s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-          aria-label={ico.name}
-        >
-          <svg width="26" height="26" viewBox="0 0 448 512" fill="#fff" aria-hidden="true">
-            <path d={ico.path} />
-          </svg>
-        </a>
-      ))}
+    <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+      {/* Instagram (carré arrondi + cercle + petit point) */}
+      <Icon aria-label="Instagram">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle cx="46" cy="18" r="3" fill="#fff" />
+        </svg>
+      </Icon>
+
+      {/* X / Twitter (X formé de 2 traits épais) */}
+      <Icon aria-label="X">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M12 14 L50 52" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          <path d="M50 14 L12 52" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Icon>
+
+      {/* Facebook (F simple en formes) */}
+      <Icon aria-label="Facebook">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          {/* tige verticale */}
+          <rect x="28" y="12" width="8" height="40" fill="#fff" rx="2" />
+          {/* barre du haut */}
+          <rect x="22" y="12" width="20" height="8" fill="#fff" rx="2" />
+          {/* barre du milieu */}
+          <rect x="22" y="26" width="16" height="8" fill="#fff" rx="2" />
+        </svg>
+      </Icon>
+
+      {/* YouTube (rectangle arrondi + triangle play) */}
+      <Icon aria-label="YouTube">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
+          <polygon points="30,24 44,32 30,40" fill="#fff" />
+        </svg>
+      </Icon>
     </div>
   );
 }
+
 
 /** 2) Bouton WhatsApp Sticky (en bloc autonome) */
 function PreviewWhatsAppSticky() {
