@@ -350,24 +350,25 @@ function PreviewCountdown() {
    🔥 Nouveaux PREVIEWS BLOCS
 ================================ */
 
-/** 1) Icônes Réseaux Sociaux (SVG simples & lisibles) */
+/** 1) Icônes Réseaux Sociaux — logos réels + couleurs officielles */
 function PreviewSocialIcons() {
-  const Icon = ({ children, href = "#" }) => (
+  const Base = ({ children, title, href = "#" , bg }) => (
     <a
       href={href}
+      title={title}
       style={{
         width: 52,
         height: 52,
         borderRadius: "50%",
         display: "grid",
         placeItems: "center",
-        background:
-          "radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 60%), #111",
+        background: bg,
         boxShadow: "0 6px 14px rgba(0,0,0,.2)",
-        transition: "transform .15s ease, box-shadow .15s ease",
+        transition: "transform .15s ease, boxShadow .15s ease",
       }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+      aria-label={title}
     >
       {children}
     </a>
@@ -375,46 +376,73 @@ function PreviewSocialIcons() {
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-      {/* Instagram (carré arrondi + cercle + petit point) */}
-      <Icon aria-label="Instagram">
+      {/* Instagram (dégradé officiel) */}
+      <Base
+        title="Instagram"
+        bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
+      >
+        {/* Camera simple blanche lisible sur le dégradé */}
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
           <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
           <circle cx="46" cy="18" r="3" fill="#fff" />
         </svg>
-      </Icon>
+      </Base>
 
-      {/* X / Twitter (X formé de 2 traits épais) */}
-      <Icon aria-label="X">
-        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M12 14 L50 52" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-          <path d="M50 14 L12 52" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-        </svg>
-      </Icon>
-
-      {/* Facebook (F simple en formes) */}
-      <Icon aria-label="Facebook">
-        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
-          {/* tige verticale */}
-          <rect x="28" y="12" width="8" height="40" fill="#fff" rx="2" />
-          {/* barre du haut */}
-          <rect x="22" y="12" width="20" height="8" fill="#fff" rx="2" />
-          {/* barre du milieu */}
-          <rect x="22" y="26" width="16" height="8" fill="#fff" rx="2" />
-        </svg>
-      </Icon>
-
-      {/* YouTube (rectangle arrondi + triangle play) */}
-      <Icon aria-label="YouTube">
-        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+      {/* YouTube (rouge #FF0000) */}
+      <Base title="YouTube" bg="#FF0000">
+        <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
           <polygon points="30,24 44,32 30,40" fill="#fff" />
         </svg>
-      </Icon>
+      </Base>
+
+      {/* Facebook (bleu #1877F2) */}
+      <Base title="Facebook" bg="#1877F2">
+        {/* “f” blanche stylisée (forme vectorielle simple) */}
+        <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
+          <path
+            d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
+            fill="#fff"
+          />
+        </svg>
+      </Base>
+
+      {/* X (noir) */}
+      <Base title="X" bg="#000000">
+        {/* X blanc (2 diagonales) */}
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          <path d="M50 14 L14 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Base>
+
+      {/* TikTok (fond noir, note blanche + petit accent cyan/rose) */}
+      <Base title="TikTok" bg="#000000">
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+          {/* tige (blanc) */}
+          <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          {/* accent cyan */}
+          <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
+          {/* accent rose */}
+          <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Base>
+
+      {/* LinkedIn (bleu #0A66C2) */}
+      <Base title="LinkedIn" bg="#0A66C2">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
+          {/* “in” simplifié en formes */}
+          <circle cx="22" cy="31" r="3" fill="#fff" />
+          <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
+          <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
+          <path d="M36 36 c0-3 2-6 6-6 s6 3 6 6 v12 h-6 v-10 c0-1.7-1.3-3-3-3 s-3 1.3-3 3 v10 h-6 V36" fill="#fff" />
+        </svg>
+      </Base>
     </div>
   );
 }
-
 
 /** 2) Bouton WhatsApp Sticky (en bloc autonome) */
 function PreviewWhatsAppSticky() {
