@@ -21,7 +21,7 @@ export const loader = async ({ request }) => {
   }
 
   const shopDomain = session.shop || "";
-  const shopSub = shopDomain.replace(".myshopify.com", "");
+  the shopSub = shopDomain.replace(".myshopify.com", "");
   const apiKey = process.env.SHOPIFY_API_KEY || "";
 
   return json({ shopSub, apiKey });
@@ -352,7 +352,7 @@ function PreviewCountdown() {
 
 /** 1) Icônes Réseaux Sociaux — logos réels + couleurs officielles */
 function PreviewSocialIcons() {
-  const Base = ({ children, title, href = "#" , bg }) => (
+  const Base = ({ children, title, href = "#", bg }) => (
     <a
       href={href}
       title={title}
@@ -376,12 +376,11 @@ function PreviewSocialIcons() {
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-      {/* Instagram (dégradé officiel) */}
+      {/* Instagram */}
       <Base
         title="Instagram"
         bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
       >
-        {/* Camera simple blanche lisible sur le dégradé */}
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
           <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
@@ -389,7 +388,7 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* YouTube (rouge #FF0000) */}
+      {/* YouTube */}
       <Base title="YouTube" bg="#FF0000">
         <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
@@ -397,9 +396,8 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* Facebook (bleu #1877F2) */}
+      {/* Facebook */}
       <Base title="Facebook" bg="#1877F2">
-        {/* “f” blanche stylisée (forme vectorielle simple) */}
         <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
           <path
             d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
@@ -408,32 +406,27 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* X (noir) */}
+      {/* X */}
       <Base title="X" bg="#000000">
-        {/* X blanc (2 diagonales) */}
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
           <path d="M50 14 L14 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
         </svg>
       </Base>
 
-      {/* TikTok (fond noir, note blanche + petit accent cyan/rose) */}
+      {/* TikTok */}
       <Base title="TikTok" bg="#000000">
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
-          {/* tige (blanc) */}
           <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-          {/* accent cyan */}
           <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
-          {/* accent rose */}
           <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
         </svg>
       </Base>
 
-      {/* LinkedIn (bleu #0A66C2) */}
+      {/* LinkedIn */}
       <Base title="LinkedIn" bg="#0A66C2">
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
-          {/* “in” simplifié en formes */}
           <circle cx="22" cy="31" r="3" fill="#fff" />
           <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
           <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
@@ -643,22 +636,14 @@ export default function Settings() {
       template: "index",
       preview: <PreviewCircleScroller />,
     },
-    // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
- {
-  id: "gold-products-premium",
-  title: "Gold Products Showcase (Premium)",
-  description: "Grille produits style gold à partir d’une collection.",
-  template: "index",
-  preview: <div style={{padding:12, borderRadius:8, background:"#fff", border:"1px solid #eee"}}>
-    <div style={{fontWeight:"bold", marginBottom:8}}>Gold Products</div>
-    <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8}}>
-      {[1,2,3].map(i=>(
-        <div key={i} style={{height:50, background:"linear-gradient(135deg,#8A6A2A,#C9A34A)", borderRadius:8}}/>
-      ))}
-    </div>
-  </div>
-}
-
+    // 4) Présentation Gold
+    {
+      id: "gold-products-premium",
+      title: "Gold Products Showcase (Premium)",
+      description: "Grille produits style gold à partir d’une collection.",
+      template: "index",
+      preview: <PreviewGoldProducts />   // ✅ SEULE MODIFICATION
+    },
   ];
 
   return (
@@ -769,7 +754,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* WhatsApp global (existant). Le bloc “whatsapp-sticky-premium” est séparé */}
+      {/* WhatsApp global (existant) */}
       <a
         href="https://wa.me/+212681570887"
         target="_blank"
