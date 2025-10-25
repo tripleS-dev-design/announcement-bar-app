@@ -644,13 +644,21 @@ export default function Settings() {
       preview: <PreviewCircleScroller />,
     },
     // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
-    {
-      id: "gold-showcase-premium",
-      title: "Gold Products Showcase",
-      description: "Grille vitrine style gold pour présenter tes produits.",
-      template: "index",
-      preview: <PreviewGoldProducts />,
-    },
+ {
+  id: "gold-products-premium",
+  title: "Gold Products Showcase (Premium)",
+  description: "Grille produits style gold à partir d’une collection.",
+  template: "index",
+  preview: <div style={{padding:12, borderRadius:8, background:"#fff", border:"1px solid #eee"}}>
+    <div style={{fontWeight:"bold", marginBottom:8}}>Gold Products</div>
+    <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8}}>
+      {[1,2,3].map(i=>(
+        <div key={i} style={{height:50, background:"linear-gradient(135deg,#8A6A2A,#C9A34A)", borderRadius:8}}/>
+      ))}
+    </div>
+  </div>
+}
+
   ];
 
   return (

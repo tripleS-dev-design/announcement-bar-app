@@ -1,0 +1,235 @@
+{%- comment -%}
+  SOCIAL ICONS — App Block (Premium)
+  Handle: social-icons-premium
+  - Icônes réseaux sociaux (couleurs officielles optionnelles)
+  - Jusqu’à 5 icônes configurables (≤ 25 settings)
+{%- endcomment -%}
+
+{%- assign ns = 'social-icons-' | append: block.id -%}
+
+<div class="{{ ns }}-wrap" role="navigation" aria-label="Social media links">
+  <div class="{{ ns }}-row">
+    {%- assign use_brand_colors = block.settings.brand_colors -%}
+
+    {%- for i in (1..5) -%}
+      {%- assign brand_key = 'brand_' | append: i -%}
+      {%- assign url_key = 'url_' | append: i -%}
+      {%- assign label_key = 'label_' | append: i -%}
+
+      {%- assign brand_name = block.settings[brand_key] -%}
+      {%- assign url_val = block.settings[url_key] -%}
+      {%- assign label_val = block.settings[label_key] | default: brand_name | capitalize -%}
+
+      {%- if brand_name != blank and url_val != blank -%}
+        <a
+          class="{{ ns }}-item {{ ns }}-{{ brand_name }}"
+          href="{{ url_val | escape }}"
+          aria-label="{{ label_val | escape }}"
+          {% if block.settings.new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+          <span class="{{ ns }}-icon" aria-hidden="true">
+            {%- case brand_name -%}
+              {%- when 'instagram' -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="{{ ns }}-ig" cx="30%" cy="30%" r="70%">
+                      <stop offset="0%" stop-color="#FEDA77"/>
+                      <stop offset="25%" stop-color="#F58529"/>
+                      <stop offset="55%" stop-color="#DD2A7B"/>
+                      <stop offset="75%" stop-color="#8134AF"/>
+                      <stop offset="100%" stop-color="#515BD4"/>
+                    </radialGradient>
+                  </defs>
+                  {% if use_brand_colors %}
+                    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#{{ ns }}-ig)"/>
+                    <rect x="12" y="12" width="40" height="40" rx="12" ry="12" fill="none" stroke="#fff" stroke-width="4"/>
+                    <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" stroke-width="4"/>
+                    <circle cx="44" cy="20" r="3" fill="#fff"/>
+                  {% else %}
+                    <rect x="12" y="12" width="40" height="40" rx="12" ry="12" fill="none" stroke="currentColor" stroke-width="4"/>
+                    <circle cx="32" cy="32" r="10" fill="none" stroke="currentColor" stroke-width="4"/>
+                    <circle cx="44" cy="20" r="3" fill="currentColor"/>
+                  {% endif %}
+                </svg>
+
+              {%- when 'youtube' -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  {% if use_brand_colors %}<rect x="8" y="18" width="48" height="28" rx="8" fill="#FF0000"/>{% endif %}
+                  <rect x="8" y="18" width="48" height="28" rx="8" fill="none" stroke="currentColor" stroke-width="4"/>
+                  <polygon points="30,24 44,32 30,40" fill="currentColor"/>
+                </svg>
+
+              {%- when 'facebook' -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  {% if use_brand_colors %}<rect x="6" y="6" width="52" height="52" rx="12" fill="#1877F2"/>{% endif %}
+                  <path d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
+                        fill="currentColor"/>
+                </svg>
+
+              {%- when 'x' -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  {% if use_brand_colors %}<rect x="6" y="6" width="52" height="52" rx="12" fill="#000"/>{% endif %}
+                  <path d="M14 14 L50 50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+                  <path d="M50 14 L14 50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+
+              {%- when 'tiktok' -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  {% if use_brand_colors %}<rect x="6" y="6" width="52" height="52" rx="12" fill="#000"/>{% endif %}
+                  <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+                  {% if use_brand_colors %}
+                    <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" stroke-width="6" stroke-linecap="round"/>
+                  {% endif %}
+                </svg>
+
+              {%- when 'linkedin' -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  {% if use_brand_colors %}<rect x="6" y="6" width="52" height="52" rx="8" fill="#0A66C2"/>{% endif %}
+                  <circle cx="22" cy="31" r="3" fill="currentColor"/>
+                  <rect x="19" y="36" width="6" height="12" rx="1" fill="currentColor"/>
+                  <rect x="30" y="30" width="6" height="18" rx="1" fill="currentColor"/>
+                  <path d="M36 36 c0-3 2-6 6-6 s6 3 6 6 v12 h-6 v-10 c0-1.7-1.3-3-3-3 s-3 1.3-3 3 v10 h-6 V36"
+                        fill="currentColor"/>
+                </svg>
+
+              {%- else -%}
+                <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="20" fill="currentColor"/></svg>
+            {%- endcase -%}
+          </span>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+<style>
+  .{{ ns }}-row{
+    display:flex;
+    gap: {{ block.settings.gap | default: 12 }}px;
+    align-items:center;
+    justify-content:
+      {% case block.settings.align %}
+        {% when 'left' %} flex-start
+        {% when 'center' %} center
+        {% when 'right' %} flex-end
+        {% else %} flex-start
+      {% endcase %};
+    flex-wrap: wrap;
+  }
+  .{{ ns }}-item{
+    width: {{ block.settings.size | default: 44 }}px;
+    height: {{ block.settings.size | default: 44 }}px;
+    display:grid; place-items:center;
+    text-decoration:none;
+    color: {% if block.settings.brand_colors %}#fff{% else %}{{ block.settings.mono_color | default: '#111111' }}{% endif %};
+    background:
+      {% if block.settings.brand_colors and block.settings.shape == 'circle' %}
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.15), transparent 60%), #111
+      {% else %}
+        {{ block.settings.bg_color | default: 'transparent' }}
+      {% endif %};
+    border-radius: {% if block.settings.shape == 'square' %}12px{% else %}50%{% endif %};
+    box-shadow: {% if block.settings.shadow %}0 6px 14px rgba(0,0,0,.20){% else %}none{% endif %};
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .{{ ns }}-item:hover{
+    transform: translateY(-2px);
+    box-shadow: {% if block.settings.shadow %}0 10px 18px rgba(0,0,0,.22){% else %}none{% endif %};
+    filter: brightness(1.05);
+  }
+  .{{ ns }}-icon svg{
+    width: calc({{ block.settings.size | default: 44 }}px * 0.60);
+    height: calc({{ block.settings.size | default: 44 }}px * 0.60);
+    display:block;
+  }
+
+  {% if block.settings.brand_colors %}
+    .{{ ns }}-instagram{ background: radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%); }
+    .{{ ns }}-youtube{ background: #FF0000; }
+    .{{ ns }}-facebook{ background: #1877F2; }
+    .{{ ns }}-x{ background: #000000; }
+    .{{ ns }}-tiktok{ background: #000000; }
+    .{{ ns }}-linkedin{ background: #0A66C2; }
+  {% endif %}
+</style>
+
+{% schema %}
+{
+  "name": "Social Icons (Premium)",
+  "target": "section",
+  "settings": [
+    { "type": "range", "id": "size", "min": 28, "max": 72, "step": 2, "unit": "px", "label": "Taille des pastilles", "default": 48 },
+    { "type": "range", "id": "gap", "min": 4, "max": 32, "step": 1, "unit": "px", "label": "Espacement", "default": 12 },
+    { "type": "select", "id": "align", "label": "Alignement", "default": "left", "options": [
+      { "value": "left", "label": "Gauche" },
+      { "value": "center", "label": "Centre" },
+      { "value": "right", "label": "Droite" }
+    ]},
+    { "type": "select", "id": "shape", "label": "Forme", "default": "circle", "options": [
+      { "value": "circle", "label": "Rond" },
+      { "value": "square", "label": "Carré" }
+    ]},
+    { "type": "checkbox", "id": "brand_colors", "label": "Couleurs officielles des marques", "default": true },
+    { "type": "color", "id": "mono_color", "label": "Couleur du logo (mode monochrome)", "default": "#111111" },
+    { "type": "color", "id": "bg_color", "label": "Fond (si couleurs marques désactivées)", "default": "transparent" },
+    { "type": "checkbox", "id": "shadow", "label": "Ombre portée", "default": true },
+    { "type": "checkbox", "id": "new_tab", "label": "Ouvrir dans un nouvel onglet", "default": true },
+
+    { "type": "select", "id": "brand_1", "label": "Icône 1 — Réseau", "default": "instagram", "options": [
+      { "value": "instagram", "label": "Instagram" },
+      { "value": "youtube", "label": "YouTube" },
+      { "value": "facebook", "label": "Facebook" },
+      { "value": "x", "label": "X (Twitter)" },
+      { "value": "tiktok", "label": "TikTok" },
+      { "value": "linkedin", "label": "LinkedIn" }
+    ]},
+    { "type": "text", "id": "label_1", "label": "Icône 1 — Label (aria)", "default": "Instagram" },
+    { "type": "url", "id": "url_1", "label": "Icône 1 — Lien" },
+
+    { "type": "select", "id": "brand_2", "label": "Icône 2 — Réseau", "default": "youtube", "options": [
+      { "value": "instagram", "label": "Instagram" },
+      { "value": "youtube", "label": "YouTube" },
+      { "value": "facebook", "label": "Facebook" },
+      { "value": "x", "label": "X (Twitter)" },
+      { "value": "tiktok", "label": "TikTok" },
+      { "value": "linkedin", "label": "LinkedIn" }
+    ]},
+    { "type": "text", "id": "label_2", "label": "Icône 2 — Label (aria)", "default": "YouTube" },
+    { "type": "url", "id": "url_2", "label": "Icône 2 — Lien" },
+
+    { "type": "select", "id": "brand_3", "label": "Icône 3 — Réseau", "default": "facebook", "options": [
+      { "value": "instagram", "label": "Instagram" },
+      { "value": "youtube", "label": "YouTube" },
+      { "value": "facebook", "label": "Facebook" },
+      { "value": "x", "label": "X (Twitter)" },
+      { "value": "tiktok", "label": "TikTok" },
+      { "value": "linkedin", "label": "LinkedIn" }
+    ]},
+    { "type": "text", "id": "label_3", "label": "Icône 3 — Label (aria)", "default": "Facebook" },
+    { "type": "url", "id": "url_3", "label": "Icône 3 — Lien" },
+
+    { "type": "select", "id": "brand_4", "label": "Icône 4 — Réseau", "default": "x", "options": [
+      { "value": "instagram", "label": "Instagram" },
+      { "value": "youtube", "label": "YouTube" },
+      { "value": "facebook", "label": "Facebook" },
+      { "value": "x", "label": "X (Twitter)" },
+      { "value": "tiktok", "label": "TikTok" },
+      { "value": "linkedin", "label": "LinkedIn" }
+    ]},
+    { "type": "text", "id": "label_4", "label": "Icône 4 — Label (aria)", "default": "X" },
+    { "type": "url", "id": "url_4", "label": "Icône 4 — Lien" },
+
+    { "type": "select", "id": "brand_5", "label": "Icône 5 — Réseau", "default": "tiktok", "options": [
+      { "value": "instagram", "label": "Instagram" },
+      { "value": "youtube", "label": "YouTube" },
+      { "value": "facebook", "label": "Facebook" },
+      { "value": "x", "label": "X (Twitter)" },
+      { "value": "tiktok", "label": "TikTok" },
+      { "value": "linkedin", "label": "LinkedIn" }
+    ]},
+    { "type": "text", "id": "label_5", "label": "Icône 5 — Label (aria)", "default": "TikTok" },
+    { "type": "url", "id": "url_5", "label": "Icône 5 — Lien" }
+  ]
+}
+{% endschema %}
