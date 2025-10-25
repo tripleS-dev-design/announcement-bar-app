@@ -507,23 +507,24 @@ function PreviewCircleScroller() {
 }
 
 // --- Aperçu admin style "Sélection Or" (comme sur ta boutique)
+// --- Aperçu admin "Sélection Or" — version compacte (3 cartes alignées)
 function PreviewGoldProductsStoreLike() {
-  // Démo uniquement (placeholders). Tu peux changer les URLs / titres / prix.
   const items = [
     { title: "Sac bandoulière élégant et imperméable en cuir…", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
-    { title: "سماعة ديجيتال M10 TWS Wireless Earbuds",         price: "Dh 80.00 MAD",  img: "https://picsum.photos/seed/gold2/800/600" },
+    { title: "M10 TWS Wireless Earbuds",         price: "Dh 80.00 MAD",  img: "https://picsum.photos/seed/gold2/800/600" },
     { title: "Caméra ampoule WiFi HD 360° gestion à distance",  price: "Dh 185.00 MAD", img: "https://picsum.photos/seed/gold3/800/600" },
   ];
 
   return (
-    <div style={{ padding: 12, borderRadius: 8, background: "#fff", border: "1px solid #eee" }}>
-      <div style={{ fontWeight: "bold", marginBottom: 10 }}>Gold Products</div>
+    <div style={{ padding: 10, borderRadius: 8, background: "#fff", border: "1px solid #eee" }}>
+      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>Gold Products</div>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-          gap: 14,
+          // 👉 3 colonnes fixes (s’adapte à la largeur dispo)
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 10,
           width: "100%",
         }}
       >
@@ -532,44 +533,49 @@ function PreviewGoldProductsStoreLike() {
             key={i}
             style={{
               background: "#fff",
-              borderRadius: 14,
+              borderRadius: 12,
               overflow: "hidden",
-              boxShadow: "0 6px 14px rgba(0,0,0,.08)",
+              boxShadow: "0 6px 12px rgba(0,0,0,.06)",
               border: "1px solid #e5e7eb",
             }}
           >
-            {/* Image */}
+            {/* Image plus petite */}
             <img
               src={p.img}
               alt={p.title}
-              width={800}
-              height={600}
-              style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
+              width={600}
+              height={400}
+              style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }}
               loading="lazy"
               decoding="async"
             />
 
-            {/* Bandeau or/beige avec titre + prix (comme ta section) */}
+            {/* Bandeau or/beige compact */}
             <div
               style={{
                 background: "linear-gradient(0deg,#E9DFC8,#F1E6CF)",
-                padding: "10px 12px",
+                padding: "8px 10px",
                 borderTop: "1px solid #e6d9b8",
+                minHeight: 66, // assure une hauteur homogène
               }}
             >
               <div
                 style={{
-                  fontSize: 14,
+                  fontSize: 12.5,
                   fontWeight: 600,
                   color: "#1f2937",
-                  lineHeight: 1.35,
+                  lineHeight: 1.3,
                   marginBottom: 6,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
                 }}
               >
                 {p.title}
               </div>
 
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#1f2937" }}>{p.price}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: "#1f2937" }}>{p.price}</div>
             </div>
           </div>
         ))}
@@ -577,6 +583,7 @@ function PreviewGoldProductsStoreLike() {
     </div>
   );
 }
+
 
 /* ==============================
    PAGE Settings
