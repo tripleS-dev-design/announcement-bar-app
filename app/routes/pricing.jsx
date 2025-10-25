@@ -85,34 +85,45 @@ function CheckItem({ children }) {
 function FeaturesList() {
   return (
     <div style={{ textAlign: "left", color: "#0f0f0f", fontSize: 13, lineHeight: 1.55 }}>
-      <h4 style={{ margin: "10px 0 8px", fontWeight: 800 }}>Premium Features</h4>
+      <h4 style={{ margin: "10px 0 8px", fontWeight: 800 }}>What’s included in Premium</h4>
 
-      <div style={{ fontWeight: 700, marginTop: 10 }}>Highly-customizable Announcement Bar</div>
+      <div style={{ fontWeight: 700, marginTop: 10 }}>7 Premium Blocks (one-click install)</div>
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
-        <CheckItem>3 styles: scrolling, multilingual carousel, light-glow</CheckItem>
-        <CheckItem>Image or color background, overlay, text shadow</CheckItem>
-        <CheckItem>CTA placement: left / center / right</CheckItem>
-      </ul>
-
-      <div style={{ fontWeight: 700, marginTop: 10 }}>High-conversion Popup</div>
-      <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
-        <CheckItem>3 visuals: standard, light effect, radial glow</CheckItem>
-        <CheckItem>Image or color, text alignment & size controls</CheckItem>
-        <CheckItem>Display delay + customizable call-to-action button</CheckItem>
-      </ul>
-
-      <div style={{ fontWeight: 700, marginTop: 10 }}>Dynamic Countdown</div>
-      <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
-        <CheckItem>3 formats: simple, squared, animated circle</CheckItem>
-        <CheckItem>Background, border, text: fully customizable</CheckItem>
-        <CheckItem>Optional glow mode, days/hours/minutes/seconds</CheckItem>
+        <CheckItem>
+          <strong>Announcement Bar</strong> — eye-catching message (scrolling, multilingual carousel, glow)
+        </CheckItem>
+        <CheckItem>
+          <strong>Popup</strong> — capture attention with image/color, timing & CTA (standard / light effect / radial glow)
+        </CheckItem>
+        <CheckItem>
+          <strong>Countdown</strong> — urgency timer (simple / square / animated circle), fully customizable
+        </CheckItem>
+        <CheckItem>
+          <strong>Social Icons</strong> — branded icons with clean hover and consistent styling
+        </CheckItem>
+        <CheckItem>
+          <strong>WhatsApp Sticky Button</strong> — quick contact in the bottom corner (mobile & desktop)
+        </CheckItem>
+        <CheckItem>
+          <strong>Circle Image Scroller</strong> — story-style circular carousel for images
+        </CheckItem>
+        <CheckItem>
+          <strong>Gold Products Showcase</strong> — compact 3-card product grid with price (store-like look)
+        </CheckItem>
       </ul>
 
       <div style={{ fontWeight: 700, marginTop: 10 }}>Seamless Integration</div>
+      <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
+        <CheckItem>Add directly from the Shopify Theme Editor (one click)</CheckItem>
+        <CheckItem>Real-time preview inside the editor</CheckItem>
+        <CheckItem>No code required, instant setup</CheckItem>
+      </ul>
+
+      <div style={{ fontWeight: 700, marginTop: 10 }}>Performance & Support</div>
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 0" }}>
-        <CheckItem>Add directly from Shopify Theme Editor</CheckItem>
-        <CheckItem>Real-time preview</CheckItem>
-        <CheckItem>No code required, instant install</CheckItem>
+        <CheckItem>Lightweight components, mobile-first</CheckItem>
+        <CheckItem>Compatible with modern Shopify themes</CheckItem>
+        <CheckItem>Continuous improvements & support</CheckItem>
       </ul>
     </div>
   );
@@ -289,7 +300,7 @@ export default function Pricing() {
         {/* Header */}
         <div style={headerStyle}>
           <h1 style={headerTitle}>Unlock All Features — Premium Access</h1>
-          <p style={headerSub}>Transparent plans, instant activation, cancel anytime.</p>
+          <p style={headerSub}>Transparent plans, instant activation, cancel anytime. Includes <strong>7 Premium Blocks</strong> you can add from the Theme Editor.</p>
         </div>
 
         {/* Pricing grid */}
