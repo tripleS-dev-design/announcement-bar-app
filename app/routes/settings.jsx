@@ -4,7 +4,7 @@ import { useLocation, useLoaderData } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 
 /* ==============================
-   LOADER : shop + plan + API KEY
+   LOADER: shop + plan + API KEY
 ================================ */
 export const loader = async ({ request }) => {
   const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
@@ -28,7 +28,7 @@ export const loader = async ({ request }) => {
 };
 
 /* ==============================
-   UI & styles (inchangés)
+   UI & styles (unchanged)
 ================================ */
 const BUTTON_BASE = {
   border: "none",
@@ -62,7 +62,7 @@ const GLOBAL_STYLES = `
 `;
 
 /* ==============================
-   Deep link helpers (corrigés)
+   Deep link helpers (fixed)
    👉 addAppBlockId = {API_KEY}/{handle}
 ================================ */
 function editorBase({ shopSub }) {
@@ -87,7 +87,7 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Tes composants (existants)
+   Your components (existing)
 ================================ */
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -122,7 +122,7 @@ function OpeningPopup() {
           How to use the Premium Blocks
         </h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
-          Go to your <strong>Theme Editor</strong> and click on{" "}
+          Go to your <strong>Theme Editor</strong> and click{" "}
           <strong>Add Block</strong> in the App section.
         </p>
         <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
@@ -250,7 +250,7 @@ function PreviewPopup() {
   );
 }
 
-/* ====== Countdown existant ====== */
+/* ====== Existing countdown ====== */
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -347,12 +347,12 @@ function PreviewCountdown() {
 }
 
 /* ==============================
-   🔥 Nouveaux PREVIEWS BLOCS
+   🔥 New block previews
 ================================ */
 
-/** 1) Icônes Réseaux Sociaux — logos réels + couleurs officielles */
+/** 1) Social icons — real brand colors */
 function PreviewSocialIcons() {
-  const Base = ({ children, title, href = "#" , bg }) => (
+  const Base = ({ children, title, href = "#", bg }) => (
     <a
       href={href}
       title={title}
@@ -376,12 +376,12 @@ function PreviewSocialIcons() {
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-      {/* Instagram (dégradé officiel) */}
+      {/* Instagram (official gradient) */}
       <Base
         title="Instagram"
         bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
       >
-        {/* Camera simple blanche lisible sur le dégradé */}
+        {/* Simple white camera over the gradient */}
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
           <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
@@ -389,7 +389,7 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* YouTube (rouge #FF0000) */}
+      {/* YouTube (red #FF0000) */}
       <Base title="YouTube" bg="#FF0000">
         <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
@@ -397,9 +397,9 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* Facebook (bleu #1877F2) */}
+      {/* Facebook (blue #1877F2) */}
       <Base title="Facebook" bg="#1877F2">
-        {/* “f” blanche stylisée (forme vectorielle simple) */}
+        {/* stylized white “f” */}
         <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
           <path
             d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
@@ -408,32 +408,32 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* X (noir) */}
+      {/* X (black) */}
       <Base title="X" bg="#000000">
-        {/* X blanc (2 diagonales) */}
+        {/* white X (two diagonals) */}
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
           <path d="M50 14 L14 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
         </svg>
       </Base>
 
-      {/* TikTok (fond noir, note blanche + petit accent cyan/rose) */}
+      {/* TikTok (black background, white note + cyan/pink accents) */}
       <Base title="TikTok" bg="#000000">
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
-          {/* tige (blanc) */}
+          {/* stem (white) */}
           <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-          {/* accent cyan */}
+          {/* cyan accent */}
           <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
-          {/* accent rose */}
+          {/* pink accent */}
           <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
         </svg>
       </Base>
 
-      {/* LinkedIn (bleu #0A66C2) */}
+      {/* LinkedIn (blue #0A66C2) */}
       <Base title="LinkedIn" bg="#0A66C2">
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
-          {/* “in” simplifié en formes */}
+          {/* simplified “in” */}
           <circle cx="22" cy="31" r="3" fill="#fff" />
           <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
           <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
@@ -444,7 +444,7 @@ function PreviewSocialIcons() {
   );
 }
 
-/** 2) Bouton WhatsApp Sticky (en bloc autonome) */
+/** 2) WhatsApp Sticky button (standalone block) */
 function PreviewWhatsAppSticky() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -468,13 +468,13 @@ function PreviewWhatsAppSticky() {
       </div>
       <div>
         <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
-        <div style={{ color: "#555" }}>Contact rapide — coin bas (mobile & desktop)</div>
+        <div style={{ color: "#555" }}>Quick contact — bottom corner (mobile & desktop)</div>
       </div>
     </div>
   );
 }
 
-/** 3) Carousel d’images circulaires (scroll auto) */
+/** 3) Circular image scroller (auto scroll) */
 function PreviewCircleScroller() {
   const imgs = [
     "https://picsum.photos/seed/a/200",
@@ -506,13 +506,12 @@ function PreviewCircleScroller() {
   );
 }
 
-// --- Aperçu admin style "Sélection Or" (comme sur ta boutique)
-// --- Aperçu admin "Sélection Or" — version compacte (3 cartes alignées)
+// --- Admin preview styled like your "Gold Selection" — compact (3 cards aligned)
 function PreviewGoldProductsStoreLike() {
   const items = [
-    { title: "Sac bandoulière élégant et imperméable en cuir…", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
-    { title: "M10 TWS Wireless Earbuds",         price: "Dh 80.00 MAD",  img: "https://picsum.photos/seed/gold2/800/600" },
-    { title: "Caméra ampoule WiFi HD 360° gestion à distance",  price: "Dh 185.00 MAD", img: "https://picsum.photos/seed/gold3/800/600" },
+    { title: "Elegant waterproof crossbody bag (anti-theft, USB charging)", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
+    { title: "M10 TWS Wireless Earbuds",                                   price: "Dh 80.00 MAD",  img: "https://picsum.photos/seed/gold2/800/600" },
+    { title: "Bulb camera WiFi HD 360° with remote control",                price: "Dh 185.00 MAD", img: "https://picsum.photos/seed/gold3/800/600" },
   ];
 
   return (
@@ -522,7 +521,6 @@ function PreviewGoldProductsStoreLike() {
       <div
         style={{
           display: "grid",
-          // 👉 3 colonnes fixes (s’adapte à la largeur dispo)
           gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
           gap: 10,
           width: "100%",
@@ -539,7 +537,7 @@ function PreviewGoldProductsStoreLike() {
               border: "1px solid #e5e7eb",
             }}
           >
-            {/* Image plus petite */}
+            {/* Smaller image */}
             <img
               src={p.img}
               alt={p.title}
@@ -550,13 +548,13 @@ function PreviewGoldProductsStoreLike() {
               decoding="async"
             />
 
-            {/* Bandeau or/beige compact */}
+            {/* Compact gold/beige band */}
             <div
               style={{
                 background: "linear-gradient(0deg,#E9DFC8,#F1E6CF)",
                 padding: "8px 10px",
                 borderTop: "1px solid #e6d9b8",
-                minHeight: 66, // assure une hauteur homogène
+                minHeight: 66,
               }}
             >
               <div
@@ -584,9 +582,8 @@ function PreviewGoldProductsStoreLike() {
   );
 }
 
-
 /* ==============================
-   PAGE Settings
+   PAGE: Settings
 ================================ */
 export default function Settings() {
   const { shopSub, apiKey } = useLoaderData();
@@ -596,9 +593,9 @@ export default function Settings() {
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  // Blocs existants + Nouveaux blocs (même design, en dessous)
+  // Existing blocks + new ones (same card UI)
   const blocks = [
-    // === EXISTANTS ===
+    // === EXISTING ===
     {
       id: "announcement-premium",
       title: "Premium Announcement Bar",
@@ -621,42 +618,39 @@ export default function Settings() {
       preview: <PreviewCountdown />,
     },
 
-    // === NOUVEAUX (sous les 3 premiers) ===
-    // 1) Icônes Social
+    // === NEW (under the first 3) ===
+    // 1) Social icons
     {
       id: "social-icons-premium",
       title: "Social Icons",
-      description: "Icônes réseaux sociaux avec hover & style propre.",
+      description: "Social icons with hover and clean style.",
       template: "index",
       preview: <PreviewSocialIcons />,
     },
-    // 2) WhatsApp Sticky (bloc autonome)
+    // 2) WhatsApp Sticky (standalone block)
     {
       id: "whatsapp-sticky-premium",
       title: "WhatsApp Sticky Button",
-      description: "Bouton flottant contact rapide (coin bas).",
+      description: "Floating quick-contact button (bottom corner).",
       template: "index",
       preview: <PreviewWhatsAppSticky />,
     },
-    // 3) Carousel images circulaires
+    // 3) Circular image carousel
     {
       id: "circle-scroller-premium",
       title: "Circle Image Scroller",
-      description: "Carousel horizontal d’images rondes (look stories).",
+      description: "Horizontal carousel of circular images (stories look).",
       template: "index",
       preview: <PreviewCircleScroller />,
     },
-    // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
-{
-  id: "gold-products-premium",
-  title: "Gold Products Showcase (Premium)",
-  description: "Grille produits style gold à partir d’une collection.",
-  template: "index",
-  preview: <PreviewGoldProductsStoreLike />
-}
-
-
-
+    // 4) Gold products showcase
+    {
+      id: "gold-products-premium",
+      title: "Gold Products Showcase (Premium)",
+      description: "Gold-style product grid from a collection.",
+      template: "index",
+      preview: <PreviewGoldProductsStoreLike />
+    }
   ];
 
   return (
@@ -690,7 +684,7 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* ✅ Deep link : addAppBlockId = API_KEY/HANDLE */}
+              {/* ✅ Deep link: addAppBlockId = API_KEY/HANDLE */}
               <a
                 href={makeAddBlockLink({
                   shopSub,
@@ -718,7 +712,7 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* Pricing au centre en bas */}
+      {/* Pricing button (center bottom) */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
@@ -739,7 +733,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* YouTube en bas à droite */}
+      {/* YouTube button (bottom right) */}
       <a
         href={"https://youtu.be/UJzd4Re21e0"}
         target="_blank"
@@ -767,7 +761,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* WhatsApp global (existant). Le bloc “whatsapp-sticky-premium” est séparé */}
+      {/* Global WhatsApp (existing). The “whatsapp-sticky-premium” block is separate */}
       <a
         href="https://wa.me/+212681570887"
         target="_blank"
