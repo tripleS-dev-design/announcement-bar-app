@@ -1,35 +1,31 @@
-{% comment %}
-  Premium Timer — app BLOCK (block.* scope)
-{% endcomment %}
-
 <style>
-  .countdown-container{
-    width:100vw !important; position:relative; left:50%; margin-left:-50vw;
-    padding:18px 10px; text-align:center; color: {{ block.settings.text_color }};
-    font-size: {{ block.settings.font_size }}px; font-weight:bold;
-    display:flex; flex-wrap:nowrap; align-items:center; justify-content:space-between;
+  .countdown-container {
+    width: 100vw !important; position: relative; left: 50%; margin-left: -50vw;
+    padding: 18px 10px; text-align: center; color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px; font-weight: bold;
+    display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between;
 
     {% if block.settings.background_image != blank %}
       background-image: url({{ block.settings.background_image | image_url: width: 2048 }});
-      background-size:cover; background-position:center;
+      background-size: cover; background-position: center;
     {% else %}
       background-color: {{ block.settings.bg_color }};
     {% endif %}
   }
 
-  .countdown-label{ margin-right:18px; font-size:calc({{ block.settings.font_size }}px + 2px); white-space:nowrap; }
-  .countdown-timer{ display:flex; flex-wrap:nowrap; justify-content:center; gap:12px; flex:1; min-width:0; }
+  .countdown-label { margin-right: 18px; font-size: calc({{ block.settings.font_size }}px + 2px); white-space: nowrap; }
+  .countdown-timer { display: flex; flex-wrap: nowrap; justify-content: center; gap: 12px; flex: 1; min-width: 0; }
 
-  .countdown-block{
-    padding:10px 12px;
+  .countdown-block {
+    padding: 10px 12px;
     min-width: {{ block.settings.block_width }};
     min-height: {{ block.settings.block_height }};
-    display:flex; align-items:center; justify-content:center;
+    display: flex; align-items: center; justify-content: center;
     color: {{ block.settings.text_color }};
 
     {% if block.settings.block_background_image != blank %}
       background-image: url({{ block.settings.block_background_image | image_url: width: 512 }});
-      background-size:cover; background-position:center;
+      background-size: cover; background-position: center;
     {% else %}
       background-color: {{ block.settings.timer_bg }};
     {% endif %}
@@ -38,29 +34,29 @@
     font-size: {{ block.settings.font_size }}px;
   }
 
-  .countdown-rectangle .countdown-block{ border-radius:8px; }
-  .countdown-circle .countdown-block{ border-radius:50%; }
-  .glow-effect .countdown-block{ animation: glow 1.5s infinite alternate; }
-  @keyframes glow{ from{ box-shadow:0 0 8px {{ block.settings.border_color }}; } to{ box-shadow:0 0 20px {{ block.settings.border_color }}; } }
+  .countdown-rectangle .countdown-block { border-radius: 8px; }
+  .countdown-circle .countdown-block { border-radius: 50%; }
+  .glow-effect .countdown-block { animation: glow 1.5s infinite alternate; }
+  @keyframes glow { from { box-shadow: 0 0 8px {{ block.settings.border_color }}; } to { box-shadow: 0 0 20px {{ block.settings.border_color }}; } }
 
-  .countdown-button-container{ margin-left:18px; flex-shrink:0; }
-  .countdown-button{
+  .countdown-button-container { margin-left: 18px; flex-shrink: 0; }
+  .countdown-button {
     background: {{ block.settings.button_color }}; color: {{ block.settings.button_text_color }};
-    padding:7px 14px; border-radius:4px; font-weight:bold; text-decoration:none; white-space:nowrap;
+    padding: 7px 14px; border-radius: 4px; font-weight: bold; text-decoration: none; white-space: nowrap;
   }
 
-  @media (max-width:600px){
-    .countdown-container{ padding:8px 6px; flex-wrap:wrap; justify-content:center; gap:8px; }
-    .countdown-label{ font-size:calc({{ block.settings.font_size }}px * .65); margin-right:0; width:100%; text-align:center; }
-    .countdown-timer{ gap:8px; flex-wrap:nowrap; justify-content:center; width:100%; margin-bottom:8px; }
-    .countdown-block{
-      padding:6px 8px;
-      min-width: calc({{ block.settings.block_width | replace: 'px','' }} * 1px / 2.5);
-      min-height: calc({{ block.settings.block_height | replace: 'px','' }} * 1px / 2.5);
-      font-size: calc({{ block.settings.font_size }}px * .65);
+  @media (max-width: 600px) {
+    .countdown-container { padding: 8px 6px; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .countdown-label { font-size: calc({{ block.settings.font_size }}px * 0.65); margin-right: 0; width: 100%; text-align: center; }
+    .countdown-timer { gap: 8px; flex-wrap: nowrap; justify-content: center; width: 100%; margin-bottom: 8px; }
+    .countdown-block {
+      padding: 6px 8px;
+      min-width: calc({{ block.settings.block_width | replace: 'px', '' }} / 2.5) + "px";
+      min-height: calc({{ block.settings.block_height | replace: 'px', '' }} / 2.5) + "px";
+      font-size: calc({{ block.settings.font_size }}px * 0.65);
     }
-    .countdown-button-container{ margin-left:0; width:100%; text-align:center; }
-    .countdown-button{ padding:6px 12px; font-size:calc({{ block.settings.font_size }}px * .65); display:inline-block; width:auto; white-space:nowrap; }
+    .countdown-button-container { margin-left: 0; width: 100%; text-align: center; }
+    .countdown-button { padding: 6px 12px; font-size: calc({{ block.settings.font_size }}px * 0.65); display: inline-block; width: auto; white-space: nowrap; }
   }
 </style>
 
@@ -76,25 +72,25 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function(){
+  document.addEventListener("DOMContentLoaded", function () {
     const endTime = new Date("{{ block.settings.end_date }}").getTime();
     const display = document.getElementById("countdown-{{ block.id }}");
 
-    function pad(n){ return String(n).padStart(2,'0'); }
-    function updateCountdown(){
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function updateCountdown() {
       const now = Date.now();
       let diff = endTime - now;
-      if (diff <= 0){ clearInterval(timer); diff = 0; }
+      if (diff <= 0) { clearInterval(timer); diff = 0; }
 
-      const d = Math.floor(diff / (1000*60*60*24));
-      const h = Math.floor((diff / (1000*60*60)) % 24);
-      const m = Math.floor((diff / (1000*60)) % 60);
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
       const s = Math.floor((diff / 1000) % 60);
       const parts = [];
-      if ({{ block.settings.show_days }})    parts.push(`<div class="countdown-block">${pad(d)}${'{{ block.settings.label_days }}'}</div>`);
-      if ({{ block.settings.show_hours }})   parts.push(`<div class="countdown-block">${pad(h)}${'{{ block.settings.label_hours }}'}</div>`);
-      if ({{ block.settings.show_minutes }}) parts.push(`<div class="countdown-block">${pad(m)}${'{{ block.settings.label_minutes }}'}</div>`);
-      if ({{ block.settings.show_seconds }}) parts.push(`<div class="countdown-block">${pad(s)}${'{{ block.settings.label_seconds }}'}</div>`);
+      if ({{ block.settings.show_days }})    { parts.push(`<div class="countdown-block">${pad(d)}${'{{ block.settings.label_days }}'}</div>`); }
+      if ({{ block.settings.show_hours }})   { parts.push(`<div class="countdown-block">${pad(h)}${'{{ block.settings.label_hours }}'}</div>`); }
+      if ({{ block.settings.show_minutes }}) { parts.push(`<div class="countdown-block">${pad(m)}${'{{ block.settings.label_minutes }}'}</div>`); }
+      if ({{ block.settings.show_seconds }}) { parts.push(`<div class="countdown-block">${pad(s)}${'{{ block.settings.label_seconds }}'}</div>`); }
       display.innerHTML = parts.join("");
     }
     const timer = setInterval(updateCountdown, 1000);

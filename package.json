@@ -32,7 +32,6 @@
     "@remix-run/serve": "^2.16.1",
     "@shopify/app-bridge-react": "^4.1.6",
     "@shopify/polaris": "^12.27.0",
-    "@shopify/polaris-icons": "^9.3.1",
     "@shopify/react-i18n": "^7.14.0",
     "@shopify/shopify-app-remix": "^3.8.3",
     "@shopify/shopify-app-session-storage-memory": "^4.0.18",

@@ -1,35 +1,39 @@
 {% comment %}
-  Premium Popup — app BLOCK (block.* scope) — image_url + width/height
+  Popup Premium — App BLOCK
+  - image_url + width/height on <img>
 {% endcomment %}
 
 <style>
-  .popup-premium-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; z-index:9999;}
-  .popup-premium-overlay.visible{display:flex !important;}
+  .popup-premium-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+    justify-content:center; align-items:center; z-index:9999;
+  }
+  .popup-premium-overlay.visible { display:flex !important; }
 
-  .popup-premium-content{
-    padding:30px; border-radius:12px; max-width:400px; width:90%;
+  .popup-premium-content {
+    padding: 30px; border-radius: 12px; max-width: 400px; width: 90%;
     background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};
-    box-shadow:0 10px 30px rgba(0,0,0,.2); position:relative; animation: fadeIn .4s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2); position: relative; animation: fadeIn .4s ease;
     {% if block.settings.background_image != blank %}
       background-image: url("{{ block.settings.background_image | image_url: width: 1600 }}");
-      background-size:cover; background-position:center;
+      background-size: cover; background-position: center;
     {% endif %}
   }
-  .popup-premium-content.light{ animation: glowEffect 2s ease-in-out infinite alternate; }
-  .popup-premium-content.light-glow{
+  .popup-premium-content.light { animation: glowEffect 2s ease-in-out infinite alternate; }
+  .popup-premium-content.light-glow {
     {% if block.settings.background_image == blank %}
       background: radial-gradient(circle, {{ block.settings.bg_color }} 0%, transparent 100%);
     {% endif %}
-    box-shadow:0 0 20px {{ block.settings.bg_color }};
+    box-shadow: 0 0 20px {{ block.settings.bg_color }};
     animation: glowEffectStrong 1.6s ease-in-out infinite alternate;
   }
-  @keyframes glowEffect{ from{box-shadow:0 0 10px {{ block.settings.bg_color }};} to{box-shadow:0 0 30px {{ block.settings.bg_color }};} }
-  @keyframes glowEffectStrong{ from{box-shadow:0 0 20px {{ block.settings.bg_color }};} to{box-shadow:0 0 45px {{ block.settings.bg_color }};} }
+  @keyframes glowEffect { from { box-shadow:0 0 10px {{ block.settings.bg_color }}; } to { box-shadow:0 0 30px {{ block.settings.bg_color }}; } }
+  @keyframes glowEffectStrong { from { box-shadow:0 0 20px {{ block.settings.bg_color }}; } to { box-shadow:0 0 45px {{ block.settings.bg_color }}; } }
 
-  .popup-close{ position:absolute; top:10px; right:15px; background:transparent; border:0; font-size: {{ block.settings.close_icon_size }}px; color: {{ block.settings.text_color }}; cursor:pointer; }
+  .popup-close { position:absolute; top:10px; right:15px; background:transparent; border:0; font-size: {{ block.settings.close_icon_size }}px; color: {{ block.settings.text_color }}; cursor:pointer; }
 
-  .popup-button-container{ display:flex; justify-content: {{ block.settings.button_position }}; align-items:center; margin-top:15px; gap:8px; }
-  .popup-button{
+  .popup-button-container { display:flex; justify-content: {{ block.settings.button_position }}; align-items:center; margin-top: 15px; gap:8px; }
+  .popup-button {
     display:inline-flex; align-items:center; gap:8px;
     background: {{ block.settings.button_color }}; color: {{ block.settings.button_text_color }};
     padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
@@ -38,7 +42,7 @@
     font-size: {{ block.settings.button_font_size }}px; font-weight:bold; text-decoration:none;
   }
 
-  @keyframes fadeIn{ from{opacity:0; transform:scale(.9);} to{opacity:1; transform:scale(1);} }
+  @keyframes fadeIn { from { opacity:0; transform:scale(.9);} to { opacity:1; transform:scale(1);} }
 </style>
 
 <div id="popup-{{ block.id }}" class="popup-premium-overlay" role="dialog" aria-modal="true" aria-label="Promotion popup">
@@ -56,10 +60,10 @@
     {% if block.settings.button_text != blank %}
       <div class="popup-button-container">
         {% if block.settings.button_icon != blank %}
-          {% assign size = block.settings.button_icon_size | default: 24 %}
+          {% assign iw = 24 %}{% assign ih = 24 %}
           <img
-            src="{{ block.settings.button_icon | image_url: width: size, height: size, crop: 'center' }}"
-            width="{{ size }}" height="{{ size }}" alt="Button icon">
+            src="{{ block.settings.button_icon | image_url: width: iw, height: ih, crop: 'center' }}"
+            width="{{ iw }}" height="{{ ih }}" alt="Button icon">
         {% endif %}
         <a href="{{ block.settings.button_link }}" class="popup-button">{{ block.settings.button_text }}</a>
       </div>
@@ -68,9 +72,9 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function(){
-    const popup = document.getElementById("popup-{{ block.id }}");
-    const closeBtn = popup.querySelector('.popup-close');
+  document.addEventListener("DOMContentLoaded", function () {
+    const popup   = document.getElementById("popup-{{ block.id }}");
+    const closeBtn= popup.querySelector('.popup-close');
     const delayMs = ({{ block.settings.delay | default: 4 }}) * 1000;
 
     if (popup.parentNode !== document.body) document.body.appendChild(popup);
@@ -92,8 +96,8 @@
   "target": "section",
   "settings": [
     { "type": "select", "id": "style", "label": "Style", "default": "standard", "options": [
-      { "value": "standard", "label": "Standard" },
-      { "value": "light", "label": "Glow (soft)" },
+      { "value": "standard",   "label": "Standard" },
+      { "value": "light",      "label": "Glow (soft)" },
       { "value": "light-glow", "label": "Glow (pro)" }
     ]},
 
@@ -133,10 +137,7 @@
     { "type": "range", "id": "button_padding_horizontal", "label": "Button padding horizontal (px)", "min": 0, "max": 50, "step": 1, "default": 20 },
     { "type": "range", "id": "button_font_size", "label": "Button font size (px)", "min": 12, "max": 32, "step": 1, "default": 16 },
     { "type": "color", "id": "button_color", "label": "Button background", "default": "#000000" },
-    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#ffffff" },
-
-    { "type": "image_picker", "id": "button_icon", "label": "Button icon" },
-    { "type": "range", "id": "button_icon_size", "label": "Button icon size (px)", "min": 8, "max": 64, "step": 1, "default": 24 }
+    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#ffffff" }
   ]
 }
 {% endschema %}
