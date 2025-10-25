@@ -61,7 +61,7 @@ const GLOBAL_STYLES = `
 @keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
 `;
 
-/* ✅ NEW: grid to show cards two per row */
+/* ✅ grid to show cards two per row */
 const GRID_STYLE = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -611,7 +611,6 @@ function TawkChat() {
       document.body.appendChild(s1);
     }
 
-    // keep widget across navigations (no cleanup)
     return () => {};
   }, []);
 
@@ -693,7 +692,7 @@ export default function Settings() {
     <>
       <style>{GLOBAL_STYLES}</style>
       <OpeningPopup />
-      {/* NEW: load Tawk.to widget instead of global WhatsApp button */}
+      {/* NEW: load Tawk.to widget (bottom-right) */}
       <TawkChat />
 
       <div style={CONTAINER_STYLE}>
@@ -774,15 +773,15 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* YouTube button (bottom right) */}
+      {/* YouTube button — moved to bottom-left to avoid overlapping Tawk */}
       <a
-        href={"https://youtu.be/UJzd4Re21e0"}
+        href={YOUTUBE_URL}
         target="_blank"
         rel="noopener noreferrer"
         style={{
           position: "fixed",
           bottom: "24px",
-          right: "24px",
+          left: "24px",     // ⬅️ moved from right to left
           textDecoration: "none",
           zIndex: 999,
         }}
@@ -802,7 +801,7 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* REMOVED: global WhatsApp floating button */}
+      {/* (No global WhatsApp floating button anymore) */}
     </>
   );
 }
