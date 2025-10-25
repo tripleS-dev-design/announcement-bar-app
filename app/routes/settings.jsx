@@ -61,6 +61,13 @@ const GLOBAL_STYLES = `
 @keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
 `;
 
+/* ✅ NEW: grid to show cards two per row */
+const GRID_STYLE = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "24px",
+};
+
 /* ==============================
    Deep link helpers (fixed)
    👉 addAppBlockId = {API_KEY}/{handle}
@@ -506,7 +513,7 @@ function PreviewCircleScroller() {
   );
 }
 
-// --- Admin preview styled like your "Gold Selection" — compact (3 cards aligned)
+/* --- Admin preview styled like your "Gold Selection" — compact (3 cards aligned) */
 function PreviewGoldProductsStoreLike() {
   const items = [
     { title: "Elegant waterproof crossbody bag (anti-theft, USB charging)", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
@@ -678,38 +685,41 @@ export default function Settings() {
           <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
         </div>
 
-        {blocks.map((block) => (
-          <div key={block.id} style={CARD_STYLE}>
-            <div style={{ flex: 1, minWidth: "220px" }}>
-              <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
-              <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
+        {/* ✅ Two-by-two layout for the block cards */}
+        <div style={GRID_STYLE}>
+          {blocks.map((block) => (
+            <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
+              <div style={{ flex: 1, minWidth: "220px" }}>
+                <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
+                <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* ✅ Deep link: addAppBlockId = API_KEY/HANDLE */}
-              <a
-                href={makeAddBlockLink({
-                  shopSub,
-                  apiKey,
-                  template: block.template || "index",
-                  handle: block.id,
-                  target: "newAppsSection",
-                })}
-                target="_top"
-                rel="noreferrer"
-              >
-                <button
-                  style={{
-                    ...BUTTON_BASE,
-                    backgroundColor: "#000",
-                    color: "#fff",
-                  }}
+                {/* ✅ Deep link: addAppBlockId = API_KEY/HANDLE */}
+                <a
+                  href={makeAddBlockLink({
+                    shopSub,
+                    apiKey,
+                    template: block.template || "index",
+                    handle: block.id,
+                    target: "newAppsSection",
+                  })}
+                  target="_top"
+                  rel="noreferrer"
                 >
-                  Add Premium Block
-                </button>
-              </a>
+                  <button
+                    style={{
+                      ...BUTTON_BASE,
+                      backgroundColor: "#000",
+                      color: "#fff",
+                    }}
+                  >
+                    Add Premium Block
+                  </button>
+                </a>
+              </div>
+              <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
             </div>
-            <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Pricing button (center bottom) */}
