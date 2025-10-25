@@ -506,78 +506,74 @@ function PreviewCircleScroller() {
   );
 }
 
-/** 4) Présentation Gold de produits (grille) */
-function PreviewGoldProducts() {
+// --- Aperçu admin style "Sélection Or" (comme sur ta boutique)
+function PreviewGoldProductsStoreLike() {
+  // Démo uniquement (placeholders). Tu peux changer les URLs / titres / prix.
   const items = [
-    { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/300" },
-    { title: "Product Two", price: "$49", img: "https://picsum.photos/seed/2/300" },
-    { title: "Product Three", price: "$59", img: "https://picsum.photos/seed/3/300" },
+    { title: "Sac bandoulière élégant et imperméable en cuir…", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
+    { title: "سماعة ديجيتال M10 TWS Wireless Earbuds",         price: "Dh 80.00 MAD",  img: "https://picsum.photos/seed/gold2/800/600" },
+    { title: "Caméra ampoule WiFi HD 360° gestion à distance",  price: "Dh 185.00 MAD", img: "https://picsum.photos/seed/gold3/800/600" },
   ];
+
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap: 12,
-        width: "100%",
-      }}
-    >
-      {items.map((p, i) => (
-        <div
-          key={i}
-          style={{
-            background:
-              "linear-gradient(135deg, #2a2212 0%, #3b2f17 40%, #57411c 70%, #2a2212 100%)",
-            color: "#f8e7b9",
-            borderRadius: 12,
-            overflow: "hidden",
-            boxShadow: "0 6px 16px rgba(0,0,0,.2)",
-          }}
-        >
-          <div style={{ position: "relative" }}>
+    <div style={{ padding: 12, borderRadius: 8, background: "#fff", border: "1px solid #eee" }}>
+      <div style={{ fontWeight: "bold", marginBottom: 10 }}>Gold Products</div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+          gap: 14,
+          width: "100%",
+        }}
+      >
+        {items.map((p, i) => (
+          <div
+            key={i}
+            style={{
+              background: "#fff",
+              borderRadius: 14,
+              overflow: "hidden",
+              boxShadow: "0 6px 14px rgba(0,0,0,.08)",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            {/* Image */}
             <img
               src={p.img}
               alt={p.title}
-              width={400}
-              height={300}
-              style={{ width: "100%", height: 140, objectFit: "cover" }}
+              width={800}
+              height={600}
+              style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
               loading="lazy"
               decoding="async"
             />
+
+            {/* Bandeau or/beige avec titre + prix (comme ta section) */}
             <div
               style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "radial-gradient(60% 60% at 70% 20%, rgba(255,215,0,.25), transparent 60%)",
-              }}
-            />
-          </div>
-          <div style={{ padding: "10px 12px" }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>{p.title}</div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                fontSize: 14,
+                background: "linear-gradient(0deg,#E9DFC8,#F1E6CF)",
+                padding: "10px 12px",
+                borderTop: "1px solid #e6d9b8",
               }}
             >
-              <span>{p.price}</span>
-              <button
+              <div
                 style={{
-                  ...BUTTON_BASE,
-                  padding: "6px 12px",
-                  backgroundColor: "#f8e7b9",
-                  color: "#3a2b12",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "#1f2937",
+                  lineHeight: 1.35,
+                  marginBottom: 6,
                 }}
               >
-                View
-              </button>
+                {p.title}
+              </div>
+
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#1f2937" }}>{p.price}</div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
