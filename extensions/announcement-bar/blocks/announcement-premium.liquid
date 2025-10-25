@@ -1,9 +1,10 @@
 {% comment %}
-  Premium Announcement Bar — block-based (same structure as TLS)
+  Premium Announcement Bar — App SECTION
+  Fix: button area isolated + stable layout across styles
 {% endcomment %}
 
 <style>
-  .announcement-bar-premium {
+  .announcement-bar-premium{
     display:flex; align-items:center; gap:16px; position:relative;
     width:100vw; margin-left:calc(-50vw + 50%);
     padding: {{ block.settings.padding_vertical }}px {{ block.settings.padding_horizontal }}px;
@@ -17,23 +18,32 @@
     color: {{ block.settings.text_color }};
     font-size: {{ block.settings.font_size }}px;
     font-weight: {{ block.settings.font_weight }};
-    text-align: {{ block.settings.text_align }};
   }
+
+  /* NEW: split content vs actions to stabilize layout */
+  .announcement-content{ flex:1 1 auto; min-width:0; overflow:hidden; text-align: {{ block.settings.text_align }}; }
+  .announcement-actions{ flex:0 0 auto; padding-inline:12px; display:flex; align-items:center; }
 
   /* marquee */
+  .announcement-bar-premium.standard .scrolling-track{ width:100%; overflow:hidden; }
   .announcement-bar-premium.standard .scrolling-text{
-    white-space:nowrap; padding-left:100%;
+    display:inline-block; white-space:nowrap;
+    padding-left:100%; will-change:transform;
     animation: scroll-{{ block.id }} {{ block.settings.speed }}s linear infinite;
   }
-  @keyframes scroll-{{ block.id }} { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+  @keyframes scroll-{{ block.id }}{ 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
 
   /* carousel */
-  .announcement-bar-premium.carousel .carousel-wrap{display:flex; align-items:center; justify-content:space-between; width:100%;}
-  .announcement-bar-premium.carousel .carousel-content{flex:1; min-width:0; text-align:center; animation: fade-{{ block.id }} .6s ease-in-out;}
-  @keyframes fade-{{ block.id }} { from{opacity:0} to{opacity:1} }
-  .announcement-bar-premium.carousel .nav-btn{cursor:pointer; user-select:none;}
+  .announcement-bar-premium.carousel .carousel-wrap{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+  }
+  .announcement-bar-premium.carousel .carousel-content{
+    flex:1 1 auto; min-width:0; text-align:center; animation: fade-{{ block.id }} .6s ease-in-out;
+  }
+  @keyframes fade-{{ block.id }}{ from{opacity:0} to{opacity:1} }
+  .announcement-bar-premium.carousel .nav-btn{ cursor:pointer; user-select:none; }
 
-  /* glow pro */
+  /* glow pro overlay should not block clicks */
   .announcement-bar-premium.light-pro{
     box-shadow:0 0 {{ block.settings.pro_glow_size }}px {{ block.settings.pro_glow_color }};
     animation: glowPro-{{ block.id }} {{ block.settings.pro_glow_speed }}s infinite alternate;
@@ -48,9 +58,7 @@
     0%{ box-shadow:0 0 {{ block.settings.pro_glow_size | divided_by: 2 }}px {{ block.settings.pro_glow_color }} }
     100%{ box-shadow:0 0 {{ block.settings.pro_glow_size }}px {{ block.settings.pro_glow_color }} }
   }
-  @keyframes pulsePro-{{ block.id }}{
-    0%,100%{ transform:scale(.9); opacity:.35 } 50%{ transform:scale(1); opacity:.65 }
-  }
+  @keyframes pulsePro-{{ block.id }}{ 0%,100%{ transform:scale(.9); opacity:.35 } 50%{ transform:scale(1); opacity:.65 } }
 
   .announcement-button{
     background: {{ block.settings.button_color }};
@@ -61,20 +69,26 @@
 </style>
 
 <div class="announcement-bar-premium {{ block.settings.bar_style }}">
-  {% if block.settings.bar_style == 'standard' %}
-    <div class="scrolling-text">{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
-  {% elsif block.settings.bar_style == 'carousel' %}
-    <div class="carousel-wrap">
-      <span class="nav-btn" onclick="prev_{{ block.id }}()">‹</span>
-      <div id="carouselText-{{ block.id }}" class="carousel-content"></div>
-      <span class="nav-btn" onclick="next_{{ block.id }}()">›</span>
-    </div>
-  {% else %}
-    <div>{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
-  {% endif %}
+  <div class="announcement-content">
+    {% if block.settings.bar_style == 'standard' %}
+      <div class="scrolling-track">
+        <div class="scrolling-text">{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
+      </div>
+    {% elsif block.settings.bar_style == 'carousel' %}
+      <div class="carousel-wrap">
+        <span class="nav-btn" onclick="prev_{{ block.id }}()">‹</span>
+        <div id="carouselText-{{ block.id }}" class="carousel-content"></div>
+        <span class="nav-btn" onclick="next_{{ block.id }}()">›</span>
+      </div>
+    {% else %}
+      <div>{{ block.settings.icon }} {{ block.settings.text_1 }}</div>
+    {% endif %}
+  </div>
 
   {% if block.settings.button_text != blank %}
-    <a href="{{ block.settings.button_link }}" class="announcement-button">{{ block.settings.button_text }}</a>
+    <div class="announcement-actions">
+      <a href="{{ block.settings.button_link }}" class="announcement-button">{{ block.settings.button_text }}</a>
+    </div>
   {% endif %}
 </div>
 
@@ -129,7 +143,6 @@
     { "type": "color", "id": "pro_glow_color", "label": "Glow color", "default": "#ffffff" },
     { "type": "range", "id": "pro_glow_size", "label": "Glow size (px)", "min": 10, "max": 100, "step": 1, "default": 30 },
     { "type": "range", "id": "pro_glow_speed", "label": "Glow speed (s)", "min": 1, "max": 10, "step": 0.5, "default": 2 }
-  ],
-  "presets": [{ "name": "Premium Announcement Bar" }]
+  ]
 }
 {% endschema %}

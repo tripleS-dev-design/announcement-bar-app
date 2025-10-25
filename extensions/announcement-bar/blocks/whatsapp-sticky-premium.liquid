@@ -1,0 +1,192 @@
+{%- comment -%}
+  WHATSAPP STICKY — App Block (Premium)
+  Handle: whatsapp-sticky-premium
+  Bouton flottant WhatsApp (mobile & desktop) avec message pré-rempli.
+{%- endcomment -%}
+
+{%- assign ns = 'wa-sticky-' | append: block.id -%}
+
+{%- comment -%}
+  Construire le lien WhatsApp :
+  - Si "custom_url" est renseigné → on l'utilise tel quel.
+  - Sinon → https://wa.me/<numero>?text=<message>
+{%- endcomment -%}
+{%- assign cleaned = block.settings.wa_number
+  | replace: ' ', '' | replace: '(', '' | replace: ')', ''
+  | replace: '-', '' | replace: '.', '' | replace: '+', '' -%}
+{%- assign msg = block.settings.prefill | url_encode -%}
+{%- if block.settings.custom_url != blank -%}
+  {%- assign wa_href = block.settings.custom_url -%}
+{%- else -%}
+  {%- if cleaned != blank -%}
+    {%- assign wa_href = 'https://wa.me/' | append: cleaned -%}
+    {%- if block.settings.prefill != blank -%}
+      {%- assign wa_href = wa_href | append: '?text=' | append: msg -%}
+    {%- endif -%}
+  {%- else -%}
+    {%- assign wa_href = '#' -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- assign show_desktop = block.settings.show_desktop -%}
+{%- assign show_mobile  = block.settings.show_mobile  -%}
+
+<a
+  class="{{ ns }}-btn"
+  href="{{ wa_href | escape }}"
+  aria-label="{{ block.settings.aria_label | default: 'WhatsApp chat' | escape }}"
+  {% if block.settings.new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+>
+  <span class="{{ ns }}-icon" aria-hidden="true">
+    <!-- Logo WhatsApp (SVG) -->
+    <svg viewBox="0 0 448 512" focusable="false" aria-hidden="true">
+      <path fill="{{ block.settings.icon_color | default: '#FFFFFF' }}"
+        d="M380.9 97.1C339.4 55.6 283.3 32 224 32 108.6 32 14 126.6 14 242c0 45.3 13.5 89.3 39 126.7L0 480l114-44c34.2 18.7 72.9 28 110 28 115.4 0 210-94.6 210-210 0-59.3-23.6-115.4-65.1-156.9zM224 438c-34.9 0-68.8-9.1-98.7-26.4l-7-4.1-67.3 26.1 25.5-65.7-4.3-7.1C55.2 329.2 46 286.6 46 242 46 142 124 64 224 64s178 78 178 178-78 196-178 196zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9s-8.8-2.7-12.5 2.7-14.3 17.9-17.5 21.6-6.4 4.1-11.9 1.4-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9c-4.9 5.4-19.2 18.7-19.2 45.7s19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3s4.6-23.5 3.2-25.7c-1.4-2.2-5-3.6-10.5-6.2z"/>
+    </svg>
+  </span>
+
+  {% if block.settings.show_label and block.settings.label != blank %}
+    <span class="{{ ns }}-label">{{ block.settings.label }}</span>
+  {% endif %}
+</a>
+
+<style>
+  .{{ ns }}-btn{
+    all: initial;
+    position: fixed;
+    z-index: {{ block.settings.z_index | default: 900 }};
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 {{ block.settings.padding_x | default: 0 }}px;
+    width: {{ block.settings.size | default: 64 }}px;
+    height: {{ block.settings.size | default: 64 }}px;
+    {% if block.settings.shape == 'square' %}border-radius: 16px;{% else %}border-radius: 9999px;{% endif %}
+    background: {{ block.settings.bg_color | default: '#25D366' }};
+    box-shadow: {% if block.settings.shadow %}0 10px 20px rgba(0,0,0,.2){% else %}none{% endif %};
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .{{ ns }}-btn:hover{ transform: translateY(-2px); {% if block.settings.shadow %}box-shadow: 0 14px 28px rgba(0,0,0,.24);{% endif %} }
+  .{{ ns }}-btn:active{ transform: translateY(0); }
+
+  .{{ ns }}-icon{ display:inline-block; line-height:0; }
+  .{{ ns }}-icon svg{
+    display:block;
+    width: calc({{ block.settings.size | default: 64 }}px * 0.56);
+    height: calc({{ block.settings.size | default: 64 }}px * 0.56);
+    /* centrage fin (le SVG WhatsApp n'est pas carré) */
+    transform: translate(
+      {{ block.settings.icon_dx | default: 0 }}px,
+      {{ block.settings.icon_dy | default: -1 }}px
+    );
+  }
+
+  .{{ ns }}-label{
+    all: unset;
+    color: {{ block.settings.label_color | default: '#FFFFFF' }};
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding-right: 10px;
+  }
+
+  /* Position */
+  {% assign pos = block.settings.position | default: 'br' %}
+  {% assign offx = block.settings.offset_x | default: 20 %}
+  {% assign offy = block.settings.offset_y | default: 20 %}
+  .{{ ns }}-btn{
+    {% if pos == 'br' %} right: {{ offx }}px; bottom: {{ offy }}px;
+    {% elsif pos == 'bl' %} left: {{ offx }}px; bottom: {{ offy }}px;
+    {% elsif pos == 'tr' %} right: {{ offx }}px; top: {{ offy }}px;
+    {% elsif pos == 'tl' %} left: {{ offx }}px; top: {{ offy }}px; {% endif %}
+  }
+
+  /* Pastille + label (chip) */
+  {% if block.settings.show_label %}
+    .{{ ns }}-btn{ padding-right: 12px; }
+    {% if pos == 'br' or pos == 'tr' %}
+      .{{ ns }}-btn{ flex-direction: row-reverse; }
+    {% endif %}
+  {% endif %}
+
+  /* Animation pulsation optionnelle */
+  {% if block.settings.pulse %}
+  .{{ ns }}-btn::after{
+    content:"";
+    position:absolute; inset:0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 rgba(37,211,102,.5);
+    animation: {{ ns }}-pulse 1.8s infinite;
+  }
+  @keyframes {{ ns }}-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(37,211,102,.45); }
+    70%  { box-shadow: 0 0 0 14px rgba(37,211,102,0); }
+    100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+  }
+  {% endif %}
+
+  /* Visibilité desktop/mobile */
+  @media (min-width: 990px){
+    {% unless show_desktop %}.{{ ns }}-btn{ display:none !important; }{% endunless %}
+  }
+  @media (max-width: 989.98px){
+    {% unless show_mobile %}.{{ ns }}-btn{ display:none !important; }{% endunless %}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "WhatsApp Sticky (Premium)",
+  "target": "section",
+  "settings": [
+    { "type": "text",  "id": "wa_number", "label": "Numéro WhatsApp (ex: +212681570887)" },
+    { "type": "text",  "id": "prefill",   "label": "Message pré-rempli", "default": "Bonjour 👋 j'ai une question." },
+    { "type": "url",   "id": "custom_url","label": "URL personnalisée (optionnel — remplace le numéro/texte)" },
+
+    { "type": "select","id": "position",  "label": "Position", "default": "br",
+      "options": [
+        { "value": "br", "label": "Bas droite" },
+        { "value": "bl", "label": "Bas gauche" },
+        { "value": "tr", "label": "Haut droite" },
+        { "value": "tl", "label": "Haut gauche" }
+      ]
+    },
+
+    { "type": "range", "id": "offset_x",  "min": 0, "max": 80, "step": 2, "unit": "px", "label": "Décalage X", "default": 20 },
+    { "type": "range", "id": "offset_y",  "min": 0, "max": 120, "step": 2, "unit": "px", "label": "Décalage Y", "default": 20 },
+    { "type": "range", "id": "size",      "min": 44, "max": 96, "step": 2, "unit": "px", "label": "Taille du bouton", "default": 64 },
+
+    { "type": "checkbox", "id": "show_label", "label": "Afficher un label", "default": false },
+    { "type": "text",     "id": "label",      "label": "Label (si activé)", "default": "WhatsApp" },
+    { "type": "color",    "id": "label_color","label": "Couleur du label", "default": "#FFFFFF" },
+
+    { "type": "select","id": "shape", "label": "Forme", "default": "circle",
+      "options": [
+        { "value": "circle", "label": "Rond" },
+        { "value": "square", "label": "Carré" }
+      ]
+    },
+
+    { "type": "color",    "id": "bg_color",   "label": "Couleur du fond", "default": "#25D366" },
+    { "type": "color",    "id": "icon_color", "label": "Couleur de l’icône", "default": "#FFFFFF" },
+    { "type": "checkbox", "id": "shadow",     "label": "Ombre portée", "default": true },
+    { "type": "checkbox", "id": "pulse",      "label": "Effet pulsation", "default": true },
+
+    { "type": "checkbox", "id": "show_desktop","label": "Afficher sur desktop", "default": true },
+    { "type": "checkbox", "id": "show_mobile", "label": "Afficher sur mobile",  "default": true },
+    { "type": "checkbox", "id": "new_tab",     "label": "Ouvrir dans un nouvel onglet", "default": true },
+
+    { "type": "range", "id": "z_index", "min": 0, "max": 9900, "step": 100, "label": "z-index", "default": 900 },
+
+    { "type": "text",  "id": "aria_label", "label": "Label d’accessibilité (aria-label)", "default": "WhatsApp chat" },
+    { "type": "range", "id": "padding_x", "min": 0, "max": 40, "step": 2, "unit": "px", "label": "Padding horizontal (si label)", "default": 0 },
+
+    { "type": "range", "id": "icon_dx", "min": -8, "max": 8, "step": 1, "unit": "px", "label": "Ajustement icône (X)", "default": 0 },
+    { "type": "range", "id": "icon_dy", "min": -8, "max": 8, "step": 1, "unit": "px", "label": "Ajustement icône (Y)", "default": -1 }
+  ]
+}
+{% endschema %}

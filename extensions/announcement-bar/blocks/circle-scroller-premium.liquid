@@ -1,0 +1,290 @@
+{%- comment -%}
+  CIRCLE IMAGE SCROLLER — App Block (Premium)
+  Handle: circle-image-scroller-premium
+{%- endcomment -%}
+
+{%- assign ns = 'cis-' | append: block.id -%}
+{%- assign size_px = block.settings.size | default: 96 -%}
+
+{%- assign has_any = false -%}
+{%- if block.settings.img_1 != blank -%}{%- assign has_any = true -%}{%- endif -%}
+{%- if has_any == false and block.settings.img_2 != blank -%}{%- assign has_any = true -%}{%- endif -%}
+{%- if has_any == false and block.settings.img_3 != blank -%}{%- assign has_any = true -%}{%- endif -%}
+{%- if has_any == false and block.settings.img_4 != blank -%}{%- assign has_any = true -%}{%- endif -%}
+{%- if has_any == false and block.settings.img_5 != blank -%}{%- assign has_any = true -%}{%- endif -%}
+{%- if has_any == false and block.settings.img_6 != blank -%}{%- assign has_any = true -%}{%- endif -%}
+
+{%- if has_any == false -%}
+  <div class="{{ ns }}-empty" style="text-align:center;padding:20px;border:1px dashed #ddd;border-radius:12px;">
+    <div style="font:600 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial">
+    </div>
+  </div>
+{%- else -%}
+  <div class="{{ ns }}-wrap" role="region" aria-label="Image scroller">
+    <div class="{{ ns }}-track">
+
+      {%- comment -%} SÉRIE ORIGINALE {%- endcomment -%}
+      {%- if block.settings.img_1 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_1 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_1 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 1">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img
+                src="{{ block.settings.img_1 | image_url: width: size_px }}"
+                width="{{ size_px }}" height="{{ size_px }}"
+                alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_1 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_2 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_2 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_2 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 2">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_2 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_2 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_3 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_3 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_3 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 3">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_3 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_3 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_4 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_4 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_4 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 4">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_4 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_4 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_5 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_5 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_5 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 5">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_5 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_5 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_6 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_6 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_6 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 6">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_6 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_6 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} DUPLICATE une fois pour la boucle infinie {%- endcomment -%}
+
+      {%- if block.settings.img_1 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_1 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_1 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 1 duplicate">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_1 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_1 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_2 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_2 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_2 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 2 duplicate">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_2 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_2 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_3 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_3 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_3 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 3 duplicate">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_3 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_3 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_4 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_4 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_4 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 4 duplicate">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_4 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_4 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_5 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_5 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_5 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 5 duplicate">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_5 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_5 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if block.settings.img_6 != blank -%}
+        <div class="{{ ns }}-item">
+          {%- if block.settings.url_6 != blank -%}
+            <a class="{{ ns }}-link" href="{{ block.settings.url_6 | escape }}"{% if block.settings.link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Image 6 duplicate">
+          {%- else -%}
+            <span class="{{ ns }}-link" aria-hidden="true">
+          {%- endif -%}
+              <img src="{{ block.settings.img_6 | image_url: width: size_px }}"
+                   width="{{ size_px }}" height="{{ size_px }}"
+                   alt="" loading="lazy" decoding="async" />
+          {%- if block.settings.url_6 != blank -%}</a>{%- else -%}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+{%- endif -%}
+
+<style>
+  .{{ ns }}-wrap{
+    overflow:hidden;
+    width:100%;
+    --size: {{ size_px }}px;
+    --gap: {{ block.settings.gap | default: 16 }}px;
+    --dur: {{ block.settings.duration | default: 30 }}s;
+    position:relative;
+  }
+  .{{ ns }}-track{
+    display:flex;
+    align-items:center;
+    gap: var(--gap);
+    width:max-content;
+    animation: {{ ns }}-marquee var(--dur) linear infinite;
+    {% if block.settings.direction == 'rtl' %} animation-direction: reverse; {% endif %}
+  }
+  {% if block.settings.pause_on_hover %}.{{ ns }}-wrap:hover .{{ ns }}-track{ animation-play-state: paused; }{% endif %}
+
+  @keyframes {{ ns }}-marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - var(--gap)/2)); }
+  }
+
+  .{{ ns }}-item{
+    width:var(--size);
+    height:var(--size);
+    flex:0 0 auto;
+    border-radius:9999px;
+    overflow:hidden;
+    {% if block.settings.shadow %} box-shadow: 0 8px 18px rgba(0,0,0,.18); {% endif %}
+    {% if block.settings.border %} outline: 3px solid rgba(255,255,255,.9); {% endif %}
+  }
+  .{{ ns }}-link{ display:block; width:100%; height:100%; }
+  .{{ ns }}-link img{ display:block; width:100%; height:100%; object-fit:cover; }
+
+  {% if block.settings.mask_edges %}
+  .{{ ns }}-wrap::before,
+  .{{ ns }}-wrap::after{
+    content:""; position:absolute; top:0; bottom:0; width:80px; pointer-events:none; z-index:2;
+  }
+  .{{ ns }}-wrap::before{ left:0; background:linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)); }
+  .{{ ns }}-wrap::after { right:0; background:linear-gradient(-90deg, rgba(255,255,255,1), rgba(255,255,255,0)); }
+  @media (prefers-color-scheme: dark){
+    .{{ ns }}-wrap::before{ background:linear-gradient(90deg, rgba(16,16,16,1), rgba(16,16,16,0)); }
+    .{{ ns }}-wrap::after { background:linear-gradient(-90deg, rgba(16,16,16,1), rgba(16,16,16,0)); }
+  }
+  {% endif %}
+</style>
+
+{% schema %}
+{
+  "name": "Circle Image Scroller",
+  "target": "section",
+  "settings": [
+    { "type": "range", "id": "size", "min": 56, "max": 160, "step": 4, "unit": "px", "label": "Taille des images", "default": 96 },
+    { "type": "range", "id": "gap", "min": 8, "max": 40, "step": 2, "unit": "px", "label": "Espacement", "default": 16 },
+    { "type": "range", "id": "duration", "min": 10, "max": 60, "step": 2, "unit": "s", "label": "Vitesse (durée d’un cycle)", "default": 30 },
+    { "type": "select", "id": "direction", "label": "Direction", "default": "ltr", "options": [
+      { "value": "ltr", "label": "Gauche → Droite" },
+      { "value": "rtl", "label": "Droite → Gauche" }
+    ]},
+
+    { "type": "checkbox", "id": "pause_on_hover", "label": "Pause au survol", "default": true },
+    { "type": "checkbox", "id": "mask_edges", "label": "Dégradé aux bords", "default": true },
+    { "type": "checkbox", "id": "shadow", "label": "Ombre portée", "default": true },
+    { "type": "checkbox", "id": "border", "label": "Contour blanc fin", "default": false },
+    { "type": "checkbox", "id": "link_new_tab", "label": "Ouvrir les liens dans un nouvel onglet", "default": true },
+
+    { "type": "image_picker", "id": "img_1", "label": "Image 1" },
+    { "type": "url", "id": "url_1", "label": "Lien 1 (optionnel)" },
+
+    { "type": "image_picker", "id": "img_2", "label": "Image 2" },
+    { "type": "url", "id": "url_2", "label": "Lien 2 (optionnel)" },
+
+    { "type": "image_picker", "id": "img_3", "label": "Image 3" },
+    { "type": "url", "id": "url_3", "label": "Lien 3 (optionnel)" },
+
+    { "type": "image_picker", "id": "img_4", "label": "Image 4" },
+    { "type": "url", "id": "url_4", "label": "Lien 4 (optionnel)" },
+
+    { "type": "image_picker", "id": "img_5", "label": "Image 5" },
+    { "type": "url", "id": "url_5", "label": "Lien 5 (optionnel)" },
+
+    { "type": "image_picker", "id": "img_6", "label": "Image 6" },
+    { "type": "url", "id": "url_6", "label": "Lien 6 (optionnel)" }
+  ]
+}
+{% endschema %}

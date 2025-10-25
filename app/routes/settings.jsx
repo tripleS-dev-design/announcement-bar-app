@@ -20,11 +20,8 @@ export const loader = async ({ request }) => {
     return redirect(`/pricing?${qs}`);
   }
 
-  // shop courant (ex: "selya11904" à partir de "selya11904.myshopify.com")
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
-
-  // 🔑 API key (client_id) — public dans l’admin, nécessaire pour les deep links
   const apiKey = process.env.SHOPIFY_API_KEY || "";
 
   return json({ shopSub, apiKey });
@@ -69,17 +66,14 @@ const GLOBAL_STYLES = `
    👉 addAppBlockId = {API_KEY}/{handle}
 ================================ */
 function editorBase({ shopSub }) {
-  // admin.shopify.com est le plus fiable
   return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
 }
-
-/** Ouvre l’éditeur et PRÉ-REMPLIT l’ajout d’un App Block (le marchand confirme) */
 function makeAddBlockLink({
   shopSub,
   apiKey,
   template = "index",
-  handle, // ex: "announcement-premium" (nom du .liquid dans /blocks)
-  target = "newAppsSection", // "newAppsSection" | "mainSection" | "sectionGroup:header" | `sectionId:${id}`
+  handle,
+  target = "newAppsSection",
 }) {
   const base = editorBase({ shopSub });
   const p = new URLSearchParams({
@@ -93,7 +87,7 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Tes composants (inchangés)
+   Tes composants (existants)
 ================================ */
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -256,6 +250,7 @@ function PreviewPopup() {
   );
 }
 
+/* ====== Countdown existant ====== */
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -352,6 +347,242 @@ function PreviewCountdown() {
 }
 
 /* ==============================
+   🔥 Nouveaux PREVIEWS BLOCS
+================================ */
+
+/** 1) Icônes Réseaux Sociaux — logos réels + couleurs officielles */
+function PreviewSocialIcons() {
+  const Base = ({ children, title, href = "#" , bg }) => (
+    <a
+      href={href}
+      title={title}
+      style={{
+        width: 52,
+        height: 52,
+        borderRadius: "50%",
+        display: "grid",
+        placeItems: "center",
+        background: bg,
+        boxShadow: "0 6px 14px rgba(0,0,0,.2)",
+        transition: "transform .15s ease, boxShadow .15s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+      aria-label={title}
+    >
+      {children}
+    </a>
+  );
+
+  return (
+    <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+      {/* Instagram (dégradé officiel) */}
+      <Base
+        title="Instagram"
+        bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
+      >
+        {/* Camera simple blanche lisible sur le dégradé */}
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle cx="46" cy="18" r="3" fill="#fff" />
+        </svg>
+      </Base>
+
+      {/* YouTube (rouge #FF0000) */}
+      <Base title="YouTube" bg="#FF0000">
+        <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
+          <polygon points="30,24 44,32 30,40" fill="#fff" />
+        </svg>
+      </Base>
+
+      {/* Facebook (bleu #1877F2) */}
+      <Base title="Facebook" bg="#1877F2">
+        {/* “f” blanche stylisée (forme vectorielle simple) */}
+        <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
+          <path
+            d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
+            fill="#fff"
+          />
+        </svg>
+      </Base>
+
+      {/* X (noir) */}
+      <Base title="X" bg="#000000">
+        {/* X blanc (2 diagonales) */}
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          <path d="M50 14 L14 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Base>
+
+      {/* TikTok (fond noir, note blanche + petit accent cyan/rose) */}
+      <Base title="TikTok" bg="#000000">
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+          {/* tige (blanc) */}
+          <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          {/* accent cyan */}
+          <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
+          {/* accent rose */}
+          <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Base>
+
+      {/* LinkedIn (bleu #0A66C2) */}
+      <Base title="LinkedIn" bg="#0A66C2">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
+          {/* “in” simplifié en formes */}
+          <circle cx="22" cy="31" r="3" fill="#fff" />
+          <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
+          <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
+          <path d="M36 36 c0-3 2-6 6-6 s6 3 6 6 v12 h-6 v-10 c0-1.7-1.3-3-3-3 s-3 1.3-3 3 v10 h-6 V36" fill="#fff" />
+        </svg>
+      </Base>
+    </div>
+  );
+}
+
+/** 2) Bouton WhatsApp Sticky (en bloc autonome) */
+function PreviewWhatsAppSticky() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div
+        style={{
+          position: "relative",
+          width: 64,
+          height: 64,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 35% 35%, rgba(255,255,255,.25), transparent 60%), #25D366",
+          boxShadow: "0 10px 20px rgba(0,0,0,.15)",
+          display: "grid",
+          placeItems: "center",
+        }}
+        title="Sticky WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 448 512" fill="#fff">
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z" />
+        </svg>
+      </div>
+      <div>
+        <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
+        <div style={{ color: "#555" }}>Contact rapide — coin bas (mobile & desktop)</div>
+      </div>
+    </div>
+  );
+}
+
+/** 3) Carousel d’images circulaires (scroll auto) */
+function PreviewCircleScroller() {
+  const imgs = [
+    "https://picsum.photos/seed/a/200",
+    "https://picsum.photos/seed/b/200",
+    "https://picsum.photos/seed/c/200",
+    "https://picsum.photos/seed/d/200",
+    "https://picsum.photos/seed/e/200",
+  ];
+  return (
+    <div style={{ overflowX: "auto", display: "flex", gap: 12, paddingBottom: 6 }}>
+      {imgs.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt={`circle-${i}`}
+          width={88}
+          height={88}
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
+            boxShadow: "0 4px 10px rgba(0,0,0,.12)",
+            border: "2px solid rgba(0,0,0,.06)",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+    </div>
+  );
+}
+
+/** 4) Présentation Gold de produits (grille) */
+function PreviewGoldProducts() {
+  const items = [
+    { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/300" },
+    { title: "Product Two", price: "$49", img: "https://picsum.photos/seed/2/300" },
+    { title: "Product Three", price: "$59", img: "https://picsum.photos/seed/3/300" },
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: 12,
+        width: "100%",
+      }}
+    >
+      {items.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            background:
+              "linear-gradient(135deg, #2a2212 0%, #3b2f17 40%, #57411c 70%, #2a2212 100%)",
+            color: "#f8e7b9",
+            borderRadius: 12,
+            overflow: "hidden",
+            boxShadow: "0 6px 16px rgba(0,0,0,.2)",
+          }}
+        >
+          <div style={{ position: "relative" }}>
+            <img
+              src={p.img}
+              alt={p.title}
+              width={400}
+              height={300}
+              style={{ width: "100%", height: 140, objectFit: "cover" }}
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(60% 60% at 70% 20%, rgba(255,215,0,.25), transparent 60%)",
+              }}
+            />
+          </div>
+          <div style={{ padding: "10px 12px" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>{p.title}</div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: 14,
+              }}
+            >
+              <span>{p.price}</span>
+              <button
+                style={{
+                  ...BUTTON_BASE,
+                  padding: "6px 12px",
+                  backgroundColor: "#f8e7b9",
+                  color: "#3a2b12",
+                }}
+              >
+                View
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ==============================
    PAGE Settings
 ================================ */
 export default function Settings() {
@@ -362,11 +593,72 @@ export default function Settings() {
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
   const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  // Tes 3 blocks (handles = noms des fichiers .liquid dans /extensions/announcement-bar/blocks)
+  // Blocs existants + Nouveaux blocs (même design, en dessous)
   const blocks = [
-    { id: "announcement-premium", title: "Premium Announcement Bar", description: "Animated or multilingual bar to grab attention.", template: "index", preview: <PreviewAnnouncementBar /> },
-    { id: "popup-premium",        title: "Premium Popup",            description: "Modern popup with promo code and glow animation.",    template: "index", preview: <PreviewPopup /> },
-    { id: "timer-premium",        title: "Premium Countdown",        description: "Three dynamic countdown styles.",                     template: "index", preview: <PreviewCountdown /> },
+    // === EXISTANTS ===
+    {
+      id: "announcement-premium",
+      title: "Premium Announcement Bar",
+      description: "Animated or multilingual bar to grab attention.",
+      template: "index",
+      preview: <PreviewAnnouncementBar />,
+    },
+    {
+      id: "popup-premium",
+      title: "Premium Popup",
+      description: "Modern popup with promo code and glow animation.",
+      template: "index",
+      preview: <PreviewPopup />,
+    },
+    {
+      id: "timer-premium",
+      title: "Premium Countdown",
+      description: "Three dynamic countdown styles.",
+      template: "index",
+      preview: <PreviewCountdown />,
+    },
+
+    // === NOUVEAUX (sous les 3 premiers) ===
+    // 1) Icônes Social
+    {
+      id: "social-icons-premium",
+      title: "Social Icons",
+      description: "Icônes réseaux sociaux avec hover & style propre.",
+      template: "index",
+      preview: <PreviewSocialIcons />,
+    },
+    // 2) WhatsApp Sticky (bloc autonome)
+    {
+      id: "whatsapp-sticky-premium",
+      title: "WhatsApp Sticky Button",
+      description: "Bouton flottant contact rapide (coin bas).",
+      template: "index",
+      preview: <PreviewWhatsAppSticky />,
+    },
+    // 3) Carousel images circulaires
+    {
+      id: "circle-scroller-premium",
+      title: "Circle Image Scroller",
+      description: "Carousel horizontal d’images rondes (look stories).",
+      template: "index",
+      preview: <PreviewCircleScroller />,
+    },
+    // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
+ {
+  id: "gold-products-premium",
+  title: "Gold Products Showcase (Premium)",
+  description: "Grille produits style gold à partir d’une collection.",
+  template: "index",
+  preview: <div style={{padding:12, borderRadius:8, background:"#fff", border:"1px solid #eee"}}>
+    <div style={{fontWeight:"bold", marginBottom:8}}>Gold Products</div>
+    <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8}}>
+      {[1,2,3].map(i=>(
+        <div key={i} style={{height:50, background:"linear-gradient(135deg,#8A6A2A,#C9A34A)", borderRadius:8}}/>
+      ))}
+    </div>
+  </div>
+}
+
   ];
 
   return (
@@ -391,23 +683,7 @@ export default function Settings() {
             “Welcome to Triple Announcement Bar! Let’s boost your sales with
             powerful bars, popups, and countdowns.”
           </p>
-          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
-              }}
-            >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
-          </div>
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
         </div>
 
         {blocks.map((block) => (
@@ -416,7 +692,7 @@ export default function Settings() {
               <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
               <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-              {/* ✅ Deep link corrigé : addAppBlockId = API_KEY/HANDLE */}
+              {/* ✅ Deep link : addAppBlockId = API_KEY/HANDLE */}
               <a
                 href={makeAddBlockLink({
                   shopSub,
@@ -467,7 +743,7 @@ export default function Settings() {
 
       {/* YouTube en bas à droite */}
       <a
-        href={YOUTUBE_URL}
+        href={"https://youtu.be/UJzd4Re21e0"}
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -493,9 +769,9 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* WhatsApp en bas à gauche */}
+      {/* WhatsApp global (existant). Le bloc “whatsapp-sticky-premium” est séparé */}
       <a
-        href="https://wa.me/+212630079763"
+        href="https://wa.me/+212681570887"
         target="_blank"
         rel="noopener noreferrer"
         style={{
