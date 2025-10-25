@@ -644,20 +644,32 @@ export default function Settings() {
       preview: <PreviewCircleScroller />,
     },
     // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
- {
+{
   id: "gold-products-premium",
   title: "Gold Products Showcase (Premium)",
   description: "Grille produits style gold à partir d’une collection.",
   template: "index",
-  preview: <div style={{padding:12, borderRadius:8, background:"#fff", border:"1px solid #eee"}}>
-    <div style={{fontWeight:"bold", marginBottom:8}}>Gold Products</div>
-    <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8}}>
-      {[1,2,3].map(i=>(
-        <div key={i} style={{height:50, background:"linear-gradient(135deg,#8A6A2A,#C9A34A)", borderRadius:8}}/>
-      ))}
+  preview: (
+    <div style={{ padding: 12, borderRadius: 8, background: "#fff", border: "1px solid #eee" }}>
+      <div style={{ fontWeight: "bold", marginBottom: 8 }}>Gold Products</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
+        {[1, 2, 3].map((i) => (
+          <img
+            key={i}
+            src={`https://picsum.photos/seed/${i}/300/150`}
+            alt={`gold-${i}`}
+            width={300}
+            height={150}
+            style={{ width: "100%", height: 50, objectFit: "cover", borderRadius: 8, display: "block" }}
+            loading="lazy"
+            decoding="async"
+          />
+        ))}
+      </div>
     </div>
-  </div>
+  )
 }
+
 
   ];
 
