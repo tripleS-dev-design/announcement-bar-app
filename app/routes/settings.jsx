@@ -59,9 +59,10 @@ const CARD_STYLE = {
 const GLOBAL_STYLES = `
 @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
 @keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
+@keyframes pulseSoft { 0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6} }
 `;
 
-/* ✅ grid to show cards two per row */
+/* ✅ Two-per-row grid */
 const GRID_STYLE = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -69,8 +70,7 @@ const GRID_STYLE = {
 };
 
 /* ==============================
-   Deep link helpers (fixed)
-   👉 addAppBlockId = {API_KEY}/{handle}
+   Deep link helpers
 ================================ */
 function editorBase({ shopSub }) {
   return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
@@ -94,7 +94,7 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Your components (existing)
+   Existing components
 ================================ */
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -257,7 +257,7 @@ function PreviewPopup() {
   );
 }
 
-/* ====== Existing countdown ====== */
+/* ====== Countdown ====== */
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -383,12 +383,10 @@ function PreviewSocialIcons() {
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-      {/* Instagram (official gradient) */}
       <Base
         title="Instagram"
         bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
       >
-        {/* Simple white camera over the gradient */}
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
           <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
@@ -396,7 +394,6 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* YouTube (red #FF0000) */}
       <Base title="YouTube" bg="#FF0000">
         <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
@@ -404,9 +401,7 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* Facebook (blue #1877F2) */}
       <Base title="Facebook" bg="#1877F2">
-        {/* stylized white “f” */}
         <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
           <path
             d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
@@ -415,32 +410,24 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* X (black) */}
       <Base title="X" bg="#000000">
-        {/* white X (two diagonals) */}
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
           <path d="M50 14 L14 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
         </svg>
       </Base>
 
-      {/* TikTok (black background, white note + cyan/pink accents) */}
       <Base title="TikTok" bg="#000000">
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
-          {/* stem (white) */}
           <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-          {/* cyan accent */}
           <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
-          {/* pink accent */}
           <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
         </svg>
       </Base>
 
-      {/* LinkedIn (blue #0A66C2) */}
       <Base title="LinkedIn" bg="#0A66C2">
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
-          {/* simplified “in” */}
           <circle cx="22" cy="31" r="3" fill="#fff" />
           <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
           <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
@@ -481,7 +468,7 @@ function PreviewWhatsAppSticky() {
   );
 }
 
-/** 3) Circular image scroller (auto scroll) */
+/** 3) Circular image scroller */
 function PreviewCircleScroller() {
   const imgs = [
     "https://picsum.photos/seed/a/200",
@@ -513,7 +500,7 @@ function PreviewCircleScroller() {
   );
 }
 
-/* --- Admin preview styled like your "Gold Selection" — compact (3 cards aligned) */
+/** 4) Gold Products preview */
 function PreviewGoldProductsStoreLike() {
   const items = [
     { title: "Elegant waterproof crossbody bag (anti-theft, USB charging)", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
@@ -544,7 +531,6 @@ function PreviewGoldProductsStoreLike() {
               border: "1px solid #e5e7eb",
             }}
           >
-            {/* Smaller image */}
             <img
               src={p.img}
               alt={p.title}
@@ -554,8 +540,6 @@ function PreviewGoldProductsStoreLike() {
               loading="lazy"
               decoding="async"
             />
-
-            {/* Compact gold/beige band */}
             <div
               style={{
                 background: "linear-gradient(0deg,#E9DFC8,#F1E6CF)",
@@ -579,7 +563,6 @@ function PreviewGoldProductsStoreLike() {
               >
                 {p.title}
               </div>
-
               <div style={{ fontSize: 12.5, fontWeight: 800, color: "#1f2937" }}>{p.price}</div>
             </div>
           </div>
@@ -589,33 +572,56 @@ function PreviewGoldProductsStoreLike() {
   );
 }
 
-/* ==============================
-   🔁 Tawk.to chat widget (replaces global WhatsApp button)
-================================ */
-function TawkChat() {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.__tawkLoaded) return; // prevent multiple inserts
-    window.__tawkLoaded = true;
+/** 5) NEW — “Coming Soon” info card preview */
+function PreviewComingSoon() {
+  return (
+    <div
+      style={{
+        width: "100%",
+        padding: 14,
+        borderRadius: 12,
+        border: "1px dashed #e5e7eb",
+        background:
+          "linear-gradient(90deg, rgba(249,250,251,1) 0%, rgba(245,246,248,1) 50%, rgba(249,250,251,1) 100%)",
+        backgroundSize: "600px 100%",
+        animation: "shimmer 2.4s infinite linear",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+        <span
+          style={{
+            display: "inline-flex",
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            background: "#000",
+            color: "#fff",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 900,
+          }}
+          aria-hidden
+        >
+          ✨
+        </span>
+        <div style={{ fontWeight: 800 }}>New blocks in production</div>
+      </div>
 
-    const s1 = document.createElement("script");
-    s1.async = true;
-    s1.src = "https://embed.tawk.to/68fd2c098f570d1956b50811/1j8ef81r3";
-    s1.charset = "UTF-8";
-    s1.setAttribute("crossorigin", "*");
+      <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
+        <li>Product Page Enhancements (sticky ATC, badges, specs)</li>
+        <li>FAQ / Accordion</li>
+        <li>Stock / Urgency Bar</li>
+        <li>Bundles & Volume Discounts</li>
+        <li>Product Tabs & Specs</li>
+      </ul>
 
-    const s0 = document.getElementsByTagName("script")[0];
-    if (s0 && s0.parentNode) {
-      s0.parentNode.insertBefore(s1, s0);
-    } else {
-      document.body.appendChild(s1);
-    }
-
-    return () => {};
-  }, []);
-
-  return null;
+      <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280" }}>
+        We ship regularly. Share your idea — we can build it!
+      </div>
+    </div>
+  );
 }
+
 
 /* ==============================
    PAGE: Settings
@@ -626,17 +632,17 @@ export default function Settings() {
   const location = useLocation();
 
   const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
-  const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  // Existing blocks + new ones (same card UI)
+  // Blocks list
   const blocks = [
-    // === EXISTING ===
+    // EXISTING
     {
       id: "announcement-premium",
       title: "Premium Announcement Bar",
       description: "Animated or multilingual bar to grab attention.",
       template: "index",
       preview: <PreviewAnnouncementBar />,
+      kind: "installable",
     },
     {
       id: "popup-premium",
@@ -644,6 +650,7 @@ export default function Settings() {
       description: "Modern popup with promo code and glow animation.",
       template: "index",
       preview: <PreviewPopup />,
+      kind: "installable",
     },
     {
       id: "timer-premium",
@@ -651,49 +658,71 @@ export default function Settings() {
       description: "Three dynamic countdown styles.",
       template: "index",
       preview: <PreviewCountdown />,
+      kind: "installable",
     },
 
-    // === NEW (under the first 3) ===
-    // 1) Social icons
+    // NEW
     {
       id: "social-icons-premium",
       title: "Social Icons",
       description: "Social icons with hover and clean style.",
       template: "index",
       preview: <PreviewSocialIcons />,
+      kind: "installable",
     },
-    // 2) WhatsApp Sticky (standalone block)
     {
       id: "whatsapp-sticky-premium",
       title: "WhatsApp Sticky Button",
       description: "Floating quick-contact button (bottom corner).",
       template: "index",
       preview: <PreviewWhatsAppSticky />,
+      kind: "installable",
     },
-    // 3) Circular image carousel
     {
       id: "circle-scroller-premium",
       title: "Circle Image Scroller",
       description: "Horizontal carousel of circular images (stories look).",
       template: "index",
       preview: <PreviewCircleScroller />,
+      kind: "installable",
     },
-    // 4) Gold products showcase
     {
       id: "gold-products-premium",
       title: "Gold Products Showcase (Premium)",
       description: "Gold-style product grid from a collection.",
       template: "index",
-      preview: <PreviewGoldProductsStoreLike />
-    }
+      preview: <PreviewGoldProductsStoreLike />,
+      kind: "installable",
+    },
+
+    // ➕ INFO CARD (fills the last empty slot nicely)
+    {
+      id: "coming-soon-info",
+      title: "More Blocks Coming Soon",
+      description:
+        "We add new blocks regularly. Tell us what you want next!",
+      template: "index",
+      preview: <PreviewComingSoon />,
+      kind: "info",
+      ctaLabel: "Suggest a Block",
+    },
   ];
+
+  // CTA handlers
+  const openTawk = () => {
+    try {
+      if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
+        window.Tawk_API.maximize();
+        return;
+      }
+    } catch {}
+    window.location.href = "mailto:triple.s.dev.design@gmail.com?subject=Block%20request";
+  };
 
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
       <OpeningPopup />
-      {/* NEW: load Tawk.to widget (bottom-right) */}
-      <TawkChat />
 
       <div style={CONTAINER_STYLE}>
         <div
@@ -715,7 +744,7 @@ export default function Settings() {
           <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
         </div>
 
-        {/* ✅ Two-by-two layout for the block cards */}
+        {/* Grid */}
         <div style={GRID_STYLE}>
           {blocks.map((block) => (
             <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
@@ -723,28 +752,40 @@ export default function Settings() {
                 <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
                 <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-                {/* ✅ Deep link: addAppBlockId = API_KEY/HANDLE */}
-                <a
-                  href={makeAddBlockLink({
-                    shopSub,
-                    apiKey,
-                    template: block.template || "index",
-                    handle: block.id,
-                    target: "newAppsSection",
-                  })}
-                  target="_top"
-                  rel="noreferrer"
-                >
+                {block.kind === "installable" ? (
+                  <a
+                    href={makeAddBlockLink({
+                      shopSub,
+                      apiKey,
+                      template: block.template || "index",
+                      handle: block.id,
+                      target: "newAppsSection",
+                    })}
+                    target="_top"
+                    rel="noreferrer"
+                  >
+                    <button
+                      style={{
+                        ...BUTTON_BASE,
+                        backgroundColor: "#000",
+                        color: "#fff",
+                      }}
+                    >
+                      Add Premium Block
+                    </button>
+                  </a>
+                ) : (
                   <button
+                    onClick={openTawk}
                     style={{
-                      ...BUTTON_BASE,
-                      backgroundColor: "#000",
+                      ... BUTTON_BASE,
+                      backgroundColor: "#111",
                       color: "#fff",
                     }}
                   >
-                    Add Premium Block
+                    {block.ctaLabel || "Contact us"}
                   </button>
-                </a>
+                )}
               </div>
               <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
             </div>
@@ -752,7 +793,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Pricing button (center bottom) */}
+      {/* Pricing (center bottom) */}
       <a href={pricingHref} style={{ textDecoration: "none" }}>
         <button
           style={{
@@ -773,15 +814,15 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* YouTube button — moved to bottom-left to avoid overlapping Tawk */}
+      {/* YouTube (bottom-left) */}
       <a
-        href={YOUTUBE_URL}
+        href={"https://youtu.be/UJzd4Re21e0"}
         target="_blank"
         rel="noopener noreferrer"
         style={{
           position: "fixed",
           bottom: "24px",
-          left: "24px",     // ⬅️ moved from right to left
+          left: "24px",
           textDecoration: "none",
           zIndex: 999,
         }}
@@ -801,7 +842,49 @@ export default function Settings() {
         </button>
       </a>
 
-      {/* (No global WhatsApp floating button anymore) */}
+      {/* Tawk chat launcher (bottom-right) */}
+      <button
+        onClick={() => {
+          try {
+            if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
+              window.Tawk_API.maximize();
+              return;
+            }
+          } catch {}
+          window.location.href =
+            "mailto:triple.s.dev.design@gmail.com?subject=Support%20request";
+        }}
+        aria-label="Chat support"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          ...BUTTON_BASE,
+          backgroundColor: "#111",
+          color: "#fff",
+          borderRadius: "30px",
+          zIndex: 999,
+        }}
+      >
+        Chat
+      </button>
+
+      {/* Tawk.to embed */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+  s1.async=true;
+  s1.src='https://embed.tawk.to/68fd2c098f570d1956b50811/1j8ef81r3';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
+  s0.parentNode.insertBefore(s1,s0);
+})();
+        `,
+        }}
+      />
     </>
   );
 }
