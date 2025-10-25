@@ -63,7 +63,6 @@ const GLOBAL_STYLES = `
 
 /* ==============================
    Deep link helpers
-   addAppBlockId = {API_KEY}/{handle}
 ================================ */
 function editorBase({ shopSub }) {
   return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
@@ -87,7 +86,7 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Composants de preview
+   Composants d’aperçu
 ================================ */
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -122,11 +121,12 @@ function OpeningPopup() {
           How to use the Premium Blocks
         </h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
-          Go to your <strong>Theme Editor</strong> and click{" "}
+          Go to your <strong>Theme Editor</strong> and click on{" "}
           <strong>Add Block</strong> in the App section.
         </p>
         <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
-          Choose any premium block: Announcement Bar, Popup, or Countdown.
+          Choose any premium block: Announcement Bar, Popup, or Countdown, and
+          customize it freely!
         </p>
         <button
           onClick={() => setVisible(false)}
@@ -249,6 +249,7 @@ function PreviewPopup() {
   );
 }
 
+/* ====== Countdown ====== */
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -390,10 +391,7 @@ function PreviewSocialIcons() {
 
       <Base title="Facebook" bg="#1877F2">
         <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
-          <path
-            d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
-            fill="#fff"
-          />
+          <path d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z" fill="#fff" />
         </svg>
       </Base>
 
@@ -455,7 +453,39 @@ function PreviewWhatsAppSticky() {
   );
 }
 
-/* ====== Gold Products (grille) ====== */
+/* ====== Circle Scroller ====== */
+function PreviewCircleScroller() {
+  const imgs = [
+    "https://picsum.photos/seed/a/200",
+    "https://picsum.photos/seed/b/200",
+    "https://picsum.photos/seed/c/200",
+    "https://picsum.photos/seed/d/200",
+    "https://picsum.photos/seed/e/200",
+  ];
+  return (
+    <div style={{ overflowX: "auto", display: "flex", gap: 12, paddingBottom: 6 }}>
+      {imgs.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt={`circle-${i}`}
+          width={88}
+          height={88}
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
+            boxShadow: "0 4px 10px rgba(0,0,0,.12)",
+            border: "2px solid rgba(0,0,0,.06)",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ====== Gold Products ====== */
 function PreviewGoldProducts() {
   const items = [
     { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/400/300" },
@@ -467,4 +497,41 @@ function PreviewGoldProducts() {
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap:
+        gap: 12,
+        width: "100%",
+      }}
+    >
+      {items.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            background:
+              "linear-gradient(135deg, #2a2212 0%, #3b2f17 40%, #57411c 70%, #2a2212 100%)",
+            color: "#f8e7b9",
+            borderRadius: 12,
+            overflow: "hidden",
+            boxShadow: "0 6px 16px rgba(0,0,0,.2)",
+          }}
+        >
+          <div style={{ position: "relative" }}>
+            <img
+              src={p.img}
+              alt={p.title}
+              width={400}
+              height={300}
+              style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }}
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(60% 60% at 70% 20%, rgba(255,215,0,.25), transparent 60%)",
+              }}
+            />
+          </div>
+          <div style={{ padding: "10px 12px" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>{p.title}</div>
+            <div
