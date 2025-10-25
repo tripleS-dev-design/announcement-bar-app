@@ -4,7 +4,7 @@ import { useLoaderData, useLocation, useSearchParams } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
 /* ==============================
-   PLAN HANDLES — NE PAS CHANGER
+   PLAN HANDLES — DO NOT CHANGE
 ================================ */
 const PLAN_HANDLES = {
   monthly: "premium-monthly",
@@ -12,7 +12,7 @@ const PLAN_HANDLES = {
 };
 
 /* ==============================
-   LOADER — NE PAS CHANGER LA LOGIQUE
+   LOADER — DO NOT CHANGE LOGIC
 ================================ */
 export const loader = async ({ request }) => {
   const { authenticate } = await import("../shopify.server");
@@ -47,21 +47,35 @@ export const loader = async ({ request }) => {
     if (interval === "ANNUAL") currentHandle = PLAN_HANDLES.annual;
     if (interval === "EVERY_30_DAYS") currentHandle = PLAN_HANDLES.monthly;
   } catch {
-    // silencieux
+    // silent
   }
 
   return json({ currentHandle });
 };
 
 /* ==============================
-   COMPOSANTS PURS UI (Design only)
+   PURE UI COMPONENTS (Design-only)
 ================================ */
 function CheckItem({ children }) {
   return (
-    <li style={{ display: "grid", gridTemplateColumns: "18px 1fr", gap: 8, alignItems: "start", margin: "6px 0" }}>
+    <li
+      style={{
+        display: "grid",
+        gridTemplateColumns: "18px 1fr",
+        gap: 8,
+        alignItems: "start",
+        margin: "6px 0",
+      }}
+    >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ marginTop: 2 }}>
         <circle cx="12" cy="12" r="11" stroke="#E5E7EB" strokeWidth="2" />
-        <path d="M7 12.5l3 3 7-7" stroke="#111" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M7 12.5l3 3 7-7"
+          stroke="#111"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
       <span>{children}</span>
     </li>
@@ -75,36 +89,36 @@ function FeaturesList() {
 
       <div style={{ fontWeight: 700, marginTop: 10 }}>Highly-customizable Announcement Bar</div>
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
-        <CheckItem>3 styles : scrolling, multilingual carousel, light-glow</CheckItem>
-        <CheckItem>Image ou couleur, overlay, ombre de texte</CheckItem>
-        <CheckItem>CTA positionnable : gauche / centre / droite</CheckItem>
+        <CheckItem>3 styles: scrolling, multilingual carousel, light-glow</CheckItem>
+        <CheckItem>Image or color background, overlay, text shadow</CheckItem>
+        <CheckItem>CTA placement: left / center / right</CheckItem>
       </ul>
 
       <div style={{ fontWeight: 700, marginTop: 10 }}>High-conversion Popup</div>
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
-        <CheckItem>3 visuels : standard, light effect, radial glow</CheckItem>
-        <CheckItem>Image ou couleur, alignement & taille du texte</CheckItem>
-        <CheckItem>Délai d’affichage + bouton d’appel à l’action</CheckItem>
+        <CheckItem>3 visuals: standard, light effect, radial glow</CheckItem>
+        <CheckItem>Image or color, text alignment & size controls</CheckItem>
+        <CheckItem>Display delay + customizable call-to-action button</CheckItem>
       </ul>
 
       <div style={{ fontWeight: 700, marginTop: 10 }}>Dynamic Countdown</div>
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 10px" }}>
-        <CheckItem>3 formats : simple, carré, cercle animé</CheckItem>
-        <CheckItem>Fond, bordure, texte : totalement personnalisables</CheckItem>
-        <CheckItem>Mode glow optionnel, jours/ heures/ minutes/ secondes</CheckItem>
+        <CheckItem>3 formats: simple, squared, animated circle</CheckItem>
+        <CheckItem>Background, border, text: fully customizable</CheckItem>
+        <CheckItem>Optional glow mode, days/hours/minutes/seconds</CheckItem>
       </ul>
 
       <div style={{ fontWeight: 700, marginTop: 10 }}>Seamless Integration</div>
       <ul style={{ listStyle: "none", paddingLeft: 0, margin: "6px 0 0" }}>
-        <CheckItem>Ajout direct depuis le Theme Editor Shopify</CheckItem>
-        <CheckItem>Prévisualisation en temps réel</CheckItem>
-        <CheckItem>Sans code, installation instantanée</CheckItem>
+        <CheckItem>Add directly from Shopify Theme Editor</CheckItem>
+        <CheckItem>Real-time preview</CheckItem>
+        <CheckItem>No code required, instant install</CheckItem>
       </ul>
     </div>
   );
 }
 
-/* Rubans */
+/* Ribbons */
 function Ribbon({ children, tone = "default" }) {
   const isBest = tone === "best";
   return (
@@ -163,7 +177,7 @@ export default function Pricing() {
   const location = useLocation();
   const [params] = useSearchParams();
 
-  // Bypass dev: /pricing?billing=dev&shop=...&host=...
+  // Dev bypass: /pricing?billing=dev&shop=...&host=...
   useEffect(() => {
     if (params.get("billing") === "dev") {
       const qs = new URLSearchParams(location.search || "");
@@ -172,7 +186,7 @@ export default function Pricing() {
     }
   }, [params, location.search]);
 
-  // liens d’activation → on garde tous les params + plan (LOGIQUE IDENTIQUE)
+  // Activation links → keep all params + selected plan (SAME LOGIC)
   const makeActivateHref = (handle) => {
     const qs = new URLSearchParams(location.search || "");
     qs.set("plan", handle);
@@ -187,7 +201,7 @@ export default function Pricing() {
     [location.search]
   );
 
-  // Back to app — on garde TOUS les params, on enlève juste "plan" (LOGIQUE IDENTIQUE)
+  // Back to app — keep ALL params, just remove "plan" (SAME LOGIC)
   const backToAppHref = useMemo(() => {
     const qs = new URLSearchParams(location.search || "");
     qs.delete("plan");
@@ -275,7 +289,7 @@ export default function Pricing() {
         {/* Header */}
         <div style={headerStyle}>
           <h1 style={headerTitle}>Unlock All Features — Premium Access</h1>
-          <p style={headerSub}>Plans transparents, activation instantanée, annulation à tout moment.</p>
+          <p style={headerSub}>Transparent plans, instant activation, cancel anytime.</p>
         </div>
 
         {/* Pricing grid */}
@@ -325,7 +339,7 @@ export default function Pricing() {
           </div>
         </div>
 
-        {/* Back to app — garde TOUS les params */}
+        {/* Back to app — keep ALL params */}
         <div style={footStyle}>
           <a href={backToAppHref} style={{ textDecoration: "none", display: "inline-block" }}>
             <button style={backBtn}>Back to app</button>
