@@ -21,14 +21,14 @@ export const loader = async ({ request }) => {
   }
 
   const shopDomain = session.shop || "";
-  the shopSub = shopDomain.replace(".myshopify.com", "");
+  const shopSub = shopDomain.replace(".myshopify.com", "");
   const apiKey = process.env.SHOPIFY_API_KEY || "";
 
   return json({ shopSub, apiKey });
 };
 
 /* ==============================
-   UI & styles (inchangés)
+   UI & styles
 ================================ */
 const BUTTON_BASE = {
   border: "none",
@@ -62,8 +62,8 @@ const GLOBAL_STYLES = `
 `;
 
 /* ==============================
-   Deep link helpers (corrigés)
-   👉 addAppBlockId = {API_KEY}/{handle}
+   Deep link helpers
+   addAppBlockId = {API_KEY}/{handle}
 ================================ */
 function editorBase({ shopSub }) {
   return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
@@ -87,7 +87,7 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Tes composants (existants)
+   Composants de preview
 ================================ */
 function OpeningPopup() {
   const [visible, setVisible] = useState(true);
@@ -122,12 +122,11 @@ function OpeningPopup() {
           How to use the Premium Blocks
         </h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
-          Go to your <strong>Theme Editor</strong> and click on{" "}
+          Go to your <strong>Theme Editor</strong> and click{" "}
           <strong>Add Block</strong> in the App section.
         </p>
         <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
-          Choose any premium block: Announcement Bar, Popup, or Countdown, and
-          customize it freely!
+          Choose any premium block: Announcement Bar, Popup, or Countdown.
         </p>
         <button
           onClick={() => setVisible(false)}
@@ -250,7 +249,6 @@ function PreviewPopup() {
   );
 }
 
-/* ====== Countdown existant ====== */
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -346,11 +344,7 @@ function PreviewCountdown() {
   );
 }
 
-/* ==============================
-   🔥 Nouveaux PREVIEWS BLOCS
-================================ */
-
-/** 1) Icônes Réseaux Sociaux — logos réels + couleurs officielles */
+/* ====== Social Icons ====== */
 function PreviewSocialIcons() {
   const Base = ({ children, title, href = "#", bg }) => (
     <a
@@ -376,7 +370,6 @@ function PreviewSocialIcons() {
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-      {/* Instagram */}
       <Base
         title="Instagram"
         bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
@@ -388,7 +381,6 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* YouTube */}
       <Base title="YouTube" bg="#FF0000">
         <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
@@ -396,7 +388,6 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* Facebook */}
       <Base title="Facebook" bg="#1877F2">
         <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
           <path
@@ -406,7 +397,6 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* X */}
       <Base title="X" bg="#000000">
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
@@ -414,7 +404,6 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* TikTok */}
       <Base title="TikTok" bg="#000000">
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
@@ -423,7 +412,6 @@ function PreviewSocialIcons() {
         </svg>
       </Base>
 
-      {/* LinkedIn */}
       <Base title="LinkedIn" bg="#0A66C2">
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
@@ -437,7 +425,7 @@ function PreviewSocialIcons() {
   );
 }
 
-/** 2) Bouton WhatsApp Sticky (en bloc autonome) */
+/* ====== WhatsApp Sticky ====== */
 function PreviewWhatsAppSticky() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -467,314 +455,16 @@ function PreviewWhatsAppSticky() {
   );
 }
 
-/** 3) Carousel d’images circulaires (scroll auto) */
-function PreviewCircleScroller() {
-  const imgs = [
-    "https://picsum.photos/seed/a/200",
-    "https://picsum.photos/seed/b/200",
-    "https://picsum.photos/seed/c/200",
-    "https://picsum.photos/seed/d/200",
-    "https://picsum.photos/seed/e/200",
-  ];
-  return (
-    <div style={{ overflowX: "auto", display: "flex", gap: 12, paddingBottom: 6 }}>
-      {imgs.map((src, i) => (
-        <img
-          key={i}
-          src={src}
-          alt={`circle-${i}`}
-          width={88}
-          height={88}
-          style={{
-            borderRadius: "50%",
-            objectFit: "cover",
-            boxShadow: "0 4px 10px rgba(0,0,0,.12)",
-            border: "2px solid rgba(0,0,0,.06)",
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-      ))}
-    </div>
-  );
-}
-
-/** 4) Présentation Gold de produits (grille) */
+/* ====== Gold Products (grille) ====== */
 function PreviewGoldProducts() {
   const items = [
-    { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/300" },
-    { title: "Product Two", price: "$49", img: "https://picsum.photos/seed/2/300" },
-    { title: "Product Three", price: "$59", img: "https://picsum.photos/seed/3/300" },
+    { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/400/300" },
+    { title: "Product Two", price: "$49", img: "https://picsum.photos/seed/2/400/300" },
+    { title: "Product Three", price: "$59", img: "https://picsum.photos/seed/3/400/300" },
   ];
   return (
     <div
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap: 12,
-        width: "100%",
-      }}
-    >
-      {items.map((p, i) => (
-        <div
-          key={i}
-          style={{
-            background:
-              "linear-gradient(135deg, #2a2212 0%, #3b2f17 40%, #57411c 70%, #2a2212 100%)",
-            color: "#f8e7b9",
-            borderRadius: 12,
-            overflow: "hidden",
-            boxShadow: "0 6px 16px rgba(0,0,0,.2)",
-          }}
-        >
-          <div style={{ position: "relative" }}>
-            <img
-              src={p.img}
-              alt={p.title}
-              width={400}
-              height={300}
-              style={{ width: "100%", height: 140, objectFit: "cover" }}
-              loading="lazy"
-              decoding="async"
-            />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "radial-gradient(60% 60% at 70% 20%, rgba(255,215,0,.25), transparent 60%)",
-              }}
-            />
-          </div>
-          <div style={{ padding: "10px 12px" }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>{p.title}</div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                fontSize: 14,
-              }}
-            >
-              <span>{p.price}</span>
-              <button
-                style={{
-                  ...BUTTON_BASE,
-                  padding: "6px 12px",
-                  backgroundColor: "#f8e7b9",
-                  color: "#3a2b12",
-                }}
-              >
-                View
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ==============================
-   PAGE Settings
-================================ */
-export default function Settings() {
-  const { shopSub, apiKey } = useLoaderData();
-  const [lang, setLang] = useState("en");
-  const location = useLocation();
-
-  const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
-  const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
-
-  // Blocs existants + Nouveaux blocs (même design, en dessous)
-  const blocks = [
-    // === EXISTANTS ===
-    {
-      id: "announcement-premium",
-      title: "Premium Announcement Bar",
-      description: "Animated or multilingual bar to grab attention.",
-      template: "index",
-      preview: <PreviewAnnouncementBar />,
-    },
-    {
-      id: "popup-premium",
-      title: "Premium Popup",
-      description: "Modern popup with promo code and glow animation.",
-      template: "index",
-      preview: <PreviewPopup />,
-    },
-    {
-      id: "timer-premium",
-      title: "Premium Countdown",
-      description: "Three dynamic countdown styles.",
-      template: "index",
-      preview: <PreviewCountdown />,
-    },
-
-    // === NOUVEAUX (sous les 3 premiers) ===
-    // 1) Icônes Social
-    {
-      id: "social-icons-premium",
-      title: "Social Icons",
-      description: "Icônes réseaux sociaux avec hover & style propre.",
-      template: "index",
-      preview: <PreviewSocialIcons />,
-    },
-    // 2) WhatsApp Sticky (bloc autonome)
-    {
-      id: "whatsapp-sticky-premium",
-      title: "WhatsApp Sticky Button",
-      description: "Bouton flottant contact rapide (coin bas).",
-      template: "index",
-      preview: <PreviewWhatsAppSticky />,
-    },
-    // 3) Carousel images circulaires
-    {
-      id: "circle-scroller-premium",
-      title: "Circle Image Scroller",
-      description: "Carousel horizontal d’images rondes (look stories).",
-      template: "index",
-      preview: <PreviewCircleScroller />,
-    },
-    // 4) Présentation Gold
-    {
-      id: "gold-products-premium",
-      title: "Gold Products Showcase (Premium)",
-      description: "Grille produits style gold à partir d’une collection.",
-      template: "index",
-      preview: <PreviewGoldProducts />   // ✅ SEULE MODIFICATION
-    },
-  ];
-
-  return (
-    <>
-      <style>{GLOBAL_STYLES}</style>
-      <OpeningPopup />
-
-      <div style={CONTAINER_STYLE}>
-        <div
-          style={{
-            background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
-            backgroundSize: "800px 100%",
-            borderRadius: "12px",
-            padding: "24px",
-            marginBottom: "32px",
-            color: "#fff",
-            textAlign: "center",
-            animation: "shimmer 3s infinite linear",
-          }}
-        >
-          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-            “Welcome to Triple Announcement Bar! Let’s boost your sales with
-            powerful bars, popups, and countdowns.”
-          </p>
-          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
-        </div>
-
-        {blocks.map((block) => (
-          <div key={block.id} style={CARD_STYLE}>
-            <div style={{ flex: 1, minWidth: "220px" }}>
-              <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
-              <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
-
-              {/* ✅ Deep link : addAppBlockId = API_KEY/HANDLE */}
-              <a
-                href={makeAddBlockLink({
-                  shopSub,
-                  apiKey,
-                  template: block.template || "index",
-                  handle: block.id,
-                  target: "newAppsSection",
-                })}
-                target="_top"
-                rel="noreferrer"
-              >
-                <button
-                  style={{
-                    ...BUTTON_BASE,
-                    backgroundColor: "#000",
-                    color: "#fff",
-                  }}
-                >
-                  Add Premium Block
-                </button>
-              </a>
-            </div>
-            <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Pricing au centre en bas */}
-      <a href={pricingHref} style={{ textDecoration: "none" }}>
-        <button
-          style={{
-            position: "fixed",
-            bottom: "24px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            ...BUTTON_BASE,
-            backgroundColor: "#000",
-            color: "#fff",
-            padding: "12px 28px",
-            borderRadius: "30px",
-            cursor: "pointer",
-            zIndex: 999,
-          }}
-        >
-          Pricing
-        </button>
-      </a>
-
-      {/* YouTube en bas à droite */}
-      <a
-        href={"https://youtu.be/UJzd4Re21e0"}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          textDecoration: "none",
-          zIndex: 999,
-        }}
-        aria-label="YouTube tutorial"
-      >
-        <button
-          style={{
-            ...BUTTON_BASE,
-            backgroundColor: "#000",
-            color: "#fff",
-            padding: "12px 20px",
-            borderRadius: "30px",
-            cursor: "pointer",
-          }}
-        >
-          YouTube
-        </button>
-      </a>
-
-      {/* WhatsApp global (existant) */}
-      <a
-        href="https://wa.me/+212681570887"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          left: "24px",
-          backgroundColor: "#000",
-          borderRadius: "50%",
-          padding: "14px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-          zIndex: 999,
-        }}
-        aria-label="WhatsApp"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#fff" viewBox="0 0 448 512">
-          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4-186 186-186s186 83.4 186 186-83.4 186-186 186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z"/>
-        </svg>
-      </a>
-    </>
-  );
-}
+        gap:
