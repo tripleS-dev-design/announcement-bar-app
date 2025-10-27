@@ -816,7 +816,7 @@ export default function Settings() {
 
       {/* YouTube (bottom-left) */}
       <a
-        href={"https://youtu.be/UJzd4Re21e0"}
+        href={"https://youtu.be/NqKfbpymug8"}
         target="_blank"
         rel="noopener noreferrer"
         style={{
