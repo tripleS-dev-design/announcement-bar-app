@@ -41,7 +41,7 @@ const BUTTON_BASE = {
 const CONTAINER_STYLE = {
   maxWidth: "85%",
   margin: "0 auto",
-  // transform: "scale(0.95)", // retiré pour le mobile; la règle CSS ci-dessous peut aussi l’écraser
+  transform: "scale(0.95)",
   transformOrigin: "top center",
   padding: "16px",
 };
@@ -62,10 +62,10 @@ const GLOBAL_STYLES = `
 @keyframes pulseSoft { 0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6} }
 `;
 
-/* ✅ grille auto-fit (fluide desktop/tablette) */
+/* ✅ Two-per-row grid (desktop intact) */
 const GRID_STYLE = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: "24px",
 };
 
@@ -622,6 +622,7 @@ function PreviewComingSoon() {
   );
 }
 
+
 /* ==============================
    PAGE: Settings
 ================================ */
@@ -694,11 +695,12 @@ export default function Settings() {
       kind: "installable",
     },
 
-    // ➕ INFO CARD
+    // ➕ INFO CARD (fills the last empty slot nicely)
     {
       id: "coming-soon-info",
       title: "More Blocks Coming Soon",
-      description: "We add new blocks regularly. Tell us what you want next!",
+      description:
+        "We add new blocks regularly. Tell us what you want next!",
       template: "index",
       preview: <PreviewComingSoon />,
       kind: "info",
@@ -720,36 +722,44 @@ export default function Settings() {
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
-      {/* ✅ Patch mobile & safe-area */}
-      <style>{`
-        .settings-root, .settings-root * { box-sizing: border-box; }
-        .settings-root { max-width: 100%; overflow-x: clip; }
-        .settings-root img, .settings-root video, .settings-root iframe { max-width: 100%; height: auto; display: block; }
 
+      {/* ✅ AJOUT MOBILE-ONLY : n’affecte pas le desktop */}
+      <style>{`
         @media (max-width: 768px){
-          .settings-container {
+          /* container: enlève le scale SEULEMENT en mobile */
+          .settings-container{
             max-width: 100% !important;
             padding: 12px !important;
             transform: none !important;
           }
-          .cards-grid {
+          /* grille: 1 colonne en mobile (desktop reste 2 colonnes via GRID_STYLE) */
+          .cards-grid{
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
-          .fixed-btn {
+          /* images/iframes responsives en mobile */
+          .settings-root img,
+          .settings-root video,
+          .settings-root iframe{
+            max-width: 100%;
+            height: auto;
+            display: block;
+          }
+          /* boutons flottants: safe-area iPhone + pas de chevauchement */
+          .fixed-btn{
             bottom: calc(16px + env(safe-area-inset-bottom)) !important;
-            padding: 10px 16px !important;
-            border-radius: 22px !important;
             z-index: 2147483647 !important;
           }
-          .fixed-btn.pricing {
+          /* on remonte Pricing pour ne pas coller aux coins gauche/droite */
+          .fixed-btn.pricing{
             bottom: calc(72px + env(safe-area-inset-bottom)) !important;
           }
-          .fixed-btn.youtube { left: 16px !important; }
-          .fixed-btn.chat    { right: 16px !important; }
+          .fixed-btn.youtube{ left: 16px !important; }
+          .fixed-btn.chat{   right: 16px !important; }
         }
+        /* très petits écrans: masque YouTube pour éviter 3 boutons collés */
         @media (max-width: 380px){
-          .fixed-btn.youtube { display: none !important; }
+          .fixed-btn.youtube{ display: none !important; }
         }
       `}</style>
 
@@ -814,7 +824,7 @@ export default function Settings() {
                     <button
                       onClick={openTawk}
                       style={{
-                        ...BUTTON_BASE,
+                        ... BUTTON_BASE,
                         backgroundColor: "#111",
                         color: "#fff",
                       }}
@@ -856,7 +866,6 @@ export default function Settings() {
           href={"https://youtu.be/NqKfbpymug8"}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="YouTube tutorial"
           style={{
             position: "fixed",
             bottom: "24px",
@@ -864,6 +873,7 @@ export default function Settings() {
             textDecoration: "none",
             zIndex: 999,
           }}
+          aria-label="YouTube tutorial"
         >
           <button
             className="fixed-btn youtube"
