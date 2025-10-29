@@ -41,7 +41,7 @@ const BUTTON_BASE = {
 const CONTAINER_STYLE = {
   maxWidth: "85%",
   margin: "0 auto",
-  transform: "scale(0.95)",
+  // transform: "scale(0.95)", // retiré pour le mobile; la règle CSS ci-dessous peut aussi l’écraser
   transformOrigin: "top center",
   padding: "16px",
 };
@@ -62,10 +62,10 @@ const GLOBAL_STYLES = `
 @keyframes pulseSoft { 0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6} }
 `;
 
-/* ✅ Two-per-row grid */
+/* ✅ grille auto-fit (fluide desktop/tablette) */
 const GRID_STYLE = {
   display: "grid",
-  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
   gap: "24px",
 };
 
@@ -622,7 +622,6 @@ function PreviewComingSoon() {
   );
 }
 
-
 /* ==============================
    PAGE: Settings
 ================================ */
@@ -695,12 +694,11 @@ export default function Settings() {
       kind: "installable",
     },
 
-    // ➕ INFO CARD (fills the last empty slot nicely)
+    // ➕ INFO CARD
     {
       id: "coming-soon-info",
       title: "More Blocks Coming Soon",
-      description:
-        "We add new blocks regularly. Tell us what you want next!",
+      description: "We add new blocks regularly. Tell us what you want next!",
       template: "index",
       preview: <PreviewComingSoon />,
       kind: "info",
@@ -722,152 +720,194 @@ export default function Settings() {
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
+      {/* ✅ Patch mobile & safe-area */}
+      <style>{`
+        .settings-root, .settings-root * { box-sizing: border-box; }
+        .settings-root { max-width: 100%; overflow-x: clip; }
+        .settings-root img, .settings-root video, .settings-root iframe { max-width: 100%; height: auto; display: block; }
+
+        @media (max-width: 768px){
+          .settings-container {
+            max-width: 100% !important;
+            padding: 12px !important;
+            transform: none !important;
+          }
+          .cards-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .fixed-btn {
+            bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+            padding: 10px 16px !important;
+            border-radius: 22px !important;
+            z-index: 2147483647 !important;
+          }
+          .fixed-btn.pricing {
+            bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+          }
+          .fixed-btn.youtube { left: 16px !important; }
+          .fixed-btn.chat    { right: 16px !important; }
+        }
+        @media (max-width: 380px){
+          .fixed-btn.youtube { display: none !important; }
+        }
+      `}</style>
+
       <OpeningPopup />
 
-      <div style={CONTAINER_STYLE}>
+      {/* wrapper global */}
+      <div className="settings-root">
         <div
-          style={{
-            background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
-            backgroundSize: "800px 100%",
-            borderRadius: "12px",
-            padding: "24px",
-            marginBottom: "32px",
-            color: "#fff",
-            textAlign: "center",
-            animation: "shimmer 3s infinite linear",
-          }}
+          className="settings-container"
+          style={CONTAINER_STYLE}
         >
-          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-            “Welcome to Triple Announcement Bar! Let’s boost your sales with
-            powerful bars, popups, and countdowns.”
-          </p>
-          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
-        </div>
+          <div
+            style={{
+              background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
+              backgroundSize: "800px 100%",
+              borderRadius: "12px",
+              padding: "24px",
+              marginBottom: "32px",
+              color: "#fff",
+              textAlign: "center",
+              animation: "shimmer 3s infinite linear",
+            }}
+          >
+            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+              “Welcome to Triple Announcement Bar! Let’s boost your sales with
+              powerful bars, popups, and countdowns.”
+            </p>
+            <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
+          </div>
 
-        {/* Grid */}
-        <div style={GRID_STYLE}>
-          {blocks.map((block) => (
-            <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
-              <div style={{ flex: 1, minWidth: "220px" }}>
-                <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
-                <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
+          {/* Grid */}
+          <div className="cards-grid" style={GRID_STYLE}>
+            {blocks.map((block) => (
+              <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
+                <div style={{ flex: 1, minWidth: "220px" }}>
+                  <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
+                  <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-                {block.kind === "installable" ? (
-                  <a
-                    href={makeAddBlockLink({
-                      shopSub,
-                      apiKey,
-                      template: block.template || "index",
-                      handle: block.id,
-                      target: "newAppsSection",
-                    })}
-                    target="_top"
-                    rel="noreferrer"
-                  >
+                  {block.kind === "installable" ? (
+                    <a
+                      href={makeAddBlockLink({
+                        shopSub,
+                        apiKey,
+                        template: block.template || "index",
+                        handle: block.id,
+                        target: "newAppsSection",
+                      })}
+                      target="_top"
+                      rel="noreferrer"
+                    >
+                      <button
+                        style={{
+                          ...BUTTON_BASE,
+                          backgroundColor: "#000",
+                          color: "#fff",
+                        }}
+                      >
+                        Add Premium Block
+                      </button>
+                    </a>
+                  ) : (
                     <button
+                      onClick={openTawk}
                       style={{
                         ...BUTTON_BASE,
-                        backgroundColor: "#000",
+                        backgroundColor: "#111",
                         color: "#fff",
                       }}
                     >
-                      Add Premium Block
+                      {block.ctaLabel || "Contact us"}
                     </button>
-                  </a>
-                ) : (
-                  <button
-                    onClick={openTawk}
-                    style={{
-                      ... BUTTON_BASE,
-                      backgroundColor: "#111",
-                      color: "#fff",
-                    }}
-                  >
-                    {block.ctaLabel || "Contact us"}
-                  </button>
-                )}
+                  )}
+                </div>
+                <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
               </div>
-              <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Pricing (center bottom) */}
-      <a href={pricingHref} style={{ textDecoration: "none" }}>
-        <button
+        {/* Pricing (center bottom) */}
+        <a href={pricingHref} style={{ textDecoration: "none" }}>
+          <button
+            className="fixed-btn pricing"
+            style={{
+              position: "fixed",
+              bottom: "24px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              ...BUTTON_BASE,
+              backgroundColor: "#000",
+              color: "#fff",
+              padding: "12px 28px",
+              borderRadius: "30px",
+              cursor: "pointer",
+              zIndex: 999,
+            }}
+          >
+            Pricing
+          </button>
+        </a>
+
+        {/* YouTube (bottom-left) */}
+        <a
+          href={"https://youtu.be/NqKfbpymug8"}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="YouTube tutorial"
           style={{
             position: "fixed",
             bottom: "24px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            ...BUTTON_BASE,
-            backgroundColor: "#000",
-            color: "#fff",
-            padding: "12px 28px",
-            borderRadius: "30px",
-            cursor: "pointer",
+            left: "24px",
+            textDecoration: "none",
             zIndex: 999,
           }}
         >
-          Pricing
-        </button>
-      </a>
+          <button
+            className="fixed-btn youtube"
+            style={{
+              ...BUTTON_BASE,
+              backgroundColor: "#000",
+              color: "#fff",
+              padding: "12px 20px",
+              borderRadius: "30px",
+              cursor: "pointer",
+            }}
+          >
+            YouTube
+          </button>
+        </a>
 
-      {/* YouTube (bottom-left) */}
-      <a
-        href={"https://youtu.be/NqKfbpymug8"}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          left: "24px",
-          textDecoration: "none",
-          zIndex: 999,
-        }}
-        aria-label="YouTube tutorial"
-      >
+        {/* Tawk chat launcher (bottom-right) */}
         <button
+          className="fixed-btn chat"
+          onClick={() => {
+            try {
+              if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
+                window.Tawk_API.maximize();
+                return;
+              }
+            } catch {}
+            window.location.href =
+              "mailto:triple.s.dev.design@gmail.com?subject=Support%20request";
+          }}
+          aria-label="Chat support"
           style={{
+            position: "fixed",
+            bottom: "24px",
+            right: "24px",
             ...BUTTON_BASE,
-            backgroundColor: "#000",
+            backgroundColor: "#111",
             color: "#fff",
-            padding: "12px 20px",
             borderRadius: "30px",
-            cursor: "pointer",
+            zIndex: 999,
           }}
         >
-          YouTube
+          Chat
         </button>
-      </a>
-
-      {/* Tawk chat launcher (bottom-right) */}
-      <button
-        onClick={() => {
-          try {
-            if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
-              window.Tawk_API.maximize();
-              return;
-            }
-          } catch {}
-          window.location.href =
-            "mailto:triple.s.dev.design@gmail.com?subject=Support%20request";
-        }}
-        aria-label="Chat support"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          ...BUTTON_BASE,
-          backgroundColor: "#111",
-          color: "#fff",
-          borderRadius: "30px",
-          zIndex: 999,
-        }}
-      >
-        Chat
-      </button>
+      </div>
 
       {/* Tawk.to embed */}
       <script
