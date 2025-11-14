@@ -1,5 +1,5 @@
 // app/routes/settings.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
@@ -53,11 +53,137 @@ const GLOBAL_STYLES = `
 @keyframes pulseSoft { 0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6} }
 `;
 
-/* ✅ Two-per-row grid (desktop intact) */
+/* ✅ Two-per-row grid (desktop) */
 const GRID_STYLE = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: "24px",
+};
+
+/* ==============================
+   SIMPLE I18N
+================================ */
+const LOCALES = {
+  en: {
+    label: "English",
+    label_language: "Language",
+
+    heroTitle:
+      "Welcome to Blocks: Bar, WhatsApp & More. Add bars, popups, countdowns, social icons, WhatsApp and product highlights directly from the Theme Editor.",
+
+    popup_title: "How to use the blocks",
+    popup_line1:
+      "Open your Theme Editor and click Add block in the Apps section.",
+    popup_line2:
+      "Choose any block (bar, popup, countdown, WhatsApp, product grid…) and customize it in a few seconds.",
+    popup_btn: "Got it!",
+
+    block_announcement_title: "Announcement Bar",
+    block_announcement_desc:
+      "Display promo messages or store updates at the top of your theme.",
+
+    block_popup_title: "Promo Popup",
+    block_popup_desc:
+      "Show an offer with title, text and call-to-action button.",
+
+    block_timer_title: "Countdown Timer",
+    block_timer_desc:
+      "Three countdown layouts to add urgency to your promotions.",
+
+    block_social_title: "Social Icons",
+    block_social_desc:
+      "Display branded social media icons with clean hover effects.",
+
+    block_whatsapp_title: "WhatsApp Sticky Button",
+    block_whatsapp_desc:
+      "Quick contact button in the bottom corner (mobile & desktop).",
+
+    block_circle_title: "Circle Image Scroller",
+    block_circle_desc:
+      "Horizontal carousel of circular images with a stories-like look.",
+
+    block_gold_title: "Gold Products Grid",
+    block_gold_desc:
+      "Compact 3-product grid with a gold background for key offers.",
+
+    coming_title: "More blocks coming soon",
+    coming_desc: "We keep shipping new sections and theme-native blocks.",
+    coming_item1:
+      "Product page enhancements (sticky add to cart, badges, specs)",
+    coming_item2: "FAQ / Accordion",
+    coming_item3: "Stock / urgency bar",
+    coming_item4: "Bundles & volume discounts",
+    coming_item5: "Product tabs & technical details",
+    coming_footer:
+      "We release updates regularly. Share your idea — we can build it.",
+
+    cta_add_block: "Add block in Theme Editor",
+    cta_contact: "Suggest a block",
+
+    youtube_button: "YouTube",
+    chat_button: "Support",
+  },
+
+  fr: {
+    label: "Français",
+    label_language: "Langue",
+
+    heroTitle:
+      "Bienvenue dans Blocks: Bar, WhatsApp & More. Ajoutez des barres d’annonce, popups, comptes à rebours, icônes sociales, WhatsApp et cartes produits directement depuis l’éditeur de thème.",
+
+    popup_title: "Comment utiliser les blocs",
+    popup_line1:
+      "Ouvrez votre éditeur de thème puis cliquez sur « Ajouter un bloc » dans la section Apps.",
+    popup_line2:
+      "Choisissez un bloc (barre, popup, compte à rebours, WhatsApp, grille produits…) et personnalisez-le en quelques secondes.",
+    popup_btn: "C’est compris",
+
+    block_announcement_title: "Barre d’annonce",
+    block_announcement_desc:
+      "Affichez une promotion ou un message important en haut de votre boutique.",
+
+    block_popup_title: "Popup promotionnelle",
+    block_popup_desc:
+      "Affichez une offre avec un titre, un texte et un bouton d’action clair.",
+
+    block_timer_title: "Compte à rebours",
+    block_timer_desc:
+      "Trois styles de compte à rebours pour ajouter de l’urgence à vos offres.",
+
+    block_social_title: "Icônes sociales",
+    block_social_desc:
+      "Affichez vos réseaux sociaux avec des icônes de marque et un survol propre.",
+
+    block_whatsapp_title: "Bouton WhatsApp fixe",
+    block_whatsapp_desc:
+      "Bouton de contact rapide dans le coin (mobile et ordinateur).",
+
+    block_circle_title: "Scroller d’images en cercle",
+    block_circle_desc:
+      "Carrousel horizontal d’images circulaires façon stories.",
+
+    block_gold_title: "Grille produits dorée",
+    block_gold_desc:
+      "Petite grille de 3 produits avec fond doré pour mettre en avant vos offres.",
+
+    coming_title: "Nouveaux blocs en préparation",
+    coming_desc:
+      "Nous ajoutons régulièrement de nouvelles sections et de nouveaux blocs natifs au thème.",
+    coming_item1:
+      "Améliorations page produit (sticky ATC, badges, fiches techniques)",
+    coming_item2: "FAQ / accordéon",
+    coming_item3: "Barre de stock / urgence",
+    coming_item4: "Bundles & remises par quantité",
+    coming_item5: "Onglets produit & caractéristiques",
+    coming_footer:
+      "Nous publions souvent des mises à jour. Partagez votre idée, on peut la construire.",
+
+    cta_add_block: "Ajouter le bloc dans le thème",
+    cta_contact: "Suggérer un bloc",
+
+    youtube_button: "YouTube",
+    chat_button: "Support",
+  },
 };
 
 /* ==============================
@@ -85,9 +211,10 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Existing components
+   Existing preview components
+   (visuels, sans logique de langue)
 ================================ */
-function OpeningPopup() {
+function OpeningPopup({ t }) {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
@@ -117,22 +244,19 @@ function OpeningPopup() {
         }}
       >
         <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
-          How to use the blocks
+          {t("popup_title")}
         </h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
-          Go to your <strong>Theme Editor</strong> and click{" "}
-          <strong>Add section / Add block</strong> in the <strong>Apps</strong> area.
+          {t("popup_line1")}
         </p>
         <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
-          Add any of the 7 free blocks (announcement bar, popup, countdown,
-          WhatsApp, social icons, image scroller, gold products) and customize
-          them directly in the editor.
+          {t("popup_line2")}
         </p>
         <button
           onClick={() => setVisible(false)}
           style={{ ...BUTTON_BASE, backgroundColor: "#fff", color: "#000" }}
         >
-          Got it!
+          {t("popup_btn")}
         </button>
       </div>
     </div>
@@ -144,22 +268,22 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
       color: "#fff",
-      text: "Limited-time sale — up to 50% off selected items.",
+      text: "Limited-time sale! Enjoy up to 50% off on your favorite items.",
       buttonText: "Shop now",
       link: "#",
     },
     {
       bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
       color: "#fff",
-      text: "Flash deal — last hours to grab your favorites.",
-      buttonText: "View offers",
+      text: "Flash sale alert! Everything must go – save big before it’s gone.",
+      buttonText: "Grab deal",
       link: "#",
     },
     {
       bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
       color: "#000",
-      text: "New arrivals live now. Discover the latest products.",
-      buttonText: "Explore",
+      text: "Clearance – prices slashed! Don’t miss out on major savings.",
+      buttonText: "Browse",
       link: "#",
     },
   ];
@@ -228,8 +352,16 @@ function PreviewPopup() {
     >
       <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>🎁 Exclusive offer</h3>
       <p style={{ margin: 0, fontSize: "14px", color: "#1e3a8a" }}>
-        Highlight a welcome discount, newsletter signup, or seasonal promotion
-        with a focused popup and clear call-to-action.
+        Get <strong>20% OFF</strong> with code{" "}
+        <strong
+          style={{
+            backgroundColor: "#93c5fd",
+            padding: "2px 4px",
+            borderRadius: "4px",
+          }}
+        >
+          WELCOME20
+        </strong>
       </p>
       <button
         style={{
@@ -239,7 +371,7 @@ function PreviewPopup() {
           color: "#bfdbfe",
         }}
       >
-        See example
+        Apply now
       </button>
     </div>
   );
@@ -331,9 +463,14 @@ function PreviewCountdown() {
             ))}
           </div>
           <button
-            style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff", padding: "8px 16px" }}
+            style={{
+              ...BUTTON_BASE,
+              backgroundColor: "#000",
+              color: "#fff",
+              padding: "8px 16px",
+            }}
           >
-            Add to page
+            Add
           </button>
         </div>
       ))}
@@ -342,10 +479,8 @@ function PreviewCountdown() {
 }
 
 /* ==============================
-   🔥 New block previews
+   Other previews
 ================================ */
-
-/** 1) Social icons — real brand colors */
 function PreviewSocialIcons() {
   const Base = ({ children, title, href = "#", bg }) => (
     <a
@@ -376,7 +511,17 @@ function PreviewSocialIcons() {
         bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
       >
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
-          <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
+          <rect
+            x="10"
+            y="10"
+            width="44"
+            height="44"
+            rx="12"
+            ry="12"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="4"
+          />
           <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
           <circle cx="46" cy="18" r="3" fill="#fff" />
         </svg>
@@ -384,7 +529,17 @@ function PreviewSocialIcons() {
 
       <Base title="YouTube" bg="#FF0000">
         <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
-          <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
+          <rect
+            x="8"
+            y="18"
+            width="48"
+            height="28"
+            rx="8"
+            ry="8"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="4"
+          />
           <polygon points="30,24 44,32 30,40" fill="#fff" />
         </svg>
       </Base>
@@ -407,27 +562,56 @@ function PreviewSocialIcons() {
 
       <Base title="TikTok" bg="#000000">
         <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-          <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
-          <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
+          <path
+            d="M28 16 v22 a10 10 0 1 1 -6 -9"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M28 22 a12 12 0 0 0 12 8"
+            fill="none"
+            stroke="#69C9D0"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M22 39 a10 10 0 0 1 6 -3"
+            fill="none"
+            stroke="#EE1D52"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
         </svg>
       </Base>
 
       <Base title="LinkedIn" bg="#0A66C2">
         <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
-          <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
+          <rect
+            x="12"
+            y="12"
+            width="40"
+            height="40"
+            rx="6"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="3"
+          />
           <circle cx="22" cy="31" r="3" fill="#fff" />
           <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
           <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
-          <path d="M36 36 c0-3 2-6 6-6 s6 3 6 6 v12 h-6 v-10 c0-1.7-1.3-3-3-3 s-3 1.3-3 3 v10 h-6 V36" fill="#fff" />
+          <path
+            d="M36 36 c0-3 2-6 6-6 s6 3 6 6 v12 h-6 v-10 c0-1.7-1.3-3-3-3 s-3 1.3-3 3 v10 h-6 V36"
+            fill="#fff"
+          />
         </svg>
       </Base>
     </div>
   );
 }
 
-/** 2) WhatsApp Sticky button (standalone block) */
-function PreviewWhatsAppSticky() {
+function PreviewWhatsAppSticky({ t }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <div
@@ -444,19 +628,24 @@ function PreviewWhatsAppSticky() {
         }}
         title="Sticky WhatsApp"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 448 512" fill="#fff">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="34"
+          height="34"
+          viewBox="0 0 448 512"
+          fill="#fff"
+        >
           <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z" />
         </svg>
       </div>
       <div>
-        <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
-        <div style={{ color: "#555" }}>Quick contact — bottom corner (mobile & desktop)</div>
+        <div style={{ fontWeight: 700 }}>{t("block_whatsapp_title")}</div>
+        <div style={{ color: "#555" }}>{t("block_whatsapp_desc")}</div>
       </div>
     </div>
   );
 }
 
-/** 3) Circular image scroller */
 function PreviewCircleScroller() {
   const imgs = [
     "https://picsum.photos/seed/a/200",
@@ -488,7 +677,6 @@ function PreviewCircleScroller() {
   );
 }
 
-/** 4) Gold Products preview */
 function PreviewGoldProductsStoreLike() {
   const items = [
     {
@@ -572,8 +760,7 @@ function PreviewGoldProductsStoreLike() {
   );
 }
 
-/** 5) NEW — “Coming Soon” info card preview */
-function PreviewComingSoon() {
+function PreviewComingSoon({ t }) {
   return (
     <div
       style={{
@@ -604,20 +791,20 @@ function PreviewComingSoon() {
         >
           ✨
         </span>
-        <div style={{ fontWeight: 800 }}>More blocks in development</div>
+        <div style={{ fontWeight: 800 }}>{t("coming_title")}</div>
       </div>
+
+      <p style={{ margin: "4px 0 8px", fontSize: 13, color: "#374151" }}>{t("coming_desc")}</p>
 
       <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-        <li>Product page enhancements (badges, specs, sticky ATC)</li>
-        <li>FAQ / Accordion sections</li>
-        <li>Stock and urgency bars</li>
-        <li>Bundles and volume discounts</li>
-        <li>Product tabs and details blocks</li>
+        <li>{t("coming_item1")}</li>
+        <li>{t("coming_item2")}</li>
+        <li>{t("coming_item3")}</li>
+        <li>{t("coming_item4")}</li>
+        <li>{t("coming_item5")}</li>
       </ul>
 
-      <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280" }}>
-        We ship updates regularly. Share your ideas and we can prioritize them.
-      </div>
+      <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280" }}>{t("coming_footer")}</div>
     </div>
   );
 }
@@ -627,84 +814,98 @@ function PreviewComingSoon() {
 ================================ */
 export default function Settings() {
   const { shopSub, apiKey } = useLoaderData();
-  const [lang, setLang] = useState("en");
   const location = useLocation();
+  const [lang, setLang] = useState("en");
 
-  // Blocks list
+  // charger langue depuis localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = window.localStorage.getItem("blocks_lang");
+      if (saved && LOCALES[saved]) setLang(saved);
+    } catch {}
+  }, []);
+
+  // sauvegarder langue
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("blocks_lang", lang);
+    } catch {}
+  }, [lang]);
+
+  const t = (key) => LOCALES[lang]?.[key] ?? LOCALES.en[key] ?? key;
+
+  // Liste des blocs (les textes viennent de t(...))
   const blocks = [
-    // EXISTING
     {
       id: "announcement-premium",
-      title: "Announcement Bar",
-      description: "Show a bold announcement bar with message, emoji and CTA button.",
+      titleKey: "block_announcement_title",
+      descKey: "block_announcement_desc",
       template: "index",
-      preview: <PreviewAnnouncementBar />,
+      preview: () => <PreviewAnnouncementBar />,
       kind: "installable",
     },
     {
       id: "popup-premium",
-      title: "Popup",
-      description: "Display a modern promo or newsletter popup with a clear call-to-action.",
+      titleKey: "block_popup_title",
+      descKey: "block_popup_desc",
       template: "index",
-      preview: <PreviewPopup />,
+      preview: () => <PreviewPopup />,
       kind: "installable",
     },
     {
       id: "timer-premium",
-      title: "Countdown Timer",
-      description: "Build urgency with three countdown styles: standard, rectangle, and circle.",
+      titleKey: "block_timer_title",
+      descKey: "block_timer_desc",
       template: "index",
-      preview: <PreviewCountdown />,
+      preview: () => <PreviewCountdown />,
       kind: "installable",
     },
-
-    // NEW
     {
       id: "social-icons-premium",
-      title: "Social Icons",
-      description: "Show branded social media icons with a clean, rounded design.",
+      titleKey: "block_social_title",
+      descKey: "block_social_desc",
       template: "index",
-      preview: <PreviewSocialIcons />,
+      preview: () => <PreviewSocialIcons />,
       kind: "installable",
     },
     {
       id: "whatsapp-sticky-premium",
-      title: "WhatsApp Sticky Button",
-      description: "Add a floating WhatsApp button in the corner for quick contact.",
+      titleKey: "block_whatsapp_title",
+      descKey: "block_whatsapp_desc",
       template: "index",
-      preview: <PreviewWhatsAppSticky />,
+      preview: () => <PreviewWhatsAppSticky t={t} />,
       kind: "installable",
     },
     {
       id: "circle-scroller-premium",
-      title: "Circle Image Scroller",
-      description: "Create a horizontal row of circular images, similar to stories.",
+      titleKey: "block_circle_title",
+      descKey: "block_circle_desc",
       template: "index",
-      preview: <PreviewCircleScroller />,
+      preview: () => <PreviewCircleScroller />,
       kind: "installable",
     },
     {
       id: "gold-products-premium",
-      title: "Gold Products Showcase",
-      description: "Highlight three key products in a compact gold-style grid.",
+      titleKey: "block_gold_title",
+      descKey: "block_gold_desc",
       template: "index",
-      preview: <PreviewGoldProductsStoreLike />,
+      preview: () => <PreviewGoldProductsStoreLike />,
       kind: "installable",
     },
-
-    // ➕ INFO CARD
     {
       id: "coming-soon-info",
-      title: "More Blocks Coming Soon",
-      description: "We add new blocks regularly. Tell us what you want next!",
+      titleKey: "coming_title",
+      descKey: "coming_desc",
       template: "index",
-      preview: <PreviewComingSoon />,
+      preview: () => <PreviewComingSoon t={t} />,
       kind: "info",
-      ctaLabel: "Suggest a block",
+      ctaLabelKey: "cta_contact",
     },
   ];
 
-  // CTA handlers
+  // bouton support
   const openTawk = () => {
     try {
       if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
@@ -712,14 +913,15 @@ export default function Settings() {
         return;
       }
     } catch {}
-    window.location.href = "mailto:triple.s.dev.design@gmail.com?subject=Block%20request";
+    window.location.href =
+      "mailto:triple.s.dev.design@gmail.com?subject=Block%20request";
   };
 
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      {/* ✅ Mobile adjustments */}
+      {/* ✅ CSS mobile-only */}
       <style>{`
         @media (max-width: 768px){
           .settings-container{
@@ -750,41 +952,83 @@ export default function Settings() {
         }
       `}</style>
 
-      <OpeningPopup />
+      <OpeningPopup t={t} />
 
       {/* wrapper global */}
       <div className="settings-root">
-        <div
-          className="settings-container"
-          style={CONTAINER_STYLE}
-        >
+        <div className="settings-container" style={CONTAINER_STYLE}>
+          {/* Hero */}
           <div
             style={{
-              background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
+              background:
+                "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
               backgroundSize: "800px 100%",
               borderRadius: "12px",
               padding: "24px",
-              marginBottom: "32px",
+              marginBottom: "24px",
               color: "#fff",
-              textAlign: "center",
               animation: "shimmer 3s infinite linear",
             }}
           >
-            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-              “Welcome to Blocks: Bar, WhatsApp & More — all 7 blocks are 100% free and
-              theme-native. Add bars, popups, timers, WhatsApp chat, social icons,
-              image scrollers and a gold product grid in minutes.”
-            </p>
-            <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: 16,
+              }}
+            >
+              <p style={{ fontSize: "16px", fontWeight: "bold", maxWidth: "75%" }}>
+                {t("heroTitle")}
+              </p>
+
+              {/* Sélecteur de langue */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  gap: 6,
+                  minWidth: 130,
+                }}
+              >
+                <span style={{ fontSize: 11, color: "#d4d4d8" }}>
+                  {t("label_language")}
+                </span>
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value)}
+                  style={{
+                    padding: "6px 10px",
+                    borderRadius: 999,
+                    border: "1px solid #4b5563",
+                    background: "#18181b",
+                    color: "#f9fafb",
+                    fontSize: 12,
+                    cursor: "pointer",
+                  }}
+                >
+                  {Object.entries(LOCALES).map(([code, cfg]) => (
+                    <option key={code} value={code}>
+                      {cfg.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
-          {/* Grid */}
+          {/* Grid des blocs */}
           <div className="cards-grid" style={GRID_STYLE}>
             {blocks.map((block) => (
               <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
                 <div style={{ flex: 1, minWidth: "220px" }}>
-                  <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
-                  <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
+                  <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>
+                    {t(block.titleKey)}
+                  </h2>
+                  <p style={{ marginBottom: "12px", color: "#555" }}>
+                    {t(block.descKey)}
+                  </p>
 
                   {block.kind === "installable" ? (
                     <a
@@ -805,7 +1049,7 @@ export default function Settings() {
                           color: "#fff",
                         }}
                       >
-                        Add block to theme
+                        {t("cta_add_block")}
                       </button>
                     </a>
                   ) : (
@@ -817,11 +1061,13 @@ export default function Settings() {
                         color: "#fff",
                       }}
                     >
-                      {block.ctaLabel || "Contact us"}
+                      {t(block.ctaLabelKey || "cta_contact")}
                     </button>
                   )}
                 </div>
-                <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
+                <div style={{ flex: 1, minWidth: "220px" }}>
+                  {block.preview()}
+                </div>
               </div>
             ))}
           </div>
@@ -852,7 +1098,7 @@ export default function Settings() {
               cursor: "pointer",
             }}
           >
-            YouTube
+            {t("youtube_button")}
           </button>
         </a>
 
@@ -861,7 +1107,11 @@ export default function Settings() {
           className="fixed-btn chat"
           onClick={() => {
             try {
-              if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
+              if (
+                window &&
+                window.Tawk_API &&
+                typeof window.Tawk_API.maximize === "function"
+              ) {
                 window.Tawk_API.maximize();
                 return;
               }
@@ -881,7 +1131,7 @@ export default function Settings() {
             zIndex: 999,
           }}
         >
-          Chat
+          {t("chat_button")}
         </button>
       </div>
 
