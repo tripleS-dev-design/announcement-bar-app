@@ -831,27 +831,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Pricing (center bottom) */}
-        <a href={pricingHref} style={{ textDecoration: "none" }}>
-          <button
-            className="fixed-btn pricing"
-            style={{
-              position: "fixed",
-              bottom: "24px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              ...BUTTON_BASE,
-              backgroundColor: "#000",
-              color: "#fff",
-              padding: "12px 28px",
-              borderRadius: "30px",
-              cursor: "pointer",
-              zIndex: 999,
-            }}
-          >
-            Pricing
-          </button>
-        </a>
+     
 
         {/* YouTube (bottom-left) */}
         <a
