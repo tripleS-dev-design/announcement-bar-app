@@ -11,25 +11,17 @@ const hostName = new URL(process.env.SHOPIFY_APP_URL).host;
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  scopes: process.env.SCOPES.split(","), // .split car SCOPES est chaîne CSV
-  hostName,  // récupéré proprement du URL complet
-  appUrl: process.env.SHOPIFY_APP_URL, // URL complète avec https://
+  scopes: process.env.SCOPES.split(","),
+  hostName,
+  appUrl: process.env.SHOPIFY_APP_URL,
   apiVersion: "2024-04",
   isEmbeddedApp: true,
   sessionStorage: new MemorySessionStorage(),
-  billing: {
-    required: true,
-    charges: [
-      {
-        plan: "Premium Plan",
-        amount: 4.99,
-        currencyCode: "USD",
-        interval: "EVERY_30_DAYS",
-        trialDays: 14,
-      },
-    ],
-  },
+  // ❌ plus de "billing" ici
 });
 
-export const ensureBilling = shopify.ensureBilling;
-export const requireBilling = shopify.ensureBilling;
+// ✅ uniquement les exports nécessaires, sans billing
+export default shopify;
+export const authenticate = shopify.authenticate;
+export const unauthenticated = shopify.unauthenticated;
+export const sessionStorage = shopify.sessionStorage;
