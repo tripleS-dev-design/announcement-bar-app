@@ -18,9 +18,8 @@ export const loader = async ({ request }) => {
   return json({ shopSub, apiKey });
 };
 
-
 /* ==============================
-   UI & styles (unchanged)
+   UI & styles
 ================================ */
 const BUTTON_BASE = {
   border: "none",
@@ -118,15 +117,16 @@ function OpeningPopup() {
         }}
       >
         <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
-          How to use the Premium Blocks
+          How to use the blocks
         </h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
           Go to your <strong>Theme Editor</strong> and click{" "}
-          <strong>Add Block</strong> in the App section.
+          <strong>Add section / Add block</strong> in the <strong>Apps</strong> area.
         </p>
         <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
-          Choose any premium block: Announcement Bar, Popup, or Countdown, and
-          customize it freely!
+          Add any of the 7 free blocks (announcement bar, popup, countdown,
+          WhatsApp, social icons, image scroller, gold products) and customize
+          them directly in the editor.
         </p>
         <button
           onClick={() => setVisible(false)}
@@ -144,22 +144,22 @@ function PreviewAnnouncementBar() {
     {
       bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
       color: "#fff",
-      text: "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
-      buttonText: "Shop Now",
+      text: "Limited-time sale — up to 50% off selected items.",
+      buttonText: "Shop now",
       link: "#",
     },
     {
       bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
       color: "#fff",
-      text: "Flash Sale Alert! Everything Must Go – Save Big Before It’s Gone!",
-      buttonText: "Grab Deal",
+      text: "Flash deal — last hours to grab your favorites.",
+      buttonText: "View offers",
       link: "#",
     },
     {
       bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
       color: "#000",
-      text: "Clearance – Prices Slashed! Don't Miss Out on Major Savings!",
-      buttonText: "Browse",
+      text: "New arrivals live now. Discover the latest products.",
+      buttonText: "Explore",
       link: "#",
     },
   ];
@@ -226,14 +226,10 @@ function PreviewPopup() {
         animation: visible ? "popupGlowPro 0.5s infinite ease-in-out" : "none",
       }}
     >
-      <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>🎁 Exclusive Offer</h3>
+      <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>🎁 Exclusive offer</h3>
       <p style={{ margin: 0, fontSize: "14px", color: "#1e3a8a" }}>
-        Get <strong>20% OFF</strong> with code{" "}
-        <strong
-          style={{ backgroundColor: "#93c5fd", padding: "2px 4px", borderRadius: "4px" }}
-        >
-          WELCOME20
-        </strong>
+        Highlight a welcome discount, newsletter signup, or seasonal promotion
+        with a focused popup and clear call-to-action.
       </p>
       <button
         style={{
@@ -243,7 +239,7 @@ function PreviewPopup() {
           color: "#bfdbfe",
         }}
       >
-        Apply Now
+        See example
       </button>
     </div>
   );
@@ -337,7 +333,7 @@ function PreviewCountdown() {
           <button
             style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff", padding: "8px 16px" }}
           >
-            Add
+            Add to page
           </button>
         </div>
       ))}
@@ -495,9 +491,21 @@ function PreviewCircleScroller() {
 /** 4) Gold Products preview */
 function PreviewGoldProductsStoreLike() {
   const items = [
-    { title: "Elegant waterproof crossbody bag (anti-theft, USB charging)", price: "Dh 190.00 MAD", img: "https://picsum.photos/seed/gold1/800/600" },
-    { title: "M10 TWS Wireless Earbuds",                                   price: "Dh 80.00 MAD",  img: "https://picsum.photos/seed/gold2/800/600" },
-    { title: "Bulb camera WiFi HD 360° with remote control",                price: "Dh 185.00 MAD", img: "https://picsum.photos/seed/gold3/800/600" },
+    {
+      title: "Elegant waterproof crossbody bag (anti-theft, USB charging)",
+      price: "Dh 190.00 MAD",
+      img: "https://picsum.photos/seed/gold1/800/600",
+    },
+    {
+      title: "M10 TWS Wireless Earbuds",
+      price: "Dh 80.00 MAD",
+      img: "https://picsum.photos/seed/gold2/800/600",
+    },
+    {
+      title: "Bulb camera WiFi HD 360° with remote control",
+      price: "Dh 185.00 MAD",
+      img: "https://picsum.photos/seed/gold3/800/600",
+    },
   ];
 
   return (
@@ -596,24 +604,23 @@ function PreviewComingSoon() {
         >
           ✨
         </span>
-        <div style={{ fontWeight: 800 }}>New blocks in production</div>
+        <div style={{ fontWeight: 800 }}>More blocks in development</div>
       </div>
 
       <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-        <li>Product Page Enhancements (sticky ATC, badges, specs)</li>
-        <li>FAQ / Accordion</li>
-        <li>Stock / Urgency Bar</li>
-        <li>Bundles & Volume Discounts</li>
-        <li>Product Tabs & Specs</li>
+        <li>Product page enhancements (badges, specs, sticky ATC)</li>
+        <li>FAQ / Accordion sections</li>
+        <li>Stock and urgency bars</li>
+        <li>Bundles and volume discounts</li>
+        <li>Product tabs and details blocks</li>
       </ul>
 
       <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280" }}>
-        We ship regularly. Share your idea — we can build it!
+        We ship updates regularly. Share your ideas and we can prioritize them.
       </div>
     </div>
   );
 }
-
 
 /* ==============================
    PAGE: Settings
@@ -623,31 +630,29 @@ export default function Settings() {
   const [lang, setLang] = useState("en");
   const location = useLocation();
 
-  const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
-
   // Blocks list
   const blocks = [
     // EXISTING
     {
       id: "announcement-premium",
-      title: "Premium Announcement Bar",
-      description: "Animated or multilingual bar to grab attention.",
+      title: "Announcement Bar",
+      description: "Show a bold announcement bar with message, emoji and CTA button.",
       template: "index",
       preview: <PreviewAnnouncementBar />,
       kind: "installable",
     },
     {
       id: "popup-premium",
-      title: "Premium Popup",
-      description: "Modern popup with promo code and glow animation.",
+      title: "Popup",
+      description: "Display a modern promo or newsletter popup with a clear call-to-action.",
       template: "index",
       preview: <PreviewPopup />,
       kind: "installable",
     },
     {
       id: "timer-premium",
-      title: "Premium Countdown",
-      description: "Three dynamic countdown styles.",
+      title: "Countdown Timer",
+      description: "Build urgency with three countdown styles: standard, rectangle, and circle.",
       template: "index",
       preview: <PreviewCountdown />,
       kind: "installable",
@@ -657,7 +662,7 @@ export default function Settings() {
     {
       id: "social-icons-premium",
       title: "Social Icons",
-      description: "Social icons with hover and clean style.",
+      description: "Show branded social media icons with a clean, rounded design.",
       template: "index",
       preview: <PreviewSocialIcons />,
       kind: "installable",
@@ -665,7 +670,7 @@ export default function Settings() {
     {
       id: "whatsapp-sticky-premium",
       title: "WhatsApp Sticky Button",
-      description: "Floating quick-contact button (bottom corner).",
+      description: "Add a floating WhatsApp button in the corner for quick contact.",
       template: "index",
       preview: <PreviewWhatsAppSticky />,
       kind: "installable",
@@ -673,30 +678,29 @@ export default function Settings() {
     {
       id: "circle-scroller-premium",
       title: "Circle Image Scroller",
-      description: "Horizontal carousel of circular images (stories look).",
+      description: "Create a horizontal row of circular images, similar to stories.",
       template: "index",
       preview: <PreviewCircleScroller />,
       kind: "installable",
     },
     {
       id: "gold-products-premium",
-      title: "Gold Products Showcase (Premium)",
-      description: "Gold-style product grid from a collection.",
+      title: "Gold Products Showcase",
+      description: "Highlight three key products in a compact gold-style grid.",
       template: "index",
       preview: <PreviewGoldProductsStoreLike />,
       kind: "installable",
     },
 
-    // ➕ INFO CARD (fills the last empty slot nicely)
+    // ➕ INFO CARD
     {
       id: "coming-soon-info",
       title: "More Blocks Coming Soon",
-      description:
-        "We add new blocks regularly. Tell us what you want next!",
+      description: "We add new blocks regularly. Tell us what you want next!",
       template: "index",
       preview: <PreviewComingSoon />,
       kind: "info",
-      ctaLabel: "Suggest a Block",
+      ctaLabel: "Suggest a block",
     },
   ];
 
@@ -715,21 +719,18 @@ export default function Settings() {
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      {/* ✅ AJOUT MOBILE-ONLY : n’affecte pas le desktop */}
+      {/* ✅ Mobile adjustments */}
       <style>{`
         @media (max-width: 768px){
-          /* container: enlève le scale SEULEMENT en mobile */
           .settings-container{
             max-width: 100% !important;
             padding: 12px !important;
             transform: none !important;
           }
-          /* grille: 1 colonne en mobile (desktop reste 2 colonnes via GRID_STYLE) */
           .cards-grid{
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
-          /* images/iframes responsives en mobile */
           .settings-root img,
           .settings-root video,
           .settings-root iframe{
@@ -737,19 +738,13 @@ export default function Settings() {
             height: auto;
             display: block;
           }
-          /* boutons flottants: safe-area iPhone + pas de chevauchement */
           .fixed-btn{
             bottom: calc(16px + env(safe-area-inset-bottom)) !important;
             z-index: 2147483647 !important;
           }
-          /* on remonte Pricing pour ne pas coller aux coins gauche/droite */
-          .fixed-btn.pricing{
-            bottom: calc(72px + env(safe-area-inset-bottom)) !important;
-          }
           .fixed-btn.youtube{ left: 16px !important; }
           .fixed-btn.chat{   right: 16px !important; }
         }
-        /* très petits écrans: masque YouTube pour éviter 3 boutons collés */
         @media (max-width: 380px){
           .fixed-btn.youtube{ display: none !important; }
         }
@@ -776,8 +771,9 @@ export default function Settings() {
             }}
           >
             <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-              “Welcome to Triple Announcement Bar! Let’s boost your sales with
-              powerful bars, popups, and countdowns.”
+              “Welcome to Blocks: Bar, WhatsApp & More — all 7 blocks are 100% free and
+              theme-native. Add bars, popups, timers, WhatsApp chat, social icons,
+              image scrollers and a gold product grid in minutes.”
             </p>
             <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
           </div>
@@ -809,14 +805,14 @@ export default function Settings() {
                           color: "#fff",
                         }}
                       >
-                        Add Premium Block
+                        Add block to theme
                       </button>
                     </a>
                   ) : (
                     <button
                       onClick={openTawk}
                       style={{
-                        ... BUTTON_BASE,
+                        ...BUTTON_BASE,
                         backgroundColor: "#111",
                         color: "#fff",
                       }}
@@ -830,8 +826,6 @@ export default function Settings() {
             ))}
           </div>
         </div>
-
-     
 
         {/* YouTube (bottom-left) */}
         <a
