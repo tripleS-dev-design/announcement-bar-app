@@ -6,7 +6,6 @@ import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
   AppDistribution,
-  BillingInterval,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
@@ -20,27 +19,6 @@ for (const k of requiredEnv) {
   }
 }
 
-export const PLAN_HANDLES = {
-  monthly: "premium-monthly",
-  annual: "premium-annual",
-};
-
-// Les clés de cet objet SONT les handles de plan
-export const billing = {
-  [PLAN_HANDLES.monthly]: {
-    amount: 0.99,
-    currencyCode: "USD",
-    interval: BillingInterval.Every30Days,
-    trialDays: 0,
-  },
-  [PLAN_HANDLES.annual]: {
-    amount: 9.99,
-    currencyCode: "USD",
-    interval: BillingInterval.Annual,
-    trialDays: 0,
-  },
-};
-
 export const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
@@ -53,8 +31,7 @@ export const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
 
-  billing, // ⬅️ important
-
+  // ✅ PLUS DE "billing" ICI → app totalement gratuite
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
