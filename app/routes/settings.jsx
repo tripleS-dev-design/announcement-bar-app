@@ -83,8 +83,7 @@ const COPY = {
     ],
 
     popupPreviewTitle: "🎁 Exclusive offer",
-    popupPreviewLine:
-      "Get {discount} OFF with code {code}",
+    popupPreviewLine: "Get {discount} OFF with code {code}",
     popupPreviewDiscount: "20%",
     popupPreviewCode: "WELCOME20",
     popupPreviewButton: "Apply now",
@@ -695,7 +694,7 @@ function OpeningPopup({ lang, onChangeLang }) {
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            marginBottom: "12px",
+            marginBottom: "16px",
           }}
         >
           <div
@@ -704,20 +703,25 @@ function OpeningPopup({ lang, onChangeLang }) {
               alignItems: "center",
               gap: 8,
               fontSize: 12,
+              padding: "4px 8px",
+              borderRadius: "999px",
+              backgroundColor: "rgba(255,255,255,0.12)",
             }}
           >
-            <span style={{ opacity: 0.85 }}>{t.langLabel}:</span>
+            <span style={{ opacity: 0.9 }}>{t.langLabel}:</span>
             <select
               value={lang}
               onChange={(e) => onChangeLang && onChangeLang(e.target.value)}
               style={{
-                padding: "4px 10px",
+                padding: "4px 12px",
                 borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.4)",
-                background: "rgba(0,0,0,0.3)",
-                color: "#fff",
+                border: "1px solid rgba(0,0,0,0.15)",
+                backgroundColor: "#ffffff",
+                color: "#111111",
                 fontSize: 12,
                 cursor: "pointer",
+                outline: "none",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
               }}
             >
               {LANG_OPTIONS.map((opt) => (
@@ -1508,7 +1512,7 @@ export default function Settings() {
         }
       `}</style>
 
-      {/* Popup avec sélecteur de langue */}
+      {/* Popup avec sélecteur de langue clair */}
       <OpeningPopup lang={lang} onChangeLang={setLang} />
 
       <div className="settings-root">
@@ -1539,21 +1543,32 @@ export default function Settings() {
               <p style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
                 {t.heroTitle}
               </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 13, opacity: 0.85 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "4px 8px",
+                  borderRadius: "999px",
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                }}
+              >
+                <span style={{ fontSize: 13, opacity: 0.95 }}>
                   {t.langLabel}:
                 </span>
                 <select
                   value={lang}
                   onChange={(e) => setLang(e.target.value)}
                   style={{
-                    padding: "6px 10px",
+                    padding: "6px 12px",
                     borderRadius: "999px",
-                    border: "1px solid rgba(255,255,255,0.4)",
-                    background: "rgba(0,0,0,0.3)",
-                    color: "#fff",
+                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "#ffffff",
+                    color: "#111111",
                     fontSize: 13,
                     cursor: "pointer",
+                    outline: "none",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
                   }}
                 >
                   {LANG_OPTIONS.map((opt) => (
