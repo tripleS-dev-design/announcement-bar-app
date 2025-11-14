@@ -1,6 +1,6 @@
 // app/routes/settings.jsx
 import React, { useState, useEffect } from "react";
-import { useLocation, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
 /* ==============================
@@ -19,8 +19,193 @@ export const loader = async ({ request }) => {
 };
 
 /* ==============================
+   COPY / LANGUES
+================================ */
+
+const LANG_OPTIONS = [
+  { code: "en", label: "English" },
+  { code: "fr", label: "Français" },
+  { code: "es", label: "Español" },
+  { code: "it", label: "Italiano" },
+  { code: "de", label: "Deutsch" },
+  { code: "ar", label: "العربية" },
+];
+
+const COPY = {
+  en: {
+    langLabel: "Language",
+    heroTitle: "Triple Announcement Bar & Blocks",
+    heroLine:
+      "Set up premium bars, popups, countdowns, social icons, WhatsApp, image scroller and gold grid in a few clicks.",
+    heroQuote:
+      "Make your theme more engaging without writing a single line of code.",
+    openingTitle: "How to use the premium blocks",
+    openingLine1:
+      "Open your Theme Editor and click “Add section” or “Add block” in the Apps area.",
+    openingLine2:
+      "Add any premium block, then customize text, colors and timing as you like.",
+    openingButton: "Got it!",
+    addBlockCta: "Add premium block",
+    infoCta: "Suggest a block",
+    comingSoonTitle: "New blocks in production",
+    comingSoonItems: [
+      "Product page enhancements (sticky ATC, badges, specs)",
+      "FAQ / Accordion",
+      "Stock / urgency bar",
+      "Bundles & volume discounts",
+      "Product tabs & specs",
+    ],
+    comingSoonFooter:
+      "We ship new blocks regularly. Tell us what you would like next.",
+    youtubeLabel: "YouTube",
+    chatLabel: "Chat",
+  },
+  fr: {
+    langLabel: "Langue",
+    heroTitle: "Triple Announcement Bar & Blocs",
+    heroLine:
+      "Ajoutez des barres d’annonce, popups, compteurs, icônes sociales, WhatsApp, scroller d’images et grille dorée en quelques clics.",
+    heroQuote:
+      "Rendez votre thème plus engageant sans écrire une seule ligne de code.",
+    openingTitle: "Comment utiliser les blocs Premium",
+    openingLine1:
+      "Ouvrez l’éditeur de thème et cliquez sur « Ajouter une section » ou « Ajouter un bloc » dans la zone Applications.",
+    openingLine2:
+      "Ajoutez un bloc premium, puis personnalisez le texte, les couleurs et le timing comme vous le souhaitez.",
+    openingButton: "Compris !",
+    addBlockCta: "Ajouter le bloc premium",
+    infoCta: "Suggérer un bloc",
+    comingSoonTitle: "Nouveaux blocs en préparation",
+    comingSoonItems: [
+      "Améliorations page produit (ATC sticky, badges, fiches)",
+      "FAQ / Accordéon",
+      "Barre de stock / urgence",
+      "Bundles & remises de volume",
+      "Onglets produit & caractéristiques",
+    ],
+    comingSoonFooter:
+      "Nous publions régulièrement de nouveaux blocs. Dites-nous ce que vous voulez voir ensuite.",
+    youtubeLabel: "YouTube",
+    chatLabel: "Chat",
+  },
+  es: {
+    langLabel: "Idioma",
+    heroTitle: "Triple Announcement Bar & Bloques",
+    heroLine:
+      "Configura barras de anuncio, popups, contadores, iconos sociales, WhatsApp, carrusel circular e incluso una cuadrícula dorada en pocos clics.",
+    heroQuote:
+      "Haz tu tema más llamativo sin escribir nada de código.",
+    openingTitle: "Cómo usar los bloques Premium",
+    openingLine1:
+      "Abre el editor de tema y haz clic en “Agregar sección” o “Agregar bloque” en el área de aplicaciones.",
+    openingLine2:
+      "Añade un bloque premium y personaliza texto, colores y tiempo como quieras.",
+    openingButton: "Entendido",
+    addBlockCta: "Añadir bloque premium",
+    infoCta: "Sugerir un bloque",
+    comingSoonTitle: "Nuevos bloques en camino",
+    comingSoonItems: [
+      "Mejoras en la página de producto (ATC fijo, badges, specs)",
+      "FAQ / Acordeón",
+      "Barra de stock / urgencia",
+      "Bundles y descuentos por volumen",
+      "Pestañas y especificaciones de producto",
+    ],
+    comingSoonFooter:
+      "Publicamos nuevos bloques con frecuencia. Cuéntanos qué necesitas.",
+    youtubeLabel: "YouTube",
+    chatLabel: "Chat",
+  },
+  it: {
+    langLabel: "Lingua",
+    heroTitle: "Triple Announcement Bar & Blocchi",
+    heroLine:
+      "Aggiungi barre annuncio, popup, countdown, icone social, WhatsApp, scroller di immagini e griglia dorata in pochi clic.",
+    heroQuote:
+      "Rendi il tuo tema più coinvolgente senza scrivere codice.",
+    openingTitle: "Come usare i blocchi Premium",
+    openingLine1:
+      "Apri il Theme Editor e clicca su “Aggiungi sezione” o “Aggiungi blocco” nell’area App.",
+    openingLine2:
+      "Aggiungi un blocco premium e personalizza testi, colori e tempi.",
+    openingButton: "Ho capito",
+    addBlockCta: "Aggiungi blocco premium",
+    infoCta: "Suggerisci un blocco",
+    comingSoonTitle: "Nuovi blocchi in arrivo",
+    comingSoonItems: [
+      "Migliorie pagina prodotto (ATC fisso, badge, schede)",
+      "FAQ / Accordion",
+      "Barra stock / urgenza",
+      "Bundle e sconti quantità",
+      "Tab e specifiche prodotto",
+    ],
+    comingSoonFooter:
+      "Rilasciamo nuovi blocchi di continuo. Dicci cosa ti serve.",
+    youtubeLabel: "YouTube",
+    chatLabel: "Chat",
+  },
+  de: {
+    langLabel: "Sprache",
+    heroTitle: "Triple Announcement Bar & Blöcke",
+    heroLine:
+      "Füge Ankündigungsleisten, Popups, Countdowns, Social Icons, WhatsApp, Bild-Scroller und Gold-Produktgitter in wenigen Klicks hinzu.",
+    heroQuote:
+      "Mach dein Theme ansprechender – ganz ohne Code.",
+    openingTitle: "So verwendest du die Premium-Blöcke",
+    openingLine1:
+      "Öffne den Theme-Editor und klicke auf „Abschnitt hinzufügen“ oder „Block hinzufügen“ im Apps-Bereich.",
+    openingLine2:
+      "Füge einen Premium-Block hinzu und passe Text, Farben und Timing an.",
+    openingButton: "Alles klar",
+    addBlockCta: "Premium-Block hinzufügen",
+    infoCta: "Block vorschlagen",
+    comingSoonTitle: "Neue Blöcke in Entwicklung",
+    comingSoonItems: [
+      "Produktseiten-Verbesserungen (Sticky ATC, Badges, Specs)",
+      "FAQ / Akkordeon",
+      "Bestands- / Dringlichkeitsleiste",
+      "Bundles & Mengenrabatte",
+      "Produkt-Tabs & Spezifikationen",
+    ],
+    comingSoonFooter:
+      "Wir veröffentlichen regelmäßig neue Blöcke. Sag uns, was dir fehlt.",
+    youtubeLabel: "YouTube",
+    chatLabel: "Chat",
+  },
+  ar: {
+    langLabel: "اللغة",
+    heroTitle: "Triple Announcement Bar & Blocks",
+    heroLine:
+      "أضف شريط إعلان، نوافذ منبثقة، عدّ تنازلي، أيقونات اجتماعية، واتساب، سكرول دائري و شبكة منتجات ذهبية بسهولة.",
+    heroQuote:
+      "اجعل متجر Shopify أكثر جاذبية بدون كتابة كود.",
+    openingTitle: "طريقة استخدام البلوكات البريميوم",
+    openingLine1:
+      "افتح محرر القالب ثم اختر «إضافة قسم» أو «إضافة بلوك» داخل قسم التطبيقات.",
+    openingLine2:
+      "اختر أي بلوك بريميوم ثم عدّل النصوص والألوان والتوقيت كما تريد.",
+    openingButton: "فهمت",
+    addBlockCta: "إضافة بلوك بريميوم",
+    infoCta: "اقترح بلوك جديد",
+    comingSoonTitle: "بلوكات جديدة قيد التطوير",
+    comingSoonItems: [
+      "تحسينات صفحة المنتج (زر ثابت، شارات، مواصفات)",
+      "أسئلة شائعة / أكورديون",
+      "شريط المخزون / الإلحاح",
+      "بندلات وخصومات كمية",
+      "تبويبات المنتج والمواصفات",
+    ],
+    comingSoonFooter:
+      "نضيف بلوكات جديدة باستمرار، شاركنا أفكارك.",
+    youtubeLabel: "YouTube",
+    chatLabel: "Chat",
+  },
+};
+
+/* ==============================
    UI & styles
 ================================ */
+
 const BUTTON_BASE = {
   border: "none",
   borderRadius: "8px",
@@ -29,6 +214,7 @@ const BUTTON_BASE = {
   cursor: "pointer",
   boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
 };
+
 const CONTAINER_STYLE = {
   maxWidth: "85%",
   margin: "0 auto",
@@ -36,6 +222,7 @@ const CONTAINER_STYLE = {
   transformOrigin: "top center",
   padding: "16px",
 };
+
 const CARD_STYLE = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
@@ -47,6 +234,7 @@ const CARD_STYLE = {
   gap: "16px",
   alignItems: "center",
 };
+
 const GLOBAL_STYLES = `
 @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
 @keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
@@ -61,381 +249,13 @@ const GRID_STYLE = {
 };
 
 /* ==============================
-   SIMPLE I18N – 6 LANGUES
-================================ */
-const LOCALES = {
-  en: {
-    label: "English",
-    label_language: "Language",
-
-    heroTitle:
-      "Welcome to Blocks: Bar, WhatsApp & More. Add bars, popups, countdowns, social icons, WhatsApp and product highlights directly from the Theme Editor.",
-
-    popup_title: "How to use the blocks",
-    popup_line1:
-      "Open your Theme Editor and click Add block in the Apps section.",
-    popup_line2:
-      "Choose any block (bar, popup, countdown, WhatsApp, product grid…) and customize it in a few seconds.",
-    popup_btn: "Got it!",
-
-    block_announcement_title: "Announcement Bar",
-    block_announcement_desc:
-      "Display promo messages or store updates at the top of your theme.",
-
-    block_popup_title: "Promo Popup",
-    block_popup_desc:
-      "Show an offer with title, text and a clear call-to-action button.",
-
-    block_timer_title: "Countdown Timer",
-    block_timer_desc:
-      "Three countdown layouts to add urgency to your promotions.",
-
-    block_social_title: "Social Icons",
-    block_social_desc:
-      "Display branded social media icons with clean hover effects.",
-
-    block_whatsapp_title: "WhatsApp Sticky Button",
-    block_whatsapp_desc:
-      "Quick contact button in the bottom corner (mobile & desktop).",
-
-    block_circle_title: "Circle Image Scroller",
-    block_circle_desc:
-      "Horizontal carousel of circular images with a stories-like look.",
-
-    block_gold_title: "Gold Products Grid",
-    block_gold_desc:
-      "Compact 3-product grid with a gold background for key offers.",
-
-    coming_title: "More blocks coming soon",
-    coming_desc: "We keep shipping new sections and theme-native blocks.",
-    coming_item1:
-      "Product page enhancements (sticky add to cart, badges, specs)",
-    coming_item2: "FAQ / Accordion",
-    coming_item3: "Stock / urgency bar",
-    coming_item4: "Bundles & volume discounts",
-    coming_item5: "Product tabs & technical details",
-    coming_footer:
-      "We release updates regularly. Share your idea — we can build it.",
-
-    cta_add_block: "Add block in Theme Editor",
-    cta_contact: "Suggest a block",
-
-    youtube_button: "YouTube",
-    chat_button: "Support",
-  },
-
-  fr: {
-    label: "Français",
-    label_language: "Langue",
-
-    heroTitle:
-      "Bienvenue dans Blocks: Bar, WhatsApp & More. Ajoutez des barres d’annonce, popups, comptes à rebours, icônes sociales, WhatsApp et cartes produits directement depuis l’éditeur de thème.",
-
-    popup_title: "Comment utiliser les blocs",
-    popup_line1:
-      "Ouvrez votre éditeur de thème puis cliquez sur « Ajouter un bloc » dans la section Apps.",
-    popup_line2:
-      "Choisissez un bloc (barre, popup, compte à rebours, WhatsApp, grille produits…) et personnalisez-le en quelques secondes.",
-    popup_btn: "C’est compris",
-
-    block_announcement_title: "Barre d’annonce",
-    block_announcement_desc:
-      "Affichez une promotion ou un message important en haut de votre boutique.",
-
-    block_popup_title: "Popup promotionnelle",
-    block_popup_desc:
-      "Affichez une offre avec un titre, un texte et un bouton d’action clair.",
-
-    block_timer_title: "Compte à rebours",
-    block_timer_desc:
-      "Trois styles de compte à rebours pour ajouter de l’urgence à vos offres.",
-
-    block_social_title: "Icônes sociales",
-    block_social_desc:
-      "Affichez vos réseaux sociaux avec des icônes de marque et un survol propre.",
-
-    block_whatsapp_title: "Bouton WhatsApp fixe",
-    block_whatsapp_desc:
-      "Bouton de contact rapide dans le coin (mobile et ordinateur).",
-
-    block_circle_title: "Scroller d’images en cercle",
-    block_circle_desc:
-      "Carrousel horizontal d’images circulaires façon stories.",
-
-    block_gold_title: "Grille produits dorée",
-    block_gold_desc:
-      "Petite grille de 3 produits avec fond doré pour mettre en avant vos offres.",
-
-    coming_title: "Nouveaux blocs en préparation",
-    coming_desc:
-      "Nous ajoutons régulièrement de nouvelles sections et de nouveaux blocs natifs au thème.",
-    coming_item1:
-      "Améliorations page produit (sticky ATC, badges, fiches techniques)",
-    coming_item2: "FAQ / accordéon",
-    coming_item3: "Barre de stock / urgence",
-    coming_item4: "Bundles & remises par quantité",
-    coming_item5: "Onglets produit & caractéristiques",
-    coming_footer:
-      "Nous publions souvent des mises à jour. Partagez votre idée, on peut la construire.",
-
-    cta_add_block: "Ajouter le bloc dans le thème",
-    cta_contact: "Suggérer un bloc",
-
-    youtube_button: "YouTube",
-    chat_button: "Support",
-  },
-
-  es: {
-    label: "Español",
-    label_language: "Idioma",
-
-    heroTitle:
-      "Bienvenido a Blocks: Bar, WhatsApp & More. Añade barras, popups, contadores, iconos sociales, WhatsApp y productos destacados directamente desde el editor de temas.",
-
-    popup_title: "Cómo usar los bloques",
-    popup_line1:
-      "Abre el editor de temas y haz clic en Añadir bloque en la sección de aplicaciones.",
-    popup_line2:
-      "Elige cualquier bloque (barra, popup, contador, WhatsApp, cuadrícula de productos…) y personalízalo en segundos.",
-    popup_btn: "Entendido",
-
-    block_announcement_title: "Barra de anuncios",
-    block_announcement_desc:
-      "Muestra promociones o mensajes importantes en la parte superior de tu tienda.",
-
-    block_popup_title: "Popup promocional",
-    block_popup_desc:
-      "Muestra una oferta con título, texto y un botón de llamada a la acción.",
-
-    block_timer_title: "Contador regresivo",
-    block_timer_desc:
-      "Tres estilos de cuenta atrás para añadir urgencia a tus campañas.",
-
-    block_social_title: "Iconos sociales",
-    block_social_desc:
-      "Muestra tus redes sociales con iconos de marca y efectos limpios.",
-
-    block_whatsapp_title: "Botón fijo de WhatsApp",
-    block_whatsapp_desc:
-      "Botón de contacto rápido en la esquina (móvil y escritorio).",
-
-    block_circle_title: "Carrusel de imágenes circulares",
-    block_circle_desc:
-      "Carrusel horizontal de imágenes redondas con estilo de historias.",
-
-    block_gold_title: "Cuadrícula dorada de productos",
-    block_gold_desc:
-      "Cuadrícula compacta de 3 productos con fondo dorado para tus mejores ofertas.",
-
-    coming_title: "Más bloques próximamente",
-    coming_desc:
-      "Seguimos lanzando nuevas secciones y bloques nativos de tema.",
-    coming_item1:
-      "Mejoras en la ficha de producto (sticky ATC, insignias, detalles)",
-    coming_item2: "FAQ / acordeón",
-    coming_item3: "Barra de stock / urgencia",
-    coming_item4: "Bundles y descuentos por volumen",
-    coming_item5: "Pestañas de producto y detalles técnicos",
-    coming_footer:
-      "Publicamos actualizaciones con frecuencia. Comparte tu idea y podemos construirla.",
-
-    cta_add_block: "Añadir bloque en el editor",
-    cta_contact: "Sugerir un bloque",
-
-    youtube_button: "YouTube",
-    chat_button: "Soporte",
-  },
-
-  de: {
-    label: "Deutsch",
-    label_language: "Sprache",
-
-    heroTitle:
-      "Willkommen bei Blocks: Bar, WhatsApp & More. Füge Ankündigungsleisten, Popups, Countdowns, Social Icons, WhatsApp und Produkt-Highlights direkt im Theme-Editor hinzu.",
-
-    popup_title: "So verwendest du die Blöcke",
-    popup_line1:
-      "Öffne den Theme-Editor und klicke auf „Block hinzufügen“ im Apps-Bereich.",
-    popup_line2:
-      "Wähle einen Block (Leiste, Popup, Countdown, WhatsApp, Produktgitter …) und passe ihn in wenigen Sekunden an.",
-    popup_btn: "Verstanden",
-
-    block_announcement_title: "Ankündigungsleiste",
-    block_announcement_desc:
-      "Zeige Aktionen oder wichtige Hinweise am oberen Rand deines Shops.",
-
-    block_popup_title: "Promo-Popup",
-    block_popup_desc:
-      "Zeige ein Angebot mit Überschrift, Text und klarer Handlungsaufforderung.",
-
-    block_timer_title: "Countdown-Timer",
-    block_timer_desc:
-      "Drei Countdown-Layouts, um deinen Aktionen mehr Dringlichkeit zu geben.",
-
-    block_social_title: "Social Icons",
-    block_social_desc:
-      "Zeige deine sozialen Netzwerke mit Marken-Icons und cleanen Hover-Effekten.",
-
-    block_whatsapp_title: "WhatsApp-Sticky-Button",
-    block_whatsapp_desc:
-      "Schnellkontakt-Button in der Ecke (mobil und Desktop).",
-
-    block_circle_title: "Kreisbild-Scroller",
-    block_circle_desc:
-      "Horizontaler Karussell-Block mit runden Bildern im Story-Stil.",
-
-    block_gold_title: "Goldenes Produktgitter",
-    block_gold_desc:
-      "Kompaktes 3-Produkt-Gitter mit goldenem Hintergrund für Top-Angebote.",
-
-    coming_title: "Weitere Blöcke in Arbeit",
-    coming_desc:
-      "Wir veröffentlichen regelmäßig neue Sektionen und theme-native Blöcke.",
-    coming_item1:
-      "Produktseiten-Optimierung (sticky ATC, Badges, technische Details)",
-    coming_item2: "FAQ / Akkordeon",
-    coming_item3: "Bestands- / Dringlichkeitsleiste",
-    coming_item4: "Bundles & Mengenrabatte",
-    coming_item5: "Produkt-Tabs & technische Daten",
-    coming_footer:
-      "Wir liefern häufig Updates aus. Teile deine Idee – wir können sie umsetzen.",
-
-    cta_add_block: "Block im Theme-Editor hinzufügen",
-    cta_contact: "Block vorschlagen",
-
-    youtube_button: "YouTube",
-    chat_button: "Support",
-  },
-
-  it: {
-    label: "Italiano",
-    label_language: "Lingua",
-
-    heroTitle:
-      "Benvenuto in Blocks: Bar, WhatsApp & More. Aggiungi barre, popup, countdown, icone social, WhatsApp e prodotti in evidenza direttamente dal Theme Editor.",
-
-    popup_title: "Come usare i blocchi",
-    popup_line1:
-      "Apri il Theme Editor e clicca su Aggiungi blocco nella sezione App.",
-    popup_line2:
-      "Scegli un blocco (barra, popup, countdown, WhatsApp, griglia prodotti…) e personalizzalo in pochi secondi.",
-    popup_btn: "Ho capito",
-
-    block_announcement_title: "Barra di annuncio",
-    block_announcement_desc:
-      "Mostra promozioni o messaggi importanti nella parte alta del negozio.",
-
-    block_popup_title: "Popup promozionale",
-    block_popup_desc:
-      "Mostra un’offerta con titolo, testo e un pulsante chiaro di call-to-action.",
-
-    block_timer_title: "Timer countdown",
-    block_timer_desc:
-      "Tre stili di countdown per creare urgenza nelle tue campagne.",
-
-    block_social_title: "Icone social",
-    block_social_desc:
-      "Mostra i tuoi social con icone di marca ed effetti hover puliti.",
-
-    block_whatsapp_title: "Pulsante fisso WhatsApp",
-    block_whatsapp_desc:
-      "Pulsante di contatto rapido nell’angolo (mobile e desktop).",
-
-    block_circle_title: "Scroller di immagini circolari",
-    block_circle_desc:
-      "Carosello orizzontale di immagini circolari in stile stories.",
-
-    block_gold_title: "Griglia prodotti dorata",
-    block_gold_desc:
-      "Griglia compatta di 3 prodotti con sfondo dorato per le offerte principali.",
-
-    coming_title: "Nuovi blocchi in arrivo",
-    coming_desc:
-      "Rilasciamo regolarmente nuove sezioni e blocchi nativi per il tema.",
-    coming_item1:
-      "Miglioramenti pagina prodotto (sticky ATC, badge, dettagli tecnici)",
-    coming_item2: "FAQ / fisarmonica",
-    coming_item3: "Barra scorte / urgenza",
-    coming_item4: "Bundle e sconti quantità",
-    coming_item5: "Schede prodotto e specifiche",
-    coming_footer:
-      "Aggiorniamo l’app spesso. Inviaci la tua idea, possiamo svilupparla.",
-
-    cta_add_block: "Aggiungi blocco nel Theme Editor",
-    cta_contact: "Suggerisci un blocco",
-
-    youtube_button: "YouTube",
-    chat_button: "Supporto",
-  },
-
-  ar: {
-    label: "العربية",
-    label_language: "اللغة",
-
-    heroTitle:
-      "مرحبًا في Blocks: Bar, WhatsApp & More. أضِف شريط إعلانات، نوافذ منبثقة، عدّ تنازلي، أيقونات اجتماعية، زر واتساب وبطاقات منتجات مباشرة من محرّر القالب.",
-
-    popup_title: "كيفية استخدام البلوكات",
-    popup_line1:
-      "افتح محرّر القالب ثم انقر على «إضافة بلوك» في قسم التطبيقات.",
-    popup_line2:
-      "اختر أي بلوك (شريط، منبثق، عدّ تنازلي، واتساب، شبكة منتجات...) ثم عدِّله في ثوانٍ قليلة.",
-    popup_btn: "حسنًا",
-
-    block_announcement_title: "شريط الإعلانات",
-    block_announcement_desc:
-      "اعرض عروضًا أو رسائل مهمة في أعلى متجرك.",
-
-    block_popup_title: "نافذة منبثقة ترويجية",
-    block_popup_desc:
-      "أظهر عرضًا مع عنوان ونص وزر دعوة لاتخاذ إجراء واضح.",
-
-    block_timer_title: "مؤقّت عدّ تنازلي",
-    block_timer_desc:
-      "ثلاثة أنماط للعدّ التنازلي لإضافة الإحساس بالاستعجال لعروضك.",
-
-    block_social_title: "أيقونات التواصل الاجتماعي",
-    block_social_desc:
-      "اعرض حساباتك على الشبكات الاجتماعية بأيقونات احترافية وتأثيرات بسيطة.",
-
-    block_whatsapp_title: "زر واتساب ثابت",
-    block_whatsapp_desc:
-      "زر تواصل سريع في الزاوية (على الجوال و سطح المكتب).",
-
-    block_circle_title: "عارض صور دائري",
-    block_circle_desc:
-      "شريط تمرير أفقي لصور دائرية بأسلوب شبيه بالقصص.",
-
-    block_gold_title: "شبكة منتجات ذهبية",
-    block_gold_desc:
-      "شبكة مكوّنة من 3 منتجات مع خلفية ذهبية لأقوى العروض.",
-
-    coming_title: "بلوكات جديدة قريبًا",
-    coming_desc:
-      "نضيف باستمرار أقسامًا جديدة وبلوكات متوافقة مع القالب.",
-    coming_item1:
-      "تحسين صفحة المنتج (زر شراء ثابت، شارات، مواصفات).",
-    coming_item2: "قسم الأسئلة الشائعة (FAQ) / أكورديون.",
-    coming_item3: "شريط المخزون / الاستعجال.",
-    coming_item4: "حزم منتجات وتخفيضات على الكمية.",
-    coming_item5: "تبويبات المنتج والخصائص التقنية.",
-    coming_footer:
-      "نصدر تحديثات بشكل منتظم. شاركنا فكرتك، ويمكننا تنفيذها.",
-
-    cta_add_block: "إضافة بلوك من محرّر القالب",
-    cta_contact: "اقترح بلوكًا",
-
-    youtube_button: "يوتيوب",
-    chat_button: "الدعم",
-  },
-};
-
-/* ==============================
    Deep link helpers
 ================================ */
+
 function editorBase({ shopSub }) {
   return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
 }
+
 function makeAddBlockLink({
   shopSub,
   apiKey,
@@ -455,11 +275,15 @@ function makeAddBlockLink({
 }
 
 /* ==============================
-   Existing preview components
+   Components
 ================================ */
-function OpeningPopup({ t }) {
+
+function OpeningPopup({ lang }) {
   const [visible, setVisible] = useState(true);
+  const t = COPY[lang] || COPY.en;
+
   if (!visible) return null;
+
   return (
     <div
       style={{
@@ -486,20 +310,18 @@ function OpeningPopup({ t }) {
           boxShadow: "0 0 30px rgba(255,255,255,0.1)",
         }}
       >
-        <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
-          {t("popup_title")}
-        </h2>
+        <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>{t.openingTitle}</h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
-          {t("popup_line1")}
+          {t.openingLine1}
         </p>
         <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
-          {t("popup_line2")}
+          {t.openingLine2}
         </p>
         <button
           onClick={() => setVisible(false)}
           style={{ ...BUTTON_BASE, backgroundColor: "#fff", color: "#000" }}
         >
-          {t("popup_btn")}
+          {t.openingButton}
         </button>
       </div>
     </div>
@@ -530,6 +352,7 @@ function PreviewAnnouncementBar() {
       link: "#",
     },
   ];
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       {bars.map((bar, i) => (
@@ -568,6 +391,7 @@ function PreviewAnnouncementBar() {
 
 function PreviewPopup() {
   const [visible, setVisible] = useState(false);
+
   useEffect(() => {
     const show = () => {
       setVisible(true);
@@ -577,6 +401,7 @@ function PreviewPopup() {
     const iv = setInterval(show, 4000);
     return () => clearInterval(iv);
   }, []);
+
   return (
     <div
       style={{
@@ -588,7 +413,7 @@ function PreviewPopup() {
         padding: "24px",
         maxWidth: "320px",
         backgroundColor: "#bfdbfe",
-        borderLeft: "6px solid "#3b82f6",
+        borderLeft: "6px solid #3b82f6", // ✅ corrigé
         borderRadius: "12px",
         animation: visible ? "popupGlowPro 0.5s infinite ease-in-out" : "none",
       }}
@@ -621,6 +446,7 @@ function PreviewPopup() {
 }
 
 /* ====== Countdown ====== */
+
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
   const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -628,6 +454,7 @@ function calcRemaining(deadline) {
   const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
   return `${h}:${m}:${s}`;
 }
+
 function StyledTimer({ value, variant }) {
   const base = {
     fontFamily: "sans-serif",
@@ -635,6 +462,7 @@ function StyledTimer({ value, variant }) {
     minWidth: "40px",
     textAlign: "center",
   };
+
   const styles = {
     standard: {
       ...base,
@@ -652,23 +480,28 @@ function StyledTimer({ value, variant }) {
     },
     circle: {
       ...base,
-      border: "3px solid "#2b6cb0",
+      border: "3px solid #2b6cb0", // ✅ corrigé
       color: "#2b6cb0",
       borderRadius: "50%",
       boxShadow: "0 0 12px rgba(43,108,176,0.6)",
     },
   };
+
   return <div style={styles[variant]}>{value}</div>;
 }
+
 function PreviewCountdown() {
   const TWO_HOURS = 2 * 3600000;
   const deadline = Date.now() + TWO_HOURS;
   const [time, setTime] = useState(calcRemaining(deadline));
+
   useEffect(() => {
     const iv = setInterval(() => setTime(calcRemaining(deadline)), 1000);
     return () => clearInterval(iv);
   }, [deadline]);
+
   const parts = time.split(":");
+
   return (
     <div
       style={{
@@ -721,9 +554,8 @@ function PreviewCountdown() {
   );
 }
 
-/* ==============================
-   Other previews
-================================ */
+/* ====== Social Icons ====== */
+
 function PreviewSocialIcons() {
   const Base = ({ children, title, href = "#", bg }) => (
     <a
@@ -737,7 +569,7 @@ function PreviewSocialIcons() {
         placeItems: "center",
         background: bg,
         boxShadow: "0 6px 14px rgba(0,0,0,.2)",
-        transition: "transform .15s ease, boxShadow .15s ease",
+        transition: "transform .15s ease, box-shadow .15s ease",
       }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
@@ -765,7 +597,14 @@ function PreviewSocialIcons() {
             stroke="#fff"
             strokeWidth="4"
           />
-          <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle
+            cx="32"
+            cy="32"
+            r="10"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="4"
+          />
           <circle cx="46" cy="18" r="3" fill="#fff" />
         </svg>
       </Base>
@@ -854,7 +693,9 @@ function PreviewSocialIcons() {
   );
 }
 
-function PreviewWhatsAppSticky({ t }) {
+/* ====== WhatsApp Sticky ====== */
+
+function PreviewWhatsAppSticky() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <div
@@ -882,12 +723,16 @@ function PreviewWhatsAppSticky({ t }) {
         </svg>
       </div>
       <div>
-        <div style={{ fontWeight: 700 }}>{t("block_whatsapp_title")}</div>
-        <div style={{ color: "#555" }}>{t("block_whatsapp_desc")}</div>
+        <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
+        <div style={{ color: "#555" }}>
+          Quick contact — bottom corner (mobile & desktop)
+        </div>
       </div>
     </div>
   );
 }
+
+/* ====== Circle Image Scroller ====== */
 
 function PreviewCircleScroller() {
   const imgs = [
@@ -898,7 +743,14 @@ function PreviewCircleScroller() {
     "https://picsum.photos/seed/e/200",
   ];
   return (
-    <div style={{ overflowX: "auto", display: "flex", gap: 12, paddingBottom: 6 }}>
+    <div
+      style={{
+        overflowX: "auto",
+        display: "flex",
+        gap: 12,
+        paddingBottom: 6,
+      }}
+    >
       {imgs.map((src, i) => (
         <img
           key={i}
@@ -920,6 +772,8 @@ function PreviewCircleScroller() {
   );
 }
 
+/* ====== Gold Products ====== */
+
 function PreviewGoldProductsStoreLike() {
   const items = [
     {
@@ -940,8 +794,17 @@ function PreviewGoldProductsStoreLike() {
   ];
 
   return (
-    <div style={{ padding: 10, borderRadius: 8, background: "#fff", border: "1px solid #eee" }}>
-      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>Gold Products</div>
+    <div
+      style={{
+        padding: 10,
+        borderRadius: 8,
+        background: "#fff",
+        border: "1px solid #eee",
+      }}
+    >
+      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>
+        Gold Products
+      </div>
 
       <div
         style={{
@@ -967,7 +830,12 @@ function PreviewGoldProductsStoreLike() {
               alt={p.title}
               width={600}
               height={400}
-              style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }}
+              style={{
+                width: "100%",
+                height: 140,
+                objectFit: "cover",
+                display: "block",
+              }}
               loading="lazy"
               decoding="async"
             />
@@ -994,7 +862,15 @@ function PreviewGoldProductsStoreLike() {
               >
                 {p.title}
               </div>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: "#1f2937" }}>{p.price}</div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: "#1f2937",
+                }}
+              >
+                {p.price}
+              </div>
             </div>
           </div>
         ))}
@@ -1003,7 +879,11 @@ function PreviewGoldProductsStoreLike() {
   );
 }
 
-function PreviewComingSoon({ t }) {
+/* ====== Coming Soon Info Card ====== */
+
+function PreviewComingSoon({ lang }) {
+  const t = COPY[lang] || COPY.en;
+
   return (
     <div
       style={{
@@ -1017,7 +897,14 @@ function PreviewComingSoon({ t }) {
         animation: "shimmer 2.4s infinite linear",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 8,
+        }}
+      >
         <span
           style={{
             display: "inline-flex",
@@ -1034,20 +921,32 @@ function PreviewComingSoon({ t }) {
         >
           ✨
         </span>
-        <div style={{ fontWeight: 800 }}>{t("coming_title")}</div>
+        <div style={{ fontWeight: 800 }}>{t.comingSoonTitle}</div>
       </div>
 
-      <p style={{ margin: "4px 0 8px", fontSize: 13, color: "#374151" }}>{t("coming_desc")}</p>
-
-      <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-        <li>{t("coming_item1")}</li>
-        <li>{t("coming_item2")}</li>
-        <li>{t("coming_item3")}</li>
-        <li>{t("coming_item4")}</li>
-        <li>{t("coming_item5")}</li>
+      <ul
+        style={{
+          margin: 0,
+          paddingLeft: 18,
+          color: "#374151",
+          fontSize: 13,
+          lineHeight: 1.5,
+        }}
+      >
+        {t.comingSoonItems.map((item, idx) => (
+          <li key={idx}>{item}</li>
+        ))}
       </ul>
 
-      <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280" }}>{t("coming_footer")}</div>
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 12,
+          color: "#6b7280",
+        }}
+      >
+        {t.comingSoonFooter}
+      </div>
     </div>
   );
 }
@@ -1055,115 +954,105 @@ function PreviewComingSoon({ t }) {
 /* ==============================
    PAGE: Settings
 ================================ */
+
 export default function Settings() {
   const { shopSub, apiKey } = useLoaderData();
-  const location = useLocation();
   const [lang, setLang] = useState("en");
+  const t = COPY[lang] || COPY.en;
 
-  // Charger langue depuis localStorage
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const saved = window.localStorage.getItem("blocks_lang");
-      if (saved && LOCALES[saved]) setLang(saved);
-    } catch {}
-  }, []);
-
-  // Sauvegarder langue
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem("blocks_lang", lang);
-    } catch {}
-  }, [lang]);
-
-  const t = (key) => LOCALES[lang]?.[key] ?? LOCALES.en[key] ?? key;
-
-  // Liste des blocs
+  // Blocks list
   const blocks = [
     {
       id: "announcement-premium",
-      titleKey: "block_announcement_title",
-      descKey: "block_announcement_desc",
+      title: "Premium Announcement Bar",
+      description: "Animated or multilingual bar to grab attention.",
       template: "index",
-      preview: () => <PreviewAnnouncementBar />,
+      preview: <PreviewAnnouncementBar />,
       kind: "installable",
     },
     {
       id: "popup-premium",
-      titleKey: "block_popup_title",
-      descKey: "block_popup_desc",
+      title: "Premium Popup",
+      description: "Modern popup with promo code and glow animation.",
       template: "index",
-      preview: () => <PreviewPopup />,
+      preview: <PreviewPopup />,
       kind: "installable",
     },
     {
       id: "timer-premium",
-      titleKey: "block_timer_title",
-      descKey: "block_timer_desc",
+      title: "Premium Countdown",
+      description: "Three dynamic countdown styles.",
       template: "index",
-      preview: () => <PreviewCountdown />,
+      preview: <PreviewCountdown />,
       kind: "installable",
     },
     {
       id: "social-icons-premium",
-      titleKey: "block_social_title",
-      descKey: "block_social_desc",
+      title: "Social Icons",
+      description: "Social icons with hover and clean style.",
       template: "index",
-      preview: () => <PreviewSocialIcons />,
+      preview: <PreviewSocialIcons />,
       kind: "installable",
     },
     {
       id: "whatsapp-sticky-premium",
-      titleKey: "block_whatsapp_title",
-      descKey: "block_whatsapp_desc",
+      title: "WhatsApp Sticky Button",
+      description: "Floating quick-contact button (bottom corner).",
       template: "index",
-      preview: () => <PreviewWhatsAppSticky t={t} />,
+      preview: <PreviewWhatsAppSticky />,
       kind: "installable",
     },
     {
       id: "circle-scroller-premium",
-      titleKey: "block_circle_title",
-      descKey: "block_circle_desc",
+      title: "Circle Image Scroller",
+      description: "Horizontal carousel of circular images (stories look).",
       template: "index",
-      preview: () => <PreviewCircleScroller />,
+      preview: <PreviewCircleScroller />,
       kind: "installable",
     },
     {
       id: "gold-products-premium",
-      titleKey: "block_gold_title",
-      descKey: "block_gold_desc",
+      title: "Gold Products Showcase (Premium)",
+      description: "Gold-style product grid from a collection.",
       template: "index",
-      preview: () => <PreviewGoldProductsStoreLike />,
+      preview: <PreviewGoldProductsStoreLike />,
       kind: "installable",
     },
     {
       id: "coming-soon-info",
-      titleKey: "coming_title",
-      descKey: "coming_desc",
+      title: "More blocks coming soon",
+      description: "We add new blocks regularly. Tell us what you want next.",
       template: "index",
-      preview: () => <PreviewComingSoon t={t} />,
+      preview: null, // géré plus bas via <PreviewComingSoon lang={lang} />
       kind: "info",
-      ctaLabelKey: "cta_contact",
     },
   ];
 
+  // CTA handlers
   const openTawk = () => {
     try {
-      if (window && window.Tawk_API && typeof window.Tawk_API.maximize === "function") {
+      if (
+        typeof window !== "undefined" &&
+        window.Tawk_API &&
+        typeof window.Tawk_API.maximize === "function"
+      ) {
         window.Tawk_API.maximize();
         return;
       }
-    } catch {}
-    window.location.href =
-      "mailto:triple.s.dev.design@gmail.com?subject=Block%20request";
+    } catch (e) {
+      // ignore
+    }
+    if (typeof window !== "undefined") {
+      window.location.href =
+        "mailto:triple.s.dev.design@gmail.com?subject=Block%20request";
+    }
   };
 
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      {/* ✅ CSS mobile-only */}
+      {/* ✅ Mobile CSS only */}
       <style>{`
         @media (max-width: 768px){
           .settings-container{
@@ -1186,6 +1075,9 @@ export default function Settings() {
             bottom: calc(16px + env(safe-area-inset-bottom)) !important;
             z-index: 2147483647 !important;
           }
+          .fixed-btn.pricing{
+            bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+          }
           .fixed-btn.youtube{ left: 16px !important; }
           .fixed-btn.chat{   right: 16px !important; }
         }
@@ -1194,11 +1086,11 @@ export default function Settings() {
         }
       `}</style>
 
-      <OpeningPopup t={t} />
+      <OpeningPopup lang={lang} />
 
       <div className="settings-root">
         <div className="settings-container" style={CONTAINER_STYLE}>
-          {/* Hero */}
+          {/* Hero + sélecteur de langue */}
           <div
             style={{
               background:
@@ -1206,7 +1098,7 @@ export default function Settings() {
               backgroundSize: "800px 100%",
               borderRadius: "12px",
               padding: "24px",
-              marginBottom: "24px",
+              marginBottom: "32px",
               color: "#fff",
               animation: "shimmer 3s infinite linear",
             }}
@@ -1214,49 +1106,62 @@ export default function Settings() {
             <div
               style={{
                 display: "flex",
-                alignItems: "flex-start",
+                flexWrap: "wrap",
                 justifyContent: "space-between",
-                gap: 16,
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 12,
               }}
             >
-              <p style={{ fontSize: "16px", fontWeight: "bold", maxWidth: "75%" }}>
-                {t("heroTitle")}
+              <p style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
+                {t.heroTitle}
               </p>
-
-              {/* Sélecteur de langue */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-end",
-                  gap: 6,
-                  minWidth: 130,
-                }}
-              >
-                <span style={{ fontSize: 11, color: "#d4d4d8" }}>
-                  {t("label_language")}
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 13, opacity: 0.85 }}>
+                  {t.langLabel}:
                 </span>
                 <select
                   value={lang}
                   onChange={(e) => setLang(e.target.value)}
                   style={{
                     padding: "6px 10px",
-                    borderRadius: 999,
-                    border: "1px solid #4b5563",
-                    background: "#18181b",
-                    color: "#f9fafb",
-                    fontSize: 12,
+                    borderRadius: "999px",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    background: "rgba(0,0,0,0.3)",
+                    color: "#fff",
+                    fontSize: 13,
                     cursor: "pointer",
                   }}
                 >
-                  {Object.entries(LOCALES).map(([code, cfg]) => (
-                    <option key={code} value={code}>
-                      {cfg.label}
+                  {LANG_OPTIONS.map((opt) => (
+                    <option key={opt.code} value={opt.code}>
+                      {opt.label}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
+
+            <p
+              style={{
+                fontSize: "14px",
+                marginTop: 4,
+                marginBottom: 6,
+                opacity: 0.9,
+              }}
+            >
+              {t.heroLine}
+            </p>
+            <p
+              style={{
+                fontSize: "13px",
+                margin: 0,
+                opacity: 0.75,
+                fontStyle: "italic",
+              }}
+            >
+              “{t.heroQuote}”
+            </p>
           </div>
 
           {/* Grid des blocs */}
@@ -1265,10 +1170,10 @@ export default function Settings() {
               <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
                 <div style={{ flex: 1, minWidth: "220px" }}>
                   <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>
-                    {t(block.titleKey)}
+                    {block.title}
                   </h2>
                   <p style={{ marginBottom: "12px", color: "#555" }}>
-                    {t(block.descKey)}
+                    {block.description}
                   </p>
 
                   {block.kind === "installable" ? (
@@ -1290,7 +1195,7 @@ export default function Settings() {
                           color: "#fff",
                         }}
                       >
-                        {t("cta_add_block")}
+                        {t.addBlockCta}
                       </button>
                     </a>
                   ) : (
@@ -1302,12 +1207,17 @@ export default function Settings() {
                         color: "#fff",
                       }}
                     >
-                      {t(block.ctaLabelKey || "cta_contact")}
+                      {t.infoCta}
                     </button>
                   )}
                 </div>
+
                 <div style={{ flex: 1, minWidth: "220px" }}>
-                  {block.preview()}
+                  {block.id === "coming-soon-info" ? (
+                    <PreviewComingSoon lang={lang} />
+                  ) : (
+                    block.preview
+                  )}
                 </div>
               </div>
             ))}
@@ -1339,7 +1249,7 @@ export default function Settings() {
               cursor: "pointer",
             }}
           >
-            {t("youtube_button")}
+            {t.youtubeLabel}
           </button>
         </a>
 
@@ -1349,16 +1259,20 @@ export default function Settings() {
           onClick={() => {
             try {
               if (
-                window &&
+                typeof window !== "undefined" &&
                 window.Tawk_API &&
                 typeof window.Tawk_API.maximize === "function"
               ) {
                 window.Tawk_API.maximize();
                 return;
               }
-            } catch {}
-            window.location.href =
-              "mailto:triple.s.dev.design@gmail.com?subject=Support%20request";
+            } catch (e) {
+              // ignore
+            }
+            if (typeof window !== "undefined") {
+              window.location.href =
+                "mailto:triple.s.dev.design@gmail.com?subject=Support%20request";
+            }
           }}
           aria-label="Chat support"
           style={{
@@ -1372,7 +1286,7 @@ export default function Settings() {
             zIndex: 999,
           }}
         >
-          {t("chat_button")}
+          {t.chatLabel}
         </button>
       </div>
 
