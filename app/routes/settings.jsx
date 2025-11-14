@@ -40,7 +40,6 @@ const COPY = {
     heroQuote:
       "Make your Shopify theme more engaging without writing a single line of code.",
 
-    // Opening popup
     openingTitle: "How to use the premium blocks",
     openingLine1:
       "Open your Theme Editor and click “Add section” or “Add block” in the Apps area.",
@@ -48,7 +47,6 @@ const COPY = {
       "Add any premium block, then customize text, colors and timing as you like.",
     openingButton: "Got it!",
 
-    // Blocks list
     blocks: {
       announcementTitle: "Premium Announcement Bar",
       announcementDesc: "Animated or multilingual bar to grab attention.",
@@ -69,7 +67,6 @@ const COPY = {
         "We add new blocks regularly. Tell us what you want next.",
     },
 
-    // Announcement bars preview
     bars: [
       {
         button: "Shop now",
@@ -85,7 +82,6 @@ const COPY = {
       },
     ],
 
-    // Popup preview
     popupPreviewTitle: "🎁 Exclusive offer",
     popupPreviewLine:
       "Get {discount} OFF with code {code}",
@@ -93,7 +89,6 @@ const COPY = {
     popupPreviewCode: "WELCOME20",
     popupPreviewButton: "Apply now",
 
-    // Countdown
     countdownLabels: {
       standard: "Standard",
       rectangle: "Rectangle",
@@ -101,15 +96,12 @@ const COPY = {
       add: "Add",
     },
 
-    // WhatsApp preview
     whatsappPreviewTitle: "WhatsApp Sticky Button",
     whatsappPreviewDesc:
       "Quick contact — bottom corner (mobile & desktop)",
 
-    // Gold grid
     goldHeading: "Gold products",
 
-    // Coming soon block
     comingSoonTitle: "New blocks in production",
     comingSoonItems: [
       "Product page enhancements (sticky ATC, badges, specs)",
@@ -121,7 +113,6 @@ const COPY = {
     comingSoonFooter:
       "We ship new blocks regularly. Tell us what you would like next.",
 
-    // Buttons
     addBlockCta: "Add premium block",
     infoCta: "Suggest a block",
     youtubeLabel: "YouTube",
@@ -668,7 +659,7 @@ function makeAddBlockLink({
    Components
 ================================ */
 
-function OpeningPopup({ lang }) {
+function OpeningPopup({ lang, onChangeLang }) {
   const t = COPY[lang] || COPY.en;
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
@@ -694,11 +685,50 @@ function OpeningPopup({ lang }) {
           borderRadius: "16px",
           textAlign: "center",
           color: "#fff",
-          maxWidth: "400px",
+          maxWidth: "420px",
           width: "90%",
           boxShadow: "0 0 30px rgba(255,255,255,0.1)",
         }}
       >
+        {/* Sélecteur de langue dans le popup */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "12px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 12,
+            }}
+          >
+            <span style={{ opacity: 0.85 }}>{t.langLabel}:</span>
+            <select
+              value={lang}
+              onChange={(e) => onChangeLang && onChangeLang(e.target.value)}
+              style={{
+                padding: "4px 10px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.4)",
+                background: "rgba(0,0,0,0.3)",
+                color: "#fff",
+                fontSize: 12,
+                cursor: "pointer",
+              }}
+            >
+              {LANG_OPTIONS.map((opt) => (
+                <option key={opt.code} value={opt.code}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
           {t.openingTitle}
         </h2>
@@ -1478,7 +1508,8 @@ export default function Settings() {
         }
       `}</style>
 
-      <OpeningPopup lang={lang} />
+      {/* Popup avec sélecteur de langue */}
+      <OpeningPopup lang={lang} onChangeLang={setLang} />
 
       <div className="settings-root">
         <div className="settings-container" style={CONTAINER_STYLE}>
