@@ -1,24 +1,15 @@
 // app/routes/settings.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useLoaderData } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 
 /* ==============================
-   LOADER: shop + plan + API KEY
+   LOADER: shop + API KEY (NO BILLING)
 ================================ */
 export const loader = async ({ request }) => {
-  const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
-  const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
+  const { authenticate } = await import("../shopify.server");
 
-  const { billing, session } = await authenticate.admin(request);
-  const url = new URL(request.url);
-  const qs = url.searchParams.toString();
-
-  try {
-    await billing.require({ plans: REQUIRED_PLANS });
-  } catch {
-    return redirect(`/pricing?${qs}`);
-  }
+  const { session } = await authenticate.admin(request);
 
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
@@ -26,6 +17,7 @@ export const loader = async ({ request }) => {
 
   return json({ shopSub, apiKey });
 };
+
 
 /* ==============================
    UI & styles (unchanged)
