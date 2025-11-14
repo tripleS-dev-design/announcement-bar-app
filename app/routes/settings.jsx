@@ -36,17 +36,80 @@ const COPY = {
     langLabel: "Language",
     heroTitle: "Triple Announcement Bar & Blocks",
     heroLine:
-      "Set up premium bars, popups, countdowns, social icons, WhatsApp, image scroller and gold grid in a few clicks.",
+      "Add announcement bars, popups, countdowns, social icons, WhatsApp chat, circle scroller and gold product grid in a few clicks.",
     heroQuote:
-      "Make your theme more engaging without writing a single line of code.",
+      "Make your Shopify theme more engaging without writing a single line of code.",
+
+    // Opening popup
     openingTitle: "How to use the premium blocks",
     openingLine1:
       "Open your Theme Editor and click “Add section” or “Add block” in the Apps area.",
     openingLine2:
       "Add any premium block, then customize text, colors and timing as you like.",
     openingButton: "Got it!",
-    addBlockCta: "Add premium block",
-    infoCta: "Suggest a block",
+
+    // Blocks list
+    blocks: {
+      announcementTitle: "Premium Announcement Bar",
+      announcementDesc: "Animated or multilingual bar to grab attention.",
+      popupTitle: "Premium Popup",
+      popupDesc: "Modern popup with promo code and glow animation.",
+      countdownTitle: "Premium Countdown",
+      countdownDesc: "Three dynamic countdown styles.",
+      socialTitle: "Social Icons",
+      socialDesc: "Social icons with hover and clean style.",
+      whatsappTitle: "WhatsApp Sticky Button",
+      whatsappDesc: "Floating quick-contact button (bottom corner).",
+      circleTitle: "Circle Image Scroller",
+      circleDesc: "Horizontal carousel of circular images (stories look).",
+      goldTitle: "Gold Products Showcase (Premium)",
+      goldDesc: "Gold-style product grid from a collection.",
+      comingSoonCardTitle: "More blocks coming soon",
+      comingSoonCardDesc:
+        "We add new blocks regularly. Tell us what you want next.",
+    },
+
+    // Announcement bars preview
+    bars: [
+      {
+        button: "Shop now",
+        text: "Limited-time sale! Enjoy up to 50% off on your favorite items.",
+      },
+      {
+        button: "Grab deal",
+        text: "Flash sale alert! Everything must go — save big before it’s gone!",
+      },
+      {
+        button: "Browse",
+        text: "Clearance — prices slashed! Don’t miss out on major savings.",
+      },
+    ],
+
+    // Popup preview
+    popupPreviewTitle: "🎁 Exclusive offer",
+    popupPreviewLine:
+      "Get {discount} OFF with code {code}",
+    popupPreviewDiscount: "20%",
+    popupPreviewCode: "WELCOME20",
+    popupPreviewButton: "Apply now",
+
+    // Countdown
+    countdownLabels: {
+      standard: "Standard",
+      rectangle: "Rectangle",
+      circle: "Circle",
+      add: "Add",
+    },
+
+    // WhatsApp preview
+    whatsappPreviewTitle: "WhatsApp Sticky Button",
+    whatsappPreviewDesc:
+      "Quick contact — bottom corner (mobile & desktop)",
+
+    // Gold grid
+    goldHeading: "Gold products",
+
+    // Coming soon block
     comingSoonTitle: "New blocks in production",
     comingSoonItems: [
       "Product page enhancements (sticky ATC, badges, specs)",
@@ -57,52 +120,182 @@ const COPY = {
     ],
     comingSoonFooter:
       "We ship new blocks regularly. Tell us what you would like next.",
+
+    // Buttons
+    addBlockCta: "Add premium block",
+    infoCta: "Suggest a block",
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
   },
+
   fr: {
     langLabel: "Langue",
     heroTitle: "Triple Announcement Bar & Blocs",
     heroLine:
       "Ajoutez des barres d’annonce, popups, compteurs, icônes sociales, WhatsApp, scroller d’images et grille dorée en quelques clics.",
     heroQuote:
-      "Rendez votre thème plus engageant sans écrire une seule ligne de code.",
+      "Rendez votre thème Shopify plus engageant sans écrire une seule ligne de code.",
+
     openingTitle: "Comment utiliser les blocs Premium",
     openingLine1:
-      "Ouvrez l’éditeur de thème et cliquez sur « Ajouter une section » ou « Ajouter un bloc » dans la zone Applications.",
+      "Ouvrez l’éditeur de thème puis cliquez sur « Ajouter une section » ou « Ajouter un bloc » dans la zone Applications.",
     openingLine2:
-      "Ajoutez un bloc premium, puis personnalisez le texte, les couleurs et le timing comme vous le souhaitez.",
+      "Ajoutez un bloc premium puis personnalisez le texte, les couleurs et le timing comme vous le souhaitez.",
     openingButton: "Compris !",
-    addBlockCta: "Ajouter le bloc premium",
-    infoCta: "Suggérer un bloc",
+
+    blocks: {
+      announcementTitle: "Premium Announcement Bar",
+      announcementDesc:
+        "Barre d’annonce animée ou multilingue pour capter l’attention.",
+      popupTitle: "Premium Popup",
+      popupDesc:
+        "Popup moderne avec code promo et effet lumineux professionnel.",
+      countdownTitle: "Premium Countdown",
+      countdownDesc: "Trois styles de compte à rebours dynamiques.",
+      socialTitle: "Social Icons",
+      socialDesc:
+        "Icônes sociales avec effet hover propre et moderne.",
+      whatsappTitle: "WhatsApp Sticky Button",
+      whatsappDesc:
+        "Bouton de contact rapide en bas de l’écran (mobile & desktop).",
+      circleTitle: "Circle Image Scroller",
+      circleDesc:
+        "Carrousel horizontal d’images circulaires type “stories”.",
+      goldTitle: "Gold Products Showcase (Premium)",
+      goldDesc:
+        "Grille de produits dorée à partir d’une collection.",
+      comingSoonCardTitle: "Encore plus de blocs bientôt",
+      comingSoonCardDesc:
+        "Nous ajoutons régulièrement de nouveaux blocs. Dites-nous ce que vous voulez voir ensuite.",
+    },
+
+    bars: [
+      {
+        button: "Voir la promo",
+        text: "Promo limitée ! Profitez jusqu’à 50 % de réduction sur vos articles favoris.",
+      },
+      {
+        button: "Saisir l’offre",
+        text: "Vente flash ! Tout doit disparaître — économisez avant la fin.",
+      },
+      {
+        button: "Découvrir",
+        text: "Déstokage — prix cassés ! Ne ratez pas ces grosses économies.",
+      },
+    ],
+
+    popupPreviewTitle: "🎁 Offre exclusive",
+    popupPreviewLine:
+      "Obtenez {discount} de réduction avec le code {code}",
+    popupPreviewDiscount: "20 %",
+    popupPreviewCode: "WELCOME20",
+    popupPreviewButton: "Appliquer maintenant",
+
+    countdownLabels: {
+      standard: "Standard",
+      rectangle: "Rectangle",
+      circle: "Cercle",
+      add: "Ajouter",
+    },
+
+    whatsappPreviewTitle: "Bouton WhatsApp Sticky",
+    whatsappPreviewDesc:
+      "Contact rapide — coin inférieur (mobile & desktop)",
+
+    goldHeading: "Produits dorés",
+
     comingSoonTitle: "Nouveaux blocs en préparation",
     comingSoonItems: [
       "Améliorations page produit (ATC sticky, badges, fiches)",
       "FAQ / Accordéon",
-      "Barre de stock / urgence",
+      "Barre de stock / d’urgence",
       "Bundles & remises de volume",
       "Onglets produit & caractéristiques",
     ],
     comingSoonFooter:
-      "Nous publions régulièrement de nouveaux blocs. Dites-nous ce que vous voulez voir ensuite.",
+      "Nous publions régulièrement de nouveaux blocs. Dites-nous ce que vous voulez ensuite.",
+
+    addBlockCta: "Ajouter le bloc premium",
+    infoCta: "Suggérer un bloc",
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
   },
+
   es: {
     langLabel: "Idioma",
     heroTitle: "Triple Announcement Bar & Bloques",
     heroLine:
-      "Configura barras de anuncio, popups, contadores, iconos sociales, WhatsApp, carrusel circular e incluso una cuadrícula dorada en pocos clics.",
+      "Configura barras de anuncio, popups, contadores, iconos sociales, chat de WhatsApp, carrusel circular y cuadrícula dorada en pocos clics.",
     heroQuote:
-      "Haz tu tema más llamativo sin escribir nada de código.",
+      "Haz tu tema de Shopify más atractivo sin escribir código.",
+
     openingTitle: "Cómo usar los bloques Premium",
     openingLine1:
-      "Abre el editor de tema y haz clic en “Agregar sección” o “Agregar bloque” en el área de aplicaciones.",
+      "Abre el editor de temas y haz clic en «Agregar sección» o «Agregar bloque» en el área de aplicaciones.",
     openingLine2:
-      "Añade un bloque premium y personaliza texto, colores y tiempo como quieras.",
+      "Añade cualquier bloque premium y personaliza texto, colores y tiempos como quieras.",
     openingButton: "Entendido",
-    addBlockCta: "Añadir bloque premium",
-    infoCta: "Sugerir un bloque",
+
+    blocks: {
+      announcementTitle: "Barra de anuncio Premium",
+      announcementDesc:
+        "Barra animada o multilingüe para captar la atención.",
+      popupTitle: "Popup Premium",
+      popupDesc:
+        "Popup moderno con código promocional y efecto de brillo.",
+      countdownTitle: "Cuenta regresiva Premium",
+      countdownDesc: "Tres estilos de cuenta regresiva dinámicos.",
+      socialTitle: "Iconos sociales",
+      socialDesc: "Iconos sociales con hover limpio y profesional.",
+      whatsappTitle: "Botón WhatsApp Sticky",
+      whatsappDesc:
+        "Botón de contacto rápido en la esquina inferior.",
+      circleTitle: "Carrusel de imágenes circulares",
+      circleDesc:
+        "Carrusel horizontal de imágenes circulares tipo stories.",
+      goldTitle: "Vitrina de productos dorados (Premium)",
+      goldDesc:
+        "Cuadrícula de productos con estilo dorado desde una colección.",
+      comingSoonCardTitle: "Más bloques muy pronto",
+      comingSoonCardDesc:
+        "Añadimos nuevos bloques con frecuencia. Cuéntanos qué necesitas.",
+    },
+
+    bars: [
+      {
+        button: "Ver ofertas",
+        text: "¡Oferta limitada! Disfruta hasta un 50 % de descuento en tus productos favoritos.",
+      },
+      {
+        button: "Aprovechar",
+        text: "¡Venta relámpago! Todo debe irse — ahorra antes de que termine.",
+      },
+      {
+        button: "Explorar",
+        text: "Liquidación — precios rebajados. No te pierdas estos ahorros.",
+      },
+    ],
+
+    popupPreviewTitle: "🎁 Oferta exclusiva",
+    popupPreviewLine:
+      "Consigue {discount} de descuento con el código {code}",
+    popupPreviewDiscount: "20 %",
+    popupPreviewCode: "WELCOME20",
+    popupPreviewButton: "Aplicar ahora",
+
+    countdownLabels: {
+      standard: "Estándar",
+      rectangle: "Rectangular",
+      circle: "Circular",
+      add: "Añadir",
+    },
+
+    whatsappPreviewTitle: "Botón WhatsApp Sticky",
+    whatsappPreviewDesc:
+      "Contacto rápido — esquina inferior (móvil y escritorio)",
+
+    goldHeading: "Productos dorados",
+
     comingSoonTitle: "Nuevos bloques en camino",
     comingSoonItems: [
       "Mejoras en la página de producto (ATC fijo, badges, specs)",
@@ -112,26 +305,90 @@ const COPY = {
       "Pestañas y especificaciones de producto",
     ],
     comingSoonFooter:
-      "Publicamos nuevos bloques con frecuencia. Cuéntanos qué necesitas.",
+      "Publicamos nuevos bloques con frecuencia. Cuéntanos qué te gustaría ver.",
+
+    addBlockCta: "Añadir bloque premium",
+    infoCta: "Sugerir un bloque",
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
   },
+
   it: {
     langLabel: "Lingua",
     heroTitle: "Triple Announcement Bar & Blocchi",
     heroLine:
-      "Aggiungi barre annuncio, popup, countdown, icone social, WhatsApp, scroller di immagini e griglia dorata in pochi clic.",
+      "Aggiungi barre annuncio, popup, countdown, icone social, chat WhatsApp, scroller di immagini e griglia dorata in pochi clic.",
     heroQuote:
-      "Rendi il tuo tema più coinvolgente senza scrivere codice.",
+      "Rendi il tuo tema Shopify più coinvolgente senza scrivere codice.",
+
     openingTitle: "Come usare i blocchi Premium",
     openingLine1:
-      "Apri il Theme Editor e clicca su “Aggiungi sezione” o “Aggiungi blocco” nell’area App.",
+      "Apri il Theme Editor e clicca su «Aggiungi sezione» o «Aggiungi blocco» nell’area App.",
     openingLine2:
-      "Aggiungi un blocco premium e personalizza testi, colori e tempi.",
+      "Aggiungi un blocco premium e personalizza testi, colori e tempi come preferisci.",
     openingButton: "Ho capito",
-    addBlockCta: "Aggiungi blocco premium",
-    infoCta: "Suggerisci un blocco",
-    comingSoonTitle: "Nuovi blocchi in arrivo",
+
+    blocks: {
+      announcementTitle: "Barra annuncio Premium",
+      announcementDesc:
+        "Barra animata o multilingue per catturare l’attenzione.",
+      popupTitle: "Popup Premium",
+      popupDesc:
+        "Popup moderno con codice sconto ed effetto glow.",
+      countdownTitle: "Countdown Premium",
+      countdownDesc: "Tre stili di conto alla rovescia dinamici.",
+      socialTitle: "Icone social",
+      socialDesc: "Icone social con hover pulito e professionale.",
+      whatsappTitle: "Bottone WhatsApp Sticky",
+      whatsappDesc:
+        "Pulsante di contatto rapido nell’angolo in basso.",
+      circleTitle: "Scroller di immagini circolari",
+      circleDesc:
+        "Carosello orizzontale di immagini circolari stile stories.",
+      goldTitle: "Vetrina prodotti dorati (Premium)",
+      goldDesc:
+        "Griglia prodotti in stile dorato da una collection.",
+      comingSoonCardTitle: "Altri blocchi in arrivo",
+      comingSoonCardDesc:
+        "Rilasciamo nuovi blocchi di continuo. Dicci cosa ti serve.",
+    },
+
+    bars: [
+      {
+        button: "Scopri ora",
+        text: "Promo a tempo limitato! Fino al 50% di sconto sui tuoi prodotti preferiti.",
+      },
+      {
+        button: "Prendi l’offerta",
+        text: "Flash sale! Tutto deve andare — risparmia finché puoi.",
+      },
+      {
+        button: "Esplora",
+        text: "Saldo finale — prezzi ribassati. Non perdere questi sconti.",
+      },
+    ],
+
+    popupPreviewTitle: "🎁 Offerta esclusiva",
+    popupPreviewLine:
+      "Ottieni {discount} di sconto con il codice {code}",
+    popupPreviewDiscount: "20%",
+    popupPreviewCode: "WELCOME20",
+    popupPreviewButton: "Applica ora",
+
+    countdownLabels: {
+      standard: "Standard",
+      rectangle: "Rettangolare",
+      circle: "Circolare",
+      add: "Aggiungi",
+    },
+
+    whatsappPreviewTitle: "Bottone WhatsApp Sticky",
+    whatsappPreviewDesc:
+      "Contatto rapido — angolo in basso (mobile & desktop)",
+
+    goldHeading: "Prodotti dorati",
+
+    comingSoonTitle: "Nuovi blocchi in sviluppo",
     comingSoonItems: [
       "Migliorie pagina prodotto (ATC fisso, badge, schede)",
       "FAQ / Accordion",
@@ -140,63 +397,196 @@ const COPY = {
       "Tab e specifiche prodotto",
     ],
     comingSoonFooter:
-      "Rilasciamo nuovi blocchi di continuo. Dicci cosa ti serve.",
+      "Rilasciamo regolarmente nuovi blocchi. Facci sapere cosa manca.",
+
+    addBlockCta: "Aggiungi blocco premium",
+    infoCta: "Suggerisci un blocco",
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
   },
+
   de: {
     langLabel: "Sprache",
     heroTitle: "Triple Announcement Bar & Blöcke",
     heroLine:
-      "Füge Ankündigungsleisten, Popups, Countdowns, Social Icons, WhatsApp, Bild-Scroller und Gold-Produktgitter in wenigen Klicks hinzu.",
+      "Füge Ankündigungsleisten, Popups, Countdowns, Social Icons, WhatsApp-Chat, Bild-Scroller und Gold-Produktgitter mit wenigen Klicks hinzu.",
     heroQuote:
-      "Mach dein Theme ansprechender – ganz ohne Code.",
+      "Mach dein Shopify-Theme attraktiver – ganz ohne Code.",
+
     openingTitle: "So verwendest du die Premium-Blöcke",
     openingLine1:
-      "Öffne den Theme-Editor und klicke auf „Abschnitt hinzufügen“ oder „Block hinzufügen“ im Apps-Bereich.",
+      "Öffne den Theme-Editor und klicke auf „Abschnitt hinzufügen“ oder „Block hinzufügen“ im Bereich Apps.",
     openingLine2:
-      "Füge einen Premium-Block hinzu und passe Text, Farben und Timing an.",
+      "Füge einen Premium-Block hinzu und passe Texte, Farben und Zeiten an.",
     openingButton: "Alles klar",
-    addBlockCta: "Premium-Block hinzufügen",
-    infoCta: "Block vorschlagen",
+
+    blocks: {
+      announcementTitle: "Premium Announcement Bar",
+      announcementDesc:
+        "Animierte oder mehrsprachige Leiste, um Aufmerksamkeit zu erzeugen.",
+      popupTitle: "Premium Popup",
+      popupDesc:
+        "Modernes Popup mit Promo-Code und Glow-Effekt.",
+      countdownTitle: "Premium Countdown",
+      countdownDesc: "Drei dynamische Countdown-Stile.",
+      socialTitle: "Social Icons",
+      socialDesc:
+        "Social-Icons mit sauberem Hover-Effekt.",
+      whatsappTitle: "WhatsApp Sticky Button",
+      whatsappDesc:
+        "Schnellkontakt-Button in der unteren Ecke.",
+      circleTitle: "Kreis-Bild-Scroller",
+      circleDesc:
+        "Horizontaler Scroller mit runden Bildern im Stories-Look.",
+      goldTitle: "Gold Products Showcase (Premium)",
+      goldDesc:
+        "Produktgitter im Gold-Stil auf Basis einer Kollektion.",
+      comingSoonCardTitle: "Weitere Blöcke folgen",
+      comingSoonCardDesc:
+        "Wir veröffentlichen regelmäßig neue Blöcke. Sag uns, was dir fehlt.",
+    },
+
+    bars: [
+      {
+        button: "Jetzt shoppen",
+        text: "Nur für kurze Zeit! Spare bis zu 50 % auf deine Lieblingsartikel.",
+      },
+      {
+        button: "Angebot sichern",
+        text: "Blitz-Sale! Alles muss raus – jetzt sparen, bevor es vorbei ist.",
+      },
+      {
+        button: "Entdecken",
+        text: "Räumungsverkauf – stark reduzierte Preise. Verpasse diese Deals nicht.",
+      },
+    ],
+
+    popupPreviewTitle: "🎁 Exklusives Angebot",
+    popupPreviewLine:
+      "Erhalte {discount} Rabatt mit dem Code {code}",
+    popupPreviewDiscount: "20 %",
+    popupPreviewCode: "WELCOME20",
+    popupPreviewButton: "Jetzt anwenden",
+
+    countdownLabels: {
+      standard: "Standard",
+      rectangle: "Rechteckig",
+      circle: "Kreis",
+      add: "Hinzufügen",
+    },
+
+    whatsappPreviewTitle: "WhatsApp Sticky Button",
+    whatsappPreviewDesc:
+      "Schnellkontakt – Ecke unten (mobil & Desktop)",
+
+    goldHeading: "Gold-Produkte",
+
     comingSoonTitle: "Neue Blöcke in Entwicklung",
     comingSoonItems: [
       "Produktseiten-Verbesserungen (Sticky ATC, Badges, Specs)",
       "FAQ / Akkordeon",
-      "Bestands- / Dringlichkeitsleiste",
+      "Bestands- / Dringlichkeits-Leiste",
       "Bundles & Mengenrabatte",
       "Produkt-Tabs & Spezifikationen",
     ],
     comingSoonFooter:
-      "Wir veröffentlichen regelmäßig neue Blöcke. Sag uns, was dir fehlt.",
+      "Wir liefern regelmäßig neue Blöcke. Sag uns, was du brauchst.",
+
+    addBlockCta: "Premium-Block hinzufügen",
+    infoCta: "Block vorschlagen",
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
   },
+
   ar: {
     langLabel: "اللغة",
     heroTitle: "Triple Announcement Bar & Blocks",
     heroLine:
-      "أضف شريط إعلان، نوافذ منبثقة، عدّ تنازلي، أيقونات اجتماعية، واتساب، سكرول دائري و شبكة منتجات ذهبية بسهولة.",
+      "أضِف شريط إعلان، نوافذ منبثقة، عدّ تنازلي، أيقونات اجتماعية، شات واتساب، سكرول دائري و شبكة منتجات ذهبية بسهولة.",
     heroQuote:
-      "اجعل متجر Shopify أكثر جاذبية بدون كتابة كود.",
+      "اجعل متجر Shopify أكثر جاذبية بدون كتابة أي سطر من الكود.",
+
     openingTitle: "طريقة استخدام البلوكات البريميوم",
     openingLine1:
-      "افتح محرر القالب ثم اختر «إضافة قسم» أو «إضافة بلوك» داخل قسم التطبيقات.",
+      "افتح محرر القالب ثم اضغط «Add section» أو «Add block» داخل قسم التطبيقات.",
     openingLine2:
-      "اختر أي بلوك بريميوم ثم عدّل النصوص والألوان والتوقيت كما تريد.",
+      "اختر أي بلوك بريميوم ثم عدّل النصوص، الألوان والتوقيت كما تريد.",
     openingButton: "فهمت",
-    addBlockCta: "إضافة بلوك بريميوم",
-    infoCta: "اقترح بلوك جديد",
+
+    blocks: {
+      announcementTitle: "شريط إعلان بريميوم",
+      announcementDesc:
+        "شريط إعلان متحرك أو متعدد اللغات لجذب الانتباه.",
+      popupTitle: "نافذة منبثقة بريميوم",
+      popupDesc:
+        "بُوب أب عصري مع كود خصم و تأثير إضاءة احترافي.",
+      countdownTitle: "عداد تنازلي بريميوم",
+      countdownDesc: "ثلاثة أشكال مختلفة لعدّ تنازلي ديناميكي.",
+      socialTitle: "أيقونات التواصل الاجتماعي",
+      socialDesc:
+        "أيقونات شبكات اجتماعية مع تأثير Hover أنيق.",
+      whatsappTitle: "زر واتساب عائم",
+      whatsappDesc:
+        "زر تواصل سريع في أسفل الصفحة (موبايل وكمبيوتر).",
+      circleTitle: "سكرول صور دائري",
+      circleDesc:
+        "شريط أفقي لصور دائرية بشكل قصص (Stories).",
+      goldTitle: "شبكة منتجات ذهبية (بريميوم)",
+      goldDesc:
+        "شبكة عرض منتجات بتصميم ذهبي من كوليكشن محدد.",
+      comingSoonCardTitle: "بلوكات جديدة قريباً",
+      comingSoonCardDesc:
+        "نُضيف بلوكات جديدة باستمرار. شارِكنا ما تحتاجه في الإصدار القادم.",
+    },
+
+    bars: [
+      {
+        button: "تسوق الآن",
+        text: "عرض محدود! خصم يصل إلى 50٪ على أفضل منتجاتك.",
+      },
+      {
+        button: "احصل على العرض",
+        text: "فلاش سيل! كل شيء يجب أن يُباع — لا تُفوّت التخفيضات.",
+      },
+      {
+        button: "اكتشف المزيد",
+        text: "تصفية مخزون — أسعار منخفضة جداً. لا تضيع الفرصة.",
+      },
+    ],
+
+    popupPreviewTitle: "🎁 عرض حصري",
+    popupPreviewLine:
+      "احصل على خصم {discount} باستخدام الكود {code}",
+    popupPreviewDiscount: "20٪",
+    popupPreviewCode: "WELCOME20",
+    popupPreviewButton: "تفعيل العرض",
+
+    countdownLabels: {
+      standard: "عادي",
+      rectangle: "مستطيل",
+      circle: "دائري",
+      add: "إضافة",
+    },
+
+    whatsappPreviewTitle: "زر واتساب عائم",
+    whatsappPreviewDesc:
+      "تواصل سريع من الزاوية السفلية (موبايل وكمبيوتر)",
+
+    goldHeading: "منتجات ذهبية",
+
     comingSoonTitle: "بلوكات جديدة قيد التطوير",
     comingSoonItems: [
       "تحسينات صفحة المنتج (زر ثابت، شارات، مواصفات)",
-      "أسئلة شائعة / أكورديون",
+      "قسم الأسئلة الشائعة / أكورديون",
       "شريط المخزون / الإلحاح",
-      "بندلات وخصومات كمية",
+      "عروض الباندل وخصومات الكمية",
       "تبويبات المنتج والمواصفات",
     ],
     comingSoonFooter:
-      "نضيف بلوكات جديدة باستمرار، شاركنا أفكارك.",
+      "نضيف بلوكات جديدة بشكل منتظم، أخبرنا بما تحتاجه.",
+
+    addBlockCta: "إضافة بلوك بريميوم",
+    infoCta: "اقترح بلوك جديد",
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
   },
@@ -241,7 +631,7 @@ const GLOBAL_STYLES = `
 @keyframes pulseSoft { 0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6} }
 `;
 
-/* ✅ Two-per-row grid (desktop) */
+/* Two-per-row grid desktop */
 const GRID_STYLE = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -279,9 +669,8 @@ function makeAddBlockLink({
 ================================ */
 
 function OpeningPopup({ lang }) {
-  const [visible, setVisible] = useState(true);
   const t = COPY[lang] || COPY.en;
-
+  const [visible, setVisible] = useState(true);
   if (!visible) return null;
 
   return (
@@ -310,7 +699,9 @@ function OpeningPopup({ lang }) {
           boxShadow: "0 0 30px rgba(255,255,255,0.1)",
         }}
       >
-        <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>{t.openingTitle}</h2>
+        <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
+          {t.openingTitle}
+        </h2>
         <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
           {t.openingLine1}
         </p>
@@ -328,28 +719,30 @@ function OpeningPopup({ lang }) {
   );
 }
 
-function PreviewAnnouncementBar() {
+/* Announcement bars */
+
+function PreviewAnnouncementBar({ lang }) {
+  const t = COPY[lang] || COPY.en;
+  const texts = t.bars || COPY.en.bars;
+
   const bars = [
     {
       bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
       color: "#fff",
-      text: "Limited-time sale! Enjoy up to 50% off on your favorite items.",
-      buttonText: "Shop now",
-      link: "#",
+      text: texts[0]?.text,
+      buttonText: texts[0]?.button,
     },
     {
       bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
       color: "#fff",
-      text: "Flash sale alert! Everything must go – save big before it’s gone.",
-      buttonText: "Grab deal",
-      link: "#",
+      text: texts[1]?.text,
+      buttonText: texts[1]?.button,
     },
     {
       bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
       color: "#000",
-      text: "Clearance – prices slashed! Don’t miss out on major savings.",
-      buttonText: "Browse",
-      link: "#",
+      text: texts[2]?.text,
+      buttonText: texts[2]?.button,
     },
   ];
 
@@ -370,7 +763,7 @@ function PreviewAnnouncementBar() {
           }}
         >
           <a
-            href={bar.link}
+            href="#"
             style={{
               ...BUTTON_BASE,
               backgroundColor: "#fff",
@@ -389,7 +782,10 @@ function PreviewAnnouncementBar() {
   );
 }
 
-function PreviewPopup() {
+/* Popup preview */
+
+function PreviewPopup({ lang }) {
+  const t = COPY[lang] || COPY.en;
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -402,6 +798,10 @@ function PreviewPopup() {
     return () => clearInterval(iv);
   }, []);
 
+  const line = (t.popupPreviewLine || COPY.en.popupPreviewLine)
+    .replace("{discount}", t.popupPreviewDiscount)
+    .replace("{code}", t.popupPreviewCode);
+
   return (
     <div
       style={{
@@ -413,24 +813,15 @@ function PreviewPopup() {
         padding: "24px",
         maxWidth: "320px",
         backgroundColor: "#bfdbfe",
-        borderLeft: "6px solid #3b82f6", // ✅ corrigé
+        borderLeft: "6px solid #3b82f6",
         borderRadius: "12px",
         animation: visible ? "popupGlowPro 0.5s infinite ease-in-out" : "none",
       }}
     >
-      <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>🎁 Exclusive offer</h3>
-      <p style={{ margin: 0, fontSize: "14px", color: "#1e3a8a" }}>
-        Get <strong>20% OFF</strong> with code{" "}
-        <strong
-          style={{
-            backgroundColor: "#93c5fd",
-            padding: "2px 4px",
-            borderRadius: "4px",
-          }}
-        >
-          WELCOME20
-        </strong>
-      </p>
+      <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>
+        {t.popupPreviewTitle}
+      </h3>
+      <p style={{ margin: 0, fontSize: "14px", color: "#1e3a8a" }}>{line}</p>
       <button
         style={{
           ...BUTTON_BASE,
@@ -439,13 +830,13 @@ function PreviewPopup() {
           color: "#bfdbfe",
         }}
       >
-        Apply now
+        {t.popupPreviewButton}
       </button>
     </div>
   );
 }
 
-/* ====== Countdown ====== */
+/* Countdown */
 
 function calcRemaining(deadline) {
   const diff = Math.max(deadline - Date.now(), 0);
@@ -480,7 +871,7 @@ function StyledTimer({ value, variant }) {
     },
     circle: {
       ...base,
-      border: "3px solid #2b6cb0", // ✅ corrigé
+      border: "3px solid #2b6cb0",
       color: "#2b6cb0",
       borderRadius: "50%",
       boxShadow: "0 0 12px rgba(43,108,176,0.6)",
@@ -490,7 +881,10 @@ function StyledTimer({ value, variant }) {
   return <div style={styles[variant]}>{value}</div>;
 }
 
-function PreviewCountdown() {
+function PreviewCountdown({ lang }) {
+  const t = COPY[lang] || COPY.en;
+  const labels = t.countdownLabels || COPY.en.countdownLabels;
+
   const TWO_HOURS = 2 * 3600000;
   const deadline = Date.now() + TWO_HOURS;
   const [time, setTime] = useState(calcRemaining(deadline));
@@ -502,6 +896,12 @@ function PreviewCountdown() {
 
   const parts = time.split(":");
 
+  const rows = [
+    { key: "standard", label: labels.standard },
+    { key: "rectangle", label: labels.rectangle },
+    { key: "circle", label: labels.circle },
+  ];
+
   return (
     <div
       style={{
@@ -512,11 +912,7 @@ function PreviewCountdown() {
         margin: "0 auto",
       }}
     >
-      {[
-        ["Standard", "standard"],
-        ["Rectangle", "rectangle"],
-        ["Circle", "circle"],
-      ].map(([title, variant], i) => (
+      {rows.map((row, i) => (
         <div
           key={i}
           style={{
@@ -531,11 +927,11 @@ function PreviewCountdown() {
           }}
         >
           <span style={{ fontSize: "16px", fontWeight: "bold", color: "#111" }}>
-            {title}
+            {row.label}
           </span>
           <div style={{ display: "flex", gap: "8px" }}>
             {parts.map((p, idx) => (
-              <StyledTimer key={idx} value={p} variant={variant} />
+              <StyledTimer key={idx} value={p} variant={row.key} />
             ))}
           </div>
           <button
@@ -546,7 +942,7 @@ function PreviewCountdown() {
               padding: "8px 16px",
             }}
           >
-            Add
+            {labels.add}
           </button>
         </div>
       ))}
@@ -554,7 +950,7 @@ function PreviewCountdown() {
   );
 }
 
-/* ====== Social Icons ====== */
+/* Social icons */
 
 function PreviewSocialIcons() {
   const Base = ({ children, title, href = "#", bg }) => (
@@ -693,9 +1089,11 @@ function PreviewSocialIcons() {
   );
 }
 
-/* ====== WhatsApp Sticky ====== */
+/* WhatsApp sticky */
 
-function PreviewWhatsAppSticky() {
+function PreviewWhatsAppSticky({ lang }) {
+  const t = COPY[lang] || COPY.en;
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <div
@@ -710,7 +1108,7 @@ function PreviewWhatsAppSticky() {
           display: "grid",
           placeItems: "center",
         }}
-        title="Sticky WhatsApp"
+        title={t.whatsappPreviewTitle}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -723,16 +1121,14 @@ function PreviewWhatsAppSticky() {
         </svg>
       </div>
       <div>
-        <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
-        <div style={{ color: "#555" }}>
-          Quick contact — bottom corner (mobile & desktop)
-        </div>
+        <div style={{ fontWeight: 700 }}>{t.whatsappPreviewTitle}</div>
+        <div style={{ color: "#555" }}>{t.whatsappPreviewDesc}</div>
       </div>
     </div>
   );
 }
 
-/* ====== Circle Image Scroller ====== */
+/* Circle scroller */
 
 function PreviewCircleScroller() {
   const imgs = [
@@ -772,9 +1168,11 @@ function PreviewCircleScroller() {
   );
 }
 
-/* ====== Gold Products ====== */
+/* Gold products */
 
-function PreviewGoldProductsStoreLike() {
+function PreviewGoldProductsStoreLike({ lang }) {
+  const t = COPY[lang] || COPY.en;
+
   const items = [
     {
       title: "Elegant waterproof crossbody bag (anti-theft, USB charging)",
@@ -803,7 +1201,7 @@ function PreviewGoldProductsStoreLike() {
       }}
     >
       <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>
-        Gold Products
+        {t.goldHeading}
       </div>
 
       <div
@@ -879,7 +1277,7 @@ function PreviewGoldProductsStoreLike() {
   );
 }
 
-/* ====== Coming Soon Info Card ====== */
+/* Coming soon card */
 
 function PreviewComingSoon({ lang }) {
   const t = COPY[lang] || COPY.en;
@@ -960,75 +1358,73 @@ export default function Settings() {
   const [lang, setLang] = useState("en");
   const t = COPY[lang] || COPY.en;
 
-  // Blocks list
   const blocks = [
     {
       id: "announcement-premium",
-      title: "Premium Announcement Bar",
-      description: "Animated or multilingual bar to grab attention.",
+      title: t.blocks.announcementTitle,
+      description: t.blocks.announcementDesc,
       template: "index",
-      preview: <PreviewAnnouncementBar />,
+      preview: <PreviewAnnouncementBar lang={lang} />,
       kind: "installable",
     },
     {
       id: "popup-premium",
-      title: "Premium Popup",
-      description: "Modern popup with promo code and glow animation.",
+      title: t.blocks.popupTitle,
+      description: t.blocks.popupDesc,
       template: "index",
-      preview: <PreviewPopup />,
+      preview: <PreviewPopup lang={lang} />,
       kind: "installable",
     },
     {
       id: "timer-premium",
-      title: "Premium Countdown",
-      description: "Three dynamic countdown styles.",
+      title: t.blocks.countdownTitle,
+      description: t.blocks.countdownDesc,
       template: "index",
-      preview: <PreviewCountdown />,
+      preview: <PreviewCountdown lang={lang} />,
       kind: "installable",
     },
     {
       id: "social-icons-premium",
-      title: "Social Icons",
-      description: "Social icons with hover and clean style.",
+      title: t.blocks.socialTitle,
+      description: t.blocks.socialDesc,
       template: "index",
       preview: <PreviewSocialIcons />,
       kind: "installable",
     },
     {
       id: "whatsapp-sticky-premium",
-      title: "WhatsApp Sticky Button",
-      description: "Floating quick-contact button (bottom corner).",
+      title: t.blocks.whatsappTitle,
+      description: t.blocks.whatsappDesc,
       template: "index",
-      preview: <PreviewWhatsAppSticky />,
+      preview: <PreviewWhatsAppSticky lang={lang} />,
       kind: "installable",
     },
     {
       id: "circle-scroller-premium",
-      title: "Circle Image Scroller",
-      description: "Horizontal carousel of circular images (stories look).",
+      title: t.blocks.circleTitle,
+      description: t.blocks.circleDesc,
       template: "index",
       preview: <PreviewCircleScroller />,
       kind: "installable",
     },
     {
       id: "gold-products-premium",
-      title: "Gold Products Showcase (Premium)",
-      description: "Gold-style product grid from a collection.",
+      title: t.blocks.goldTitle,
+      description: t.blocks.goldDesc,
       template: "index",
-      preview: <PreviewGoldProductsStoreLike />,
+      preview: <PreviewGoldProductsStoreLike lang={lang} />,
       kind: "installable",
     },
     {
       id: "coming-soon-info",
-      title: "More blocks coming soon",
-      description: "We add new blocks regularly. Tell us what you want next.",
+      title: t.blocks.comingSoonCardTitle,
+      description: t.blocks.comingSoonCardDesc,
       template: "index",
-      preview: null, // géré plus bas via <PreviewComingSoon lang={lang} />
+      preview: <PreviewComingSoon lang={lang} />,
       kind: "info",
     },
   ];
 
-  // CTA handlers
   const openTawk = () => {
     try {
       if (
@@ -1039,7 +1435,7 @@ export default function Settings() {
         window.Tawk_API.maximize();
         return;
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
     if (typeof window !== "undefined") {
@@ -1052,7 +1448,6 @@ export default function Settings() {
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      {/* ✅ Mobile CSS only */}
       <style>{`
         @media (max-width: 768px){
           .settings-container{
@@ -1075,9 +1470,6 @@ export default function Settings() {
             bottom: calc(16px + env(safe-area-inset-bottom)) !important;
             z-index: 2147483647 !important;
           }
-          .fixed-btn.pricing{
-            bottom: calc(72px + env(safe-area-inset-bottom)) !important;
-          }
           .fixed-btn.youtube{ left: 16px !important; }
           .fixed-btn.chat{   right: 16px !important; }
         }
@@ -1090,7 +1482,7 @@ export default function Settings() {
 
       <div className="settings-root">
         <div className="settings-container" style={CONTAINER_STYLE}>
-          {/* Hero + sélecteur de langue */}
+          {/* Hero + language selector */}
           <div
             style={{
               background:
@@ -1164,7 +1556,7 @@ export default function Settings() {
             </p>
           </div>
 
-          {/* Grid des blocs */}
+          {/* Blocks grid */}
           <div className="cards-grid" style={GRID_STYLE}>
             {blocks.map((block) => (
               <div key={block.id} style={{ ...CARD_STYLE, marginBottom: 0 }}>
@@ -1213,20 +1605,16 @@ export default function Settings() {
                 </div>
 
                 <div style={{ flex: 1, minWidth: "220px" }}>
-                  {block.id === "coming-soon-info" ? (
-                    <PreviewComingSoon lang={lang} />
-                  ) : (
-                    block.preview
-                  )}
+                  {block.preview}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* YouTube (bottom-left) */}
+        {/* YouTube button */}
         <a
-          href={"https://youtu.be/NqKfbpymug8"}
+          href="https://youtu.be/NqKfbpymug8"
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -1253,7 +1641,7 @@ export default function Settings() {
           </button>
         </a>
 
-        {/* Tawk chat launcher (bottom-right) */}
+        {/* Chat button */}
         <button
           className="fixed-btn chat"
           onClick={() => {
@@ -1266,7 +1654,7 @@ export default function Settings() {
                 window.Tawk_API.maximize();
                 return;
               }
-            } catch (e) {
+            } catch {
               // ignore
             }
             if (typeof window !== "undefined") {
