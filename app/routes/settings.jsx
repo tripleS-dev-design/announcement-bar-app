@@ -47,7 +47,7 @@ const COPY = {
       "Add any premium block, then customize text, colors and timing as you like.",
     openingExtraTitle: "Free help from our team",
     openingExtraLine:
-      "If you prefer, you can request a free installation and design adaptation for your theme directly from the small popup at the bottom of this page.",
+      "If you prefer, you can request a free installation and design adaptation for your theme directly from the help badge in the top bar.",
     openingButton: "Got it!",
 
     blocks: {
@@ -120,13 +120,13 @@ const COPY = {
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
 
-    // Free install popup
-    installPopupTitle: "Free installation service",
+    // Free install helper (top bar)
+    installPopupTitle: "Free installation",
     installPopupText:
-      "We can install the blocks for you and adapt the design to your current theme — at no extra cost.",
+      "We can install the blocks and adapt the design to your current theme — at no extra cost.",
     installPopupSubtext:
       "Click below and we’ll receive your request directly in support.",
-    installPopupButton: "Request free installation",
+    installPopupButton: "Ask for help",
     installPopupSupportMessage:
       "Hello, I would like a free installation of the Blocks: Bar, WhatsApp & More app blocks and a design adjustment to match my theme. Please contact me at ktami.sami@icloud.com. Thank you!",
   },
@@ -146,7 +146,7 @@ const COPY = {
       "Ajoutez un bloc premium puis personnalisez le texte, les couleurs et le timing comme vous le souhaitez.",
     openingExtraTitle: "Aide gratuite de notre équipe",
     openingExtraLine:
-      "Si vous préférez, vous pouvez demander une installation gratuite et un ajustement du design à votre thème depuis le petit popup en bas de cette page.",
+      "Vous pouvez demander une installation gratuite et un ajustement du design depuis le badge d’aide dans la barre en haut.",
     openingButton: "Compris !",
 
     blocks: {
@@ -226,13 +226,12 @@ const COPY = {
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
 
-    // Free install popup
-    installPopupTitle: "Installation gratuite des blocs",
+    installPopupTitle: "Installation gratuite",
     installPopupText:
-      "Nous pouvons installer les blocs pour vous et adapter le design à votre thème actuel — gratuitement.",
+      "Nous pouvons installer les blocs pour vous et adapter le design à votre thème — gratuitement.",
     installPopupSubtext:
-      "Cliquez ci-dessous et nous recevrons votre demande directement dans le support.",
-    installPopupButton: "Demander une installation gratuite",
+      "Cliquez sur le bouton pour envoyer votre demande directement au support.",
+    installPopupButton: "Demander de l’aide",
     installPopupSupportMessage:
       "Bonjour, je souhaite une installation gratuite des blocs de l’application Blocks: Bar, WhatsApp & More et un ajustement du design pour qu’il soit compatible avec mon thème. Vous pouvez me répondre sur ktami.sami@icloud.com. Merci !",
   },
@@ -252,7 +251,7 @@ const COPY = {
       "Añade cualquier bloque premium y personaliza texto, colores y tiempos como quieras.",
     openingExtraTitle: "Ayuda gratuita de nuestro equipo",
     openingExtraLine:
-      "Si lo prefieres, puedes solicitar una instalación gratuita y adaptación del diseño a tu tema desde el pequeño popup al final de esta página.",
+      "Puedes solicitar instalación gratuita y ajuste de diseño desde el badge de ayuda en la barra superior.",
     openingButton: "Entendido",
 
     blocks: {
@@ -331,13 +330,12 @@ const COPY = {
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
 
-    // Free install popup
-    installPopupTitle: "Instalación gratuita de los bloques",
+    installPopupTitle: "Instalación gratuita",
     installPopupText:
       "Podemos instalar los bloques por ti y adaptar el diseño a tu tema actual, sin coste adicional.",
     installPopupSubtext:
-      "Haz clic abajo y recibiremos tu solicitud directamente en soporte.",
-    installPopupButton: "Solicitar instalación gratuita",
+      "Haz clic en el botón para enviar tu solicitud directamente al soporte.",
+    installPopupButton: "Pedir ayuda",
     installPopupSupportMessage:
       "Hola, me gustaría una instalación gratuita de los bloques de la app Blocks: Bar, WhatsApp & More y un ajuste de diseño para que encaje con mi tema. Podéis responderme en ktami.sami@icloud.com. ¡Gracias!",
   },
@@ -355,9 +353,9 @@ const COPY = {
       "Apri il Theme Editor e clicca su «Aggiungi sezione» o «Aggiungi blocco» nell’area App.",
     openingLine2:
       "Aggiungi un blocco premium e personalizza testi, colori e tempi come preferisci.",
-    openingExtraTitle: "Assistenza gratuita dal nostro team",
+    openingExtraTitle: "Assistenza gratuita",
     openingExtraLine:
-      "Se preferisci, puoi richiedere un’installazione gratuita e un adattamento del design al tuo tema tramite il piccolo popup in fondo a questa pagina.",
+      "Puoi richiedere installazione gratuita e adattamento del design tramite il badge di aiuto nella barra in alto.",
     openingButton: "Ho capito",
 
     blocks: {
@@ -436,13 +434,12 @@ const COPY = {
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
 
-    // Free install popup
-    installPopupTitle: "Installazione gratuita dei blocchi",
+    installPopupTitle: "Installazione gratuita",
     installPopupText:
       "Possiamo installare i blocchi per te e adattare il design al tuo tema attuale — gratuitamente.",
     installPopupSubtext:
-      "Clicca qui sotto e riceveremo subito la tua richiesta in assistenza.",
-    installPopupButton: "Richiedi installazione gratuita",
+      "Clicca sul pulsante per inviare la tua richiesta direttamente al supporto.",
+    installPopupButton: "Chiedi aiuto",
     installPopupSupportMessage:
       "Ciao, vorrei un’installazione gratuita dei blocchi dell’app Blocks: Bar, WhatsApp & More e un adattamento del design al mio tema. Potete contattarmi su ktami.sami@icloud.com. Grazie!",
   },
@@ -460,9 +457,9 @@ const COPY = {
       "Öffne den Theme-Editor und klicke auf „Abschnitt hinzufügen“ oder „Block hinzufügen“ im Bereich Apps.",
     openingLine2:
       "Füge einen Premium-Block hinzu und passe Texte, Farben und Zeiten an.",
-    openingExtraTitle: "Kostenlose Hilfe von unserem Team",
+    openingExtraTitle: "Kostenlose Hilfe",
     openingExtraLine:
-      "Wenn du möchtest, kannst du über das kleine Popup am Ende dieser Seite jederzeit eine kostenlose Installation und Design-Anpassung für dein Theme anfragen.",
+      "Über das Hilfe-Badge in der oberen Leiste kannst du eine kostenlose Installation und Design-Anpassung anfragen.",
     openingButton: "Alles klar",
 
     blocks: {
@@ -542,13 +539,12 @@ const COPY = {
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
 
-    // Free install popup
-    installPopupTitle: "Kostenloser Installationsservice",
+    installPopupTitle: "Kostenlose Installation",
     installPopupText:
-      "Wir können die Blöcke für dich installieren und das Design an dein aktuelles Theme anpassen – kostenlos.",
+      "Wir können die Blöcke kostenlos installieren und das Design an dein Theme anpassen.",
     installPopupSubtext:
-      "Klicke unten und deine Anfrage wird direkt an den Support gesendet.",
-    installPopupButton: "Kostenlose Installation anfragen",
+      "Klicke auf den Button, um deine Anfrage direkt an den Support zu senden.",
+    installPopupButton: "Hilfe anfragen",
     installPopupSupportMessage:
       "Hallo, ich hätte gern eine kostenlose Installation der Blöcke der App Blocks: Bar, WhatsApp & More sowie eine Designanpassung an mein Theme. Bitte kontaktiert mich unter ktami.sami@icloud.com. Danke!",
   },
@@ -566,9 +562,9 @@ const COPY = {
       "افتح محرر القالب ثم اضغط «Add section» أو «Add block» داخل قسم التطبيقات.",
     openingLine2:
       "اختر أي بلوك بريميوم ثم عدّل النصوص، الألوان والتوقيت كما تريد.",
-    openingExtraTitle: "مساعدة مجانية من فريقنا",
+    openingExtraTitle: "مساعدة مجانية",
     openingExtraLine:
-      "إذا أحببت، يمكنك طلب تنصيب مجاني وتعديل للتصميم ليتوافق مع الثيم الخاص بك عبر البوب أب الصغير أسفل هذه الصفحة.",
+      "يمكنك طلب تنصيب مجاني وضبط للتصميم من خلال شارة المساعدة في الشريط العلوي.",
     openingButton: "فهمت",
 
     blocks: {
@@ -648,13 +644,12 @@ const COPY = {
     youtubeLabel: "YouTube",
     chatLabel: "Chat",
 
-    // Free install popup
-    installPopupTitle: "تنصيب مجاني للبلوكات",
+    installPopupTitle: "تنصيب مجاني",
     installPopupText:
       "يمكننا تنصيب البلوكات لك وضبط التصميم ليتماشى مع الثيم الحالي — مجاناً.",
     installPopupSubtext:
-      "اضغط على الزر وسنستقبل طلبك مباشرة في قسم الدعم.",
-    installPopupButton: "طلب تنصيب مجاني",
+      "اضغط على الزر لإرسال طلبك مباشرة إلى الدعم.",
+    installPopupButton: "طلب المساعدة",
     installPopupSupportMessage:
       "مرحباً، أود طلب تنصيب مجاني لبلوكات تطبيق Blocks: Bar, WhatsApp & More مع تعديل التصميم ليكون متوافقاً مع الثيم الخاص بي. يمكنكم التواصل معي على البريد: ktami.sami@icloud.com. شكراً لكم.",
   },
@@ -821,7 +816,6 @@ function OpeningPopup({ lang, onChangeLang }) {
           {t.openingLine2}
         </p>
 
-        {/* Bloc qui explique le service d’installation gratuite */}
         <div
           style={{
             marginBottom: "24px",
@@ -864,6 +858,57 @@ function OpeningPopup({ lang, onChangeLang }) {
           {t.openingButton}
         </button>
       </div>
+    </div>
+  );
+}
+
+/* Inline helper in hero bar */
+
+function InlineInstallHelper({ lang, onClickAsk }) {
+  const t = COPY[lang] || COPY.en;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "4px 10px",
+        borderRadius: "999px",
+        backgroundColor: "rgba(255,255,255,0.08)",
+        border: "1px solid rgba(255,255,255,0.18)",
+        maxWidth: 280,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 12,
+          color: "#f9fafb",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        🤝 {t.installPopupTitle}
+      </span>
+      <button
+        type="button"
+        onClick={onClickAsk}
+        style={{
+          border: "none",
+          borderRadius: "999px",
+          padding: "4px 10px",
+          fontSize: 11,
+          fontWeight: 600,
+          cursor: "pointer",
+          backgroundColor: "#f9fafb",
+          color: "#111827",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {t.installPopupButton}
+      </button>
     </div>
   );
 }
@@ -1498,105 +1543,6 @@ function PreviewComingSoon({ lang }) {
   );
 }
 
-/* Free installation popup */
-
-function InstallServicePopup({ lang, onClickAsk }) {
-  const t = COPY[lang] || COPY.en;
-  const [visible, setVisible] = useState(true);
-
-  if (!visible) return null;
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "96px",
-        left: "16px",
-        right: "16px",
-        margin: "0 auto",
-        maxWidth: "360px",
-        backgroundColor: "#ffffff",
-        borderRadius: "16px",
-        boxShadow: "0 10px 25px rgba(0,0,0,0.18)",
-        padding: "14px 16px",
-        zIndex: 998,
-        border: "1px solid rgba(0,0,0,0.06)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: 8,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 18 }}>🤝</span>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>
-            {t.installPopupTitle}
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setVisible(false)}
-          aria-label="Close"
-          style={{
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            fontSize: 16,
-            lineHeight: 1,
-            padding: 0,
-            color: "#6b7280",
-          }}
-        >
-          ×
-        </button>
-      </div>
-
-      <p
-        style={{
-          fontSize: 13,
-          margin: "4px 0 2px",
-          color: "#374151",
-        }}
-      >
-        {t.installPopupText}
-      </p>
-      <p
-        style={{
-          fontSize: 12,
-          margin: 0,
-          color: "#6b7280",
-        }}
-      >
-        {t.installPopupSubtext}
-      </p>
-
-      <button
-        type="button"
-        onClick={onClickAsk}
-        style={{
-          ...BUTTON_BASE,
-          marginTop: 10,
-          padding: "8px 16px",
-          fontSize: 13,
-          alignSelf: "flex-start",
-          backgroundColor: "#111827",
-          color: "#ffffff",
-          borderRadius: "999px",
-        }}
-      >
-        {t.installPopupButton}
-      </button>
-    </div>
-  );
-}
-
 /* ==============================
    PAGE: Settings
 ================================ */
@@ -1761,7 +1707,7 @@ export default function Settings() {
 
       <div className="settings-root">
         <div className="settings-container" style={CONTAINER_STYLE}>
-          {/* Hero + language selector */}
+          {/* Hero + language selector + inline helper */}
           <div
             style={{
               background:
@@ -1787,6 +1733,12 @@ export default function Settings() {
               <p style={{ fontSize: "18px", fontWeight: "bold", margin: 0 }}>
                 {t.heroTitle}
               </p>
+
+              <InlineInstallHelper
+                lang={lang}
+                onClickAsk={handleFreeInstallClick}
+              />
+
               <div
                 style={{
                   display: "flex",
@@ -1901,9 +1853,6 @@ export default function Settings() {
             ))}
           </div>
         </div>
-
-        {/* Popup “Installation gratuite” multilingue */}
-        <InstallServicePopup lang={lang} onClickAsk={handleFreeInstallClick} />
 
         {/* YouTube button */}
         <a
