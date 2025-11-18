@@ -31,7 +31,6 @@ export const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
 
-  // ✅ PLUS DE "billing" ICI → app totalement gratuite
   future: {
     unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
