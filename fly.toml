@@ -5,6 +5,8 @@ primary_region = "iad"
 
 [env]
   PORT = "8080"
+  SHOPIFY_APP_URL = "https://announcement-bar-app-lqjqja.fly.dev"
+  HOST = "announcement-bar-app-lqjqja.fly.dev"
 
 [[services]]
   internal_port = 8080
@@ -18,8 +20,8 @@ primary_region = "iad"
     handlers = ["tls", "http"]
     port = 443
 
-# --- Désactivation temporaire des health checks pour permettre le debug ---
-# (aucun bloc [[services.tcp_checks]] n'est défini)
+# Désactivation temporaire des health checks pour le debug
+# (à réactiver plus tard)
 
 [[vm]]
   memory = "1gb"
