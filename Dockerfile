@@ -5,40 +5,48 @@ EXPOSE 3000
 WORKDIR /app
 ENV NODE_ENV=production
 
-# --- Définir les arguments de build (reçus de fly.toml) ---
+# --- Arguments de build (reçus de fly.toml) ---
 ARG SHOPIFY_APP_URL
 ARG HOST
+ARG SHOPIFY_API_KEY
+ARG SHOPIFY_API_SECRET
+ARG SCOPES
 
-# --- Les transformer en variables d'environnement pour le build ---
+# --- Création d'un fichier .env pour que Remix et le SDK Shopify le lisent ---
+RUN echo "SHOPIFY_APP_URL=${SHOPIFY_APP_URL}" > .env && \
+    echo "HOST=${HOST}" >> .env && \
+    echo "SHOPIFY_API_KEY=${SHOPIFY_API_KEY}" >> .env && \
+    echo "SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}" >> .env && \
+    echo "SCOPES=${SCOPES}" >> .env
+
+# --- Définition des variables d'environnement pour le build ---
 ENV SHOPIFY_APP_URL=${SHOPIFY_APP_URL}
 ENV HOST=${HOST}
+ENV SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+ENV SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+ENV SCOPES=${SCOPES}
 
-# Copier les fichiers de dépendances
+# Copie des dépendances
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
 
-# Installer les dépendances
+# Installation sans scripts automatiques
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 RUN npm remove @shopify/cli || true
 
-# Copier le reste du code source
+# Copie du code source
 COPY . .
 
-# Générer le client Prisma
+# Génération Prisma
 RUN npx prisma generate
 
-# --- Lancer le build Remix AVEC les variables définies ---
+# Build Remix (avec le .env présent)
 RUN npm run build
 
-# --- Script de démarrage (debug temporaire) ---
+# Script de démarrage (temporaire pour debug)
 RUN echo '#!/bin/sh' > /app/start-debug.sh && \
     echo 'echo "=== DEMARRAGE DU SCRIPT ==="' >> /app/start-debug.sh && \
-    echo 'echo "=== TOUTES LES VARIABLES D ENVIRONNEMENT ==="' >> /app/start-debug.sh && \
-    echo 'env | sort' >> /app/start-debug.sh && \
-    echo 'npm run docker-start 2>&1 | tee /app/debug.log' >> /app/start-debug.sh && \
-    echo 'EXIT_CODE=$?' >> /app/start-debug.sh && \
-    echo 'echo "=== FIN DU SCRIPT (exit code: $EXIT_CODE) ===" | tee -a /app/debug.log' >> /app/start-debug.sh && \
-    echo 'tail -f /dev/null' >> /app/start-debug.sh && \
+    echo 'npm run docker-start' >> /app/start-debug.sh && \
     chmod +x /app/start-debug.sh
 
 CMD ["/app/start-debug.sh"]
