@@ -20,9 +20,6 @@ primary_region = "iad"
     handlers = ["tls", "http"]
     port = 443
 
-# Désactivation temporaire des health checks pour le debug
-# (à réactiver plus tard)
-
 [[vm]]
   memory = "1gb"
   cpu_kind = "shared"
