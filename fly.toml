@@ -2,6 +2,9 @@ app = "announcement-bar-app-lqjqja"
 primary_region = "iad"
 
 [build]
+  [build.args]
+    SHOPIFY_APP_URL = "https://announcement-bar-app-lqjqja.fly.dev"
+    HOST = "announcement-bar-app-lqjqja.fly.dev"
 
 [env]
   PORT = "8080"
