@@ -16,7 +16,9 @@ export const loader = async ({ request }) => {
 };
 
 /* ==============================
-   LANGUES (simplifiées mais complètes)
+   LANGUES (versions complètes – voir votre code original)
+   Je ne mets ici que l’anglais et le français pour la lisibilité,
+   mais vous pouvez recopier toutes les langues depuis votre ancien fichier.
 ================================ */
 const LANG_OPTIONS = [
   { code: "en", label: "English" },
@@ -82,17 +84,16 @@ const COPY = {
     installPopupButton: "Demander de l'aide",
     installPopupSupportMessage: "Bonjour, je souhaite une installation gratuite des blocs IA. Veuillez me contacter sur ktami.sami@icloud.com. Merci.",
   },
-  // Les autres langues (es, it, de, ar) suivent la même structure – je les ai condensées pour la lisibilité.
-  // En production, vous pouvez copier depuis votre version précédente ou me demander de les ajouter.
+  // Ajoutez ici les autres langues (es, it, de, ar) depuis votre code original
 };
 
 /* ==============================
-   Styles globaux (ChatGPT dark mode)
+   STYLES : fond Shopify (clair) + bulles façon ChatGPT + boutons noirs
 ================================ */
 const GLOBAL_STYLES = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background-color: #0a0a0a;
+    background-color: #f1f5f9; /* fond clair style Shopify admin */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
   .chatgpt-container {
@@ -107,23 +108,20 @@ const GLOBAL_STYLES = `
   .chat-header h1 {
     font-size: 28px;
     font-weight: 600;
-    background: linear-gradient(135deg, #ffffff, #a0a0a0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #111;
     letter-spacing: -0.5px;
   }
   .chat-header p {
-    color: #888;
+    color: #3b3b3b;
     margin-top: 8px;
     font-size: 14px;
   }
   .chat-window {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     overflow: hidden;
-    border: 1px solid #2c2c2c;
+    border: 1px solid #e2e8f0;
   }
   .messages-area {
     height: 400px;
@@ -132,7 +130,7 @@ const GLOBAL_STYLES = `
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #0f0f0f;
+    background: #ffffff;
   }
   .message {
     display: flex;
@@ -153,20 +151,20 @@ const GLOBAL_STYLES = `
     word-break: break-word;
   }
   .message.user .message-bubble {
-    background: #2b6e4f;
+    background: #000000; /* noir */
     color: white;
     border-bottom-right-radius: 6px;
   }
   .message.bot .message-bubble {
-    background: #2a2a2a;
-    color: #e0e0e0;
+    background: #f1f3f5;
+    color: #111;
     border-bottom-left-radius: 6px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid #e2e8f0;
   }
   .input-area {
     padding: 20px;
-    background: #1a1a1a;
-    border-top: 1px solid #2c2c2c;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
   }
   .input-wrapper {
     display: flex;
@@ -175,22 +173,22 @@ const GLOBAL_STYLES = `
   }
   .input-wrapper textarea {
     flex: 1;
-    background: #0f0f0f;
-    border: 1px solid #333;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
     border-radius: 32px;
     padding: 12px 18px;
     font-size: 14px;
-    color: #fff;
+    color: #111;
     resize: none;
     font-family: inherit;
     transition: border 0.2s;
   }
   .input-wrapper textarea:focus {
     outline: none;
-    border-color: #2b6e4f;
+    border-color: #000000;
   }
   .input-wrapper button {
-    background: #2b6e4f;
+    background: #000000; /* noir */
     border: none;
     border-radius: 32px;
     padding: 12px 24px;
@@ -200,7 +198,7 @@ const GLOBAL_STYLES = `
     transition: background 0.2s;
   }
   .input-wrapper button:hover:not(:disabled) {
-    background: #3d8f6a;
+    background: #2c2c2c;
   }
   .input-wrapper button:disabled {
     opacity: 0.5;
@@ -213,42 +211,42 @@ const GLOBAL_STYLES = `
     margin-top: 16px;
   }
   .quick-suggestions button {
-    background: #252525;
-    border: 1px solid #3a3a3a;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
     border-radius: 40px;
     padding: 6px 14px;
     font-size: 12px;
-    color: #ccc;
+    color: #111;
     cursor: pointer;
     transition: all 0.2s;
   }
   .quick-suggestions button:hover {
-    background: #333;
-    border-color: #2b6e4f;
-    color: white;
+    background: #f1f5f9;
+    border-color: #000000;
   }
   .preview-area {
     margin-top: 24px;
-    background: #1a1a1a;
+    background: #ffffff;
     border-radius: 20px;
     padding: 20px;
-    border: 1px solid #2c2c2c;
+    border: 1px solid #e2e8f0;
   }
   .preview-area h3 {
-    color: #ddd;
+    color: #111;
     font-size: 14px;
     margin-bottom: 12px;
-    font-weight: 500;
+    font-weight: 600;
   }
   .preview-card {
-    background: #0f0f0f;
+    background: #f8fafc;
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
   }
   .add-btn {
     width: 100%;
-    background: #2b6e4f;
+    background: #000000; /* noir */
     border: none;
     border-radius: 40px;
     padding: 12px;
@@ -258,7 +256,7 @@ const GLOBAL_STYLES = `
     transition: background 0.2s;
   }
   .add-btn:hover {
-    background: #3d8f6a;
+    background: #2c2c2c;
   }
   @keyframes fadeInUp {
     from {
@@ -282,19 +280,19 @@ const GLOBAL_STYLES = `
     right: 24px;
   }
   .floating-btn {
-    background: #1e1e1e;
-    border: 1px solid #3a3a3a;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
     border-radius: 40px;
     padding: 10px 20px;
-    color: white;
+    color: #111;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
   .floating-btn:hover {
-    background: #2a2a2a;
-    border-color: #2b6e4f;
+    background: #f1f5f9;
+    border-color: #000000;
   }
   @media (max-width: 768px) {
     .chatgpt-container { padding: 12px; }
@@ -307,7 +305,7 @@ const GLOBAL_STYLES = `
 `;
 
 /* ==============================
-   Composants utilitaires (Crisp, popup, helpers)
+   Composants utilitaires (Crisp, popup)
 ================================ */
 const CRISP_WEBSITE_ID = "7ea27a85-6b6c-4a48-8381-6c0fdc94c1ea";
 
@@ -348,28 +346,28 @@ function OpeningPopup({ lang, onChangeLang }) {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 10000 }}>
-      <div style={{ background: "#1e1e1e", borderRadius: "28px", padding: "32px", maxWidth: "440px", width: "90%", border: "1px solid #333", boxShadow: "0 30px 50px rgba(0,0,0,0.5)" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 10000 }}>
+      <div style={{ background: "white", borderRadius: "28px", padding: "32px", maxWidth: "440px", width: "90%", border: "1px solid #e2e8f0", boxShadow: "0 20px 35px rgba(0,0,0,0.1)" }}>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-          <select value={lang} onChange={(e) => onChangeLang(e.target.value)} style={{ background: "#0f0f0f", border: "1px solid #333", borderRadius: "40px", padding: "6px 12px", color: "white", fontSize: 12 }}>
+          <select value={lang} onChange={(e) => onChangeLang(e.target.value)} style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "40px", padding: "6px 12px", color: "#111", fontSize: 12 }}>
             {LANG_OPTIONS.map(opt => <option key={opt.code} value={opt.code}>{opt.label}</option>)}
           </select>
         </div>
-        <h2 style={{ color: "white", marginBottom: 12 }}>{t.openingTitle}</h2>
-        <p style={{ color: "#aaa", marginBottom: 12 }}>{t.openingLine1}</p>
-        <p style={{ color: "#aaa", marginBottom: 20 }}>{t.openingLine2}</p>
-        <div style={{ background: "#2a2a2a", borderRadius: 16, padding: 12, marginBottom: 24 }}>
-          <div style={{ fontWeight: 600, color: "#ddd" }}>🤝 {t.openingExtraTitle}</div>
-          <p style={{ fontSize: 12, color: "#999" }}>{t.openingExtraLine}</p>
+        <h2 style={{ marginBottom: 12 }}>{t.openingTitle}</h2>
+        <p style={{ color: "#3b3b3b", marginBottom: 12 }}>{t.openingLine1}</p>
+        <p style={{ color: "#3b3b3b", marginBottom: 20 }}>{t.openingLine2}</p>
+        <div style={{ background: "#f8fafc", borderRadius: 16, padding: 12, marginBottom: 24 }}>
+          <div style={{ fontWeight: 600 }}>🤝 {t.openingExtraTitle}</div>
+          <p style={{ fontSize: 12, color: "#5b5b5b" }}>{t.openingExtraLine}</p>
         </div>
-        <button onClick={() => setVisible(false)} style={{ background: "#2b6e4f", border: "none", borderRadius: 40, padding: "12px 24px", color: "white", fontWeight: 600, width: "100%", cursor: "pointer" }}>{t.openingButton}</button>
+        <button onClick={() => setVisible(false)} style={{ background: "#000000", border: "none", borderRadius: 40, padding: "12px 24px", color: "white", fontWeight: 600, width: "100%", cursor: "pointer" }}>{t.openingButton}</button>
       </div>
     </div>
   );
 }
 
 /* ==============================
-   Composant principal : Settings (interface ChatGPT)
+   COMPOSANT PRINCIPAL : Settings (interface ChatGPT sur fond clair)
 ================================ */
 export default function Settings() {
   const { shopSub, apiKey } = useLoaderData();
@@ -399,13 +397,13 @@ export default function Settings() {
       case "countdown":
         return `<div style="display:flex; gap:12px; justify-content:center;"><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.days || "00"}</span><div style="font-size:10px;">DAYS</div></div><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.hours || "00"}</span><div style="font-size:10px;">HRS</div></div><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.minutes || "00"}</span><div style="font-size:10px;">MIN</div></div><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.seconds || "00"}</span><div style="font-size:10px;">SEC</div></div></div>`;
       case "whatsapp_button":
-        return `<div style="display:flex; align-items:center; gap:12px; background:#0f0f0f; padding:12px; border-radius:60px;"><div style="background:#25D366; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><svg width="28" viewBox="0 0 448 512" fill="white"><path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z"/></svg></div><div><strong style="color:white;">WhatsApp</strong><div style="color:#aaa;">${block.content.message || "Click to chat"}</div></div></div>`;
+        return `<div style="display:flex; align-items:center; gap:12px; background:#ffffff; padding:12px; border-radius:60px; border:1px solid #e2e8f0;"><div style="background:#25D366; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><svg width="28" viewBox="0 0 448 512" fill="white"><path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z"/></svg></div><div><strong>WhatsApp</strong><div style="color:#5b5b5b;">${block.content.message || "Click to chat"}</div></div></div>`;
       case "circle_scroller":
-        return `<div style="display:flex; gap:12px; overflow-x:auto;"><div style="min-width:70px; height:70px; background:#333; border-radius:50%;"></div><div style="min-width:70px; height:70px; background:#333; border-radius:50%;"></div><div style="min-width:70px; height:70px; background:#333; border-radius:50%;"></div></div>`;
+        return `<div style="display:flex; gap:12px; overflow-x:auto;"><div style="min-width:70px; height:70px; background:#e2e8f0; border-radius:50%;"></div><div style="min-width:70px; height:70px; background:#e2e8f0; border-radius:50%;"></div><div style="min-width:70px; height:70px; background:#e2e8f0; border-radius:50%;"></div></div>`;
       case "gold_products":
         return `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;"><div style="background:#fef3c7; padding:12px; text-align:center; border-radius:12px;">✨ Gold product</div><div style="background:#fef3c7; padding:12px; text-align:center; border-radius:12px;">✨ Gold product</div><div style="background:#fef3c7; padding:12px; text-align:center; border-radius:12px;">✨ Gold product</div></div>`;
       default:
-        return `<pre style="background:#1e1e1e; padding:12px; border-radius:12px; color:#ddd;">${JSON.stringify(block, null, 2)}</pre>`;
+        return `<pre style="background:#f8fafc; padding:12px; border-radius:12px;">${JSON.stringify(block, null, 2)}</pre>`;
     }
   };
 
@@ -521,7 +519,7 @@ export default function Settings() {
           </div>
         )}
 
-        <div style={{ marginTop: 24, textAlign: "center", fontSize: 12, color: "#555" }}>
+        <div style={{ marginTop: 24, textAlign: "center", fontSize: 12, color: "#5b5b5b" }}>
           <span onClick={handleFreeInstall} style={{ cursor: "pointer", textDecoration: "underline" }}>🤝 {t.installPopupTitle}</span>
         </div>
       </div>
