@@ -1,538 +1,795 @@
 // app/routes/settings.jsx
-import { useState, useEffect, useRef } from "react";
-import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
+import React, { useState, useEffect, useMemo } from "react";
+import { useLocation, useLoaderData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
 
 /* ==============================
-   LOADER (inchangé)
+   LOADER : shop + plan + API KEY
 ================================ */
 export const loader = async ({ request }) => {
-  const { authenticate } = await import("../shopify.server");
-  const { session } = await authenticate.admin(request);
+  const { authenticate, PLAN_HANDLES } = await import("../shopify.server");
+  const REQUIRED_PLANS = [PLAN_HANDLES.monthly, PLAN_HANDLES.annual];
+
+  const { billing, session } = await authenticate.admin(request);
+  const url = new URL(request.url);
+  const qs = url.searchParams.toString();
+
+  try {
+    await billing.require({ plans: REQUIRED_PLANS });
+  } catch {
+    return redirect(`/pricing?${qs}`);
+  }
+
   const shopDomain = session.shop || "";
   const shopSub = shopDomain.replace(".myshopify.com", "");
   const apiKey = process.env.SHOPIFY_API_KEY || "";
+
   return json({ shopSub, apiKey });
 };
 
 /* ==============================
-   LANGUES (versions complètes – voir votre code original)
-   Je ne mets ici que l’anglais et le français pour la lisibilité,
-   mais vous pouvez recopier toutes les langues depuis votre ancien fichier.
+   UI & styles (inchangés)
 ================================ */
-const LANG_OPTIONS = [
-  { code: "en", label: "English" },
-  { code: "fr", label: "Français" },
-  { code: "es", label: "Español" },
-  { code: "it", label: "Italiano" },
-  { code: "de", label: "Deutsch" },
-  { code: "ar", label: "العربية" },
-];
-
-const COPY = {
-  en: {
-    langLabel: "Language",
-    heroTitle: "AI Block Studio",
-    heroLine: "Describe any block – announcement bar, popup, WhatsApp button, countdown...",
-    openingTitle: "Welcome to AI Block Studio",
-    openingLine1: "Type your request in the chat below.",
-    openingLine2: "Preview the block, then click 'Add to theme'.",
-    openingExtraTitle: "Free installation & help",
-    openingExtraLine: "Click the chat bubble or ask for free setup.",
-    openingButton: "Get started",
-    aiPlaceholder: "e.g., 'Red announcement bar with 50% off and link to /sale' or 'WhatsApp floating button with message Hello'",
-    aiGenerateBtn: "Generate",
-    aiGenerating: "Thinking...",
-    aiPreviewTitle: "Preview",
-    aiAddBtn: "Add block to theme",
-    aiSuccessMsg: "Block added! Refresh your theme editor.",
-    aiErrorMessage: "Sorry, something went wrong. Please try again.",
-    welcomeMessage: "👋 Hi! I'm your AI block assistant. Describe the block you need for your Shopify store.",
-    quickSuggestions: ["Announcement bar -50%", "WhatsApp sticky with custom message", "Popup promo code SUMMER20", "Gold product grid from 'featured'"],
-    youtubeLabel: "YouTube",
-    chatLabel: "Support",
-    installPopupTitle: "Free installation",
-    installPopupText: "We can install the blocks and adapt the design to your theme — at no cost.",
-    installPopupSubtext: "Click below to request help.",
-    installPopupButton: "Ask for help",
-    installPopupSupportMessage: "Hello, I would like a free installation of AI-generated blocks. Please contact me at ktami.sami@icloud.com. Thank you!",
-  },
-  fr: {
-    langLabel: "Langue",
-    heroTitle: "Studio de blocs IA",
-    heroLine: "Décrivez n'importe quel bloc – barre d'annonce, popup, WhatsApp, compte à rebours...",
-    openingTitle: "Bienvenue dans le Studio IA",
-    openingLine1: "Écrivez votre demande dans le chat ci-dessous.",
-    openingLine2: "Prévisualisez le bloc, puis cliquez sur 'Ajouter au thème'.",
-    openingExtraTitle: "Installation gratuite",
-    openingExtraLine: "Cliquez sur la bulle de chat ou demandez une installation gratuite.",
-    openingButton: "Commencer",
-    aiPlaceholder: "Ex: 'Barre d'annonce rouge avec -50% et lien /soldes' ou 'Bouton WhatsApp flottant avec message Bonjour'",
-    aiGenerateBtn: "Générer",
-    aiGenerating: "Réflexion...",
-    aiPreviewTitle: "Aperçu",
-    aiAddBtn: "Ajouter au thème",
-    aiSuccessMsg: "Bloc ajouté ! Actualisez l'éditeur de thème.",
-    aiErrorMessage: "Désolé, une erreur est survenue. Réessayez.",
-    welcomeMessage: "👋 Bonjour ! Je suis votre assistant IA. Décrivez le bloc dont vous avez besoin pour votre boutique Shopify.",
-    quickSuggestions: ["Barre d'annonce -50%", "WhatsApp flottant message perso", "Popup code promo ETE20", "Grille produits dorés"],
-    youtubeLabel: "YouTube",
-    chatLabel: "Support",
-    installPopupTitle: "Installation gratuite",
-    installPopupText: "Nous pouvons installer les blocs et adapter le design à votre thème – gratuitement.",
-    installPopupSubtext: "Cliquez ci-dessous pour demander de l'aide.",
-    installPopupButton: "Demander de l'aide",
-    installPopupSupportMessage: "Bonjour, je souhaite une installation gratuite des blocs IA. Veuillez me contacter sur ktami.sami@icloud.com. Merci.",
-  },
-  // Ajoutez ici les autres langues (es, it, de, ar) depuis votre code original
+const BUTTON_BASE = {
+  border: "none",
+  borderRadius: "8px",
+  padding: "12px 24px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
 };
-
-/* ==============================
-   STYLES : fond Shopify (clair) + bulles façon ChatGPT + boutons noirs
-================================ */
+const CONTAINER_STYLE = {
+  maxWidth: "85%",
+  margin: "0 auto",
+  transform: "scale(0.95)",
+  transformOrigin: "top center",
+  padding: "16px",
+};
+const CARD_STYLE = {
+  backgroundColor: "#ffffff",
+  borderRadius: "12px",
+  padding: "20px",
+  marginBottom: "24px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "16px",
+  alignItems: "center",
+};
 const GLOBAL_STYLES = `
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background-color: #f1f5f9; /* fond clair style Shopify admin */
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
-  .chatgpt-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  .chat-header {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .chat-header h1 {
-    font-size: 28px;
-    font-weight: 600;
-    color: #111;
-    letter-spacing: -0.5px;
-  }
-  .chat-header p {
-    color: #3b3b3b;
-    margin-top: 8px;
-    font-size: 14px;
-  }
-  .chat-window {
-    background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-  }
-  .messages-area {
-    height: 400px;
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: #ffffff;
-  }
-  .message {
-    display: flex;
-    animation: fadeInUp 0.2s ease-out;
-  }
-  .message.user {
-    justify-content: flex-end;
-  }
-  .message.bot {
-    justify-content: flex-start;
-  }
-  .message-bubble {
-    max-width: 80%;
-    padding: 12px 18px;
-    border-radius: 24px;
-    font-size: 14px;
-    line-height: 1.5;
-    word-break: break-word;
-  }
-  .message.user .message-bubble {
-    background: #000000; /* noir */
-    color: white;
-    border-bottom-right-radius: 6px;
-  }
-  .message.bot .message-bubble {
-    background: #f1f3f5;
-    color: #111;
-    border-bottom-left-radius: 6px;
-    border: 1px solid #e2e8f0;
-  }
-  .input-area {
-    padding: 20px;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-  }
-  .input-wrapper {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-  }
-  .input-wrapper textarea {
-    flex: 1;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 32px;
-    padding: 12px 18px;
-    font-size: 14px;
-    color: #111;
-    resize: none;
-    font-family: inherit;
-    transition: border 0.2s;
-  }
-  .input-wrapper textarea:focus {
-    outline: none;
-    border-color: #000000;
-  }
-  .input-wrapper button {
-    background: #000000; /* noir */
-    border: none;
-    border-radius: 32px;
-    padding: 12px 24px;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .input-wrapper button:hover:not(:disabled) {
-    background: #2c2c2c;
-  }
-  .input-wrapper button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .quick-suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 16px;
-  }
-  .quick-suggestions button {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 40px;
-    padding: 6px 14px;
-    font-size: 12px;
-    color: #111;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .quick-suggestions button:hover {
-    background: #f1f5f9;
-    border-color: #000000;
-  }
-  .preview-area {
-    margin-top: 24px;
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 20px;
-    border: 1px solid #e2e8f0;
-  }
-  .preview-area h3 {
-    color: #111;
-    font-size: 14px;
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
-  .preview-card {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border: 1px solid #e2e8f0;
-  }
-  .add-btn {
-    width: 100%;
-    background: #000000; /* noir */
-    border: none;
-    border-radius: 40px;
-    padding: 12px;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .add-btn:hover {
-    background: #2c2c2c;
-  }
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .floating-buttons {
-    position: fixed;
-    bottom: 24px;
-    z-index: 1000;
-  }
-  .floating-buttons.left {
-    left: 24px;
-  }
-  .floating-buttons.right {
-    right: 24px;
-  }
-  .floating-btn {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 40px;
-    padding: 10px 20px;
-    color: #111;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  }
-  .floating-btn:hover {
-    background: #f1f5f9;
-    border-color: #000000;
-  }
-  @media (max-width: 768px) {
-    .chatgpt-container { padding: 12px; }
-    .messages-area { height: 320px; padding: 16px; }
-    .message-bubble { max-width: 90%; }
-    .floating-buttons.left { left: 12px; }
-    .floating-buttons.right { right: 12px; }
-    .floating-btn { padding: 6px 12px; font-size: 12px; }
-  }
+@keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+@keyframes popupGlowPro { 0%{box-shadow:0 0 12px rgba(59,130,246,.5)} 50%{box-shadow:0 0 30px rgba(59,130,246,.9)} 100%{box-shadow:0 0 12px rgba(59,130,246,.5)} }
 `;
 
 /* ==============================
-   Composants utilitaires (Crisp, popup)
+   Deep link helpers (corrigés)
+   👉 addAppBlockId = {API_KEY}/{handle}
 ================================ */
-const CRISP_WEBSITE_ID = "7ea27a85-6b6c-4a48-8381-6c0fdc94c1ea";
-
-function useCrispChat(websiteId) {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.$crisp = window.$crisp || [];
-    window.CRISP_WEBSITE_ID = websiteId;
-    if (document.getElementById("crisp-chat-script")) return;
-    const s = document.createElement("script");
-    s.id = "crisp-chat-script";
-    s.type = "text/javascript";
-    s.async = true;
-    s.src = "https://client.crisp.chat/l.js";
-    document.head.appendChild(s);
-  }, [websiteId]);
+function editorBase({ shopSub }) {
+  return `https://admin.shopify.com/store/${shopSub}/themes/current/editor`;
+}
+function makeAddBlockLink({
+  shopSub,
+  apiKey,
+  template = "index",
+  handle,
+  target = "newAppsSection",
+}) {
+  const base = editorBase({ shopSub });
+  const p = new URLSearchParams({
+    context: "apps",
+    template,
+    addAppBlockId: `${apiKey}/${handle}`,
+    target,
+    enable_app_theme_extension_dev_preview: "1",
+  });
+  return `${base}?${p.toString()}`;
 }
 
-function crispOpen() {
-  if (typeof window === "undefined") return;
-  window.$crisp?.push(["do", "chat:open"]);
-}
-function crispSendText(text) {
-  if (typeof window === "undefined" || !text) return;
-  window.$crisp?.push(["do", "message:send", ["text", String(text)]]);
-}
-function crispSetSessionData(pairs) {
-  if (typeof window === "undefined") return;
-  window.$crisp?.push(["set", "session:data", [pairs]]);
-}
-function crispSetUserEmail(email) {
-  if (typeof window === "undefined" || !email) return;
-  window.$crisp?.push(["set", "user:email", [email]]);
-}
-
-function OpeningPopup({ lang, onChangeLang }) {
-  const t = COPY[lang] || COPY.en;
+/* ==============================
+   Tes composants (existants)
+================================ */
+function OpeningPopup() {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 10000 }}>
-      <div style={{ background: "white", borderRadius: "28px", padding: "32px", maxWidth: "440px", width: "90%", border: "1px solid #e2e8f0", boxShadow: "0 20px 35px rgba(0,0,0,0.1)" }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-          <select value={lang} onChange={(e) => onChangeLang(e.target.value)} style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "40px", padding: "6px 12px", color: "#111", fontSize: 12 }}>
-            {LANG_OPTIONS.map(opt => <option key={opt.code} value={opt.code}>{opt.label}</option>)}
-          </select>
-        </div>
-        <h2 style={{ marginBottom: 12 }}>{t.openingTitle}</h2>
-        <p style={{ color: "#3b3b3b", marginBottom: 12 }}>{t.openingLine1}</p>
-        <p style={{ color: "#3b3b3b", marginBottom: 20 }}>{t.openingLine2}</p>
-        <div style={{ background: "#f8fafc", borderRadius: 16, padding: 12, marginBottom: 24 }}>
-          <div style={{ fontWeight: 600 }}>🤝 {t.openingExtraTitle}</div>
-          <p style={{ fontSize: 12, color: "#5b5b5b" }}>{t.openingExtraLine}</p>
-        </div>
-        <button onClick={() => setVisible(false)} style={{ background: "#000000", border: "none", borderRadius: 40, padding: "12px 24px", color: "white", fontWeight: 600, width: "100%", cursor: "pointer" }}>{t.openingButton}</button>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.8)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 10000,
+      }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        style={{
+          background: "radial-gradient(circle at center, #1a1a1a, #000)",
+          padding: "32px",
+          borderRadius: "16px",
+          textAlign: "center",
+          color: "#fff",
+          maxWidth: "400px",
+          width: "90%",
+          boxShadow: "0 0 30px rgba(255,255,255,0.1)",
+        }}
+      >
+        <h2 style={{ marginBottom: "16px", fontSize: "22px" }}>
+          How to use the Premium Blocks
+        </h2>
+        <p style={{ marginBottom: "12px", fontSize: "16px", color: "#ddd" }}>
+          Go to your <strong>Theme Editor</strong> and click on{" "}
+          <strong>Add Block</strong> in the App section.
+        </p>
+        <p style={{ marginBottom: "24px", fontSize: "14px", color: "#ccc" }}>
+          Choose any premium block: Announcement Bar, Popup, or Countdown, and
+          customize it freely!
+        </p>
+        <button
+          onClick={() => setVisible(false)}
+          style={{ ...BUTTON_BASE, backgroundColor: "#fff", color: "#000" }}
+        >
+          Got it!
+        </button>
       </div>
     </div>
   );
 }
 
+function PreviewAnnouncementBar() {
+  const bars = [
+    {
+      bg: "linear-gradient(to right, #6b0a1a, #ef0f6c)",
+      color: "#fff",
+      text: "Limited-Time Sale! Enjoy up to 50% off on your favorite items",
+      buttonText: "Shop Now",
+      link: "#",
+    },
+    {
+      bg: "linear-gradient(to right, #0f38ef, #89ffe1)",
+      color: "#fff",
+      text: "Flash Sale Alert! Everything Must Go – Save Big Before It’s Gone!",
+      buttonText: "Grab Deal",
+      link: "#",
+    },
+    {
+      bg: "linear-gradient(to right, #13eb28, #a3e8ec)",
+      color: "#000",
+      text: "Clearance – Prices Slashed! Don't Miss Out on Major Savings!",
+      buttonText: "Browse",
+      link: "#",
+    },
+  ];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      {bars.map((bar, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: bar.bg,
+            color: bar.color,
+            padding: "10px 16px",
+            borderRadius: "8px",
+            fontWeight: "bold",
+          }}
+        >
+          <a
+            href={bar.link}
+            style={{
+              ...BUTTON_BASE,
+              backgroundColor: "#fff",
+              color: "#333",
+              padding: "8px 16px",
+              fontSize: "14px",
+              border: "1px solid rgba(0,0,0,0.1)",
+            }}
+          >
+            {bar.buttonText}
+          </a>
+          <span style={{ flex: 1, marginLeft: "16px" }}>{bar.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PreviewPopup() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const show = () => {
+      setVisible(true);
+      setTimeout(() => setVisible(false), 2000);
+    };
+    show();
+    const iv = setInterval(show, 4000);
+    return () => clearInterval(iv);
+  }, []);
+  return (
+    <div
+      style={{
+        position: "relative",
+        margin: "0 auto",
+        transition: "all 0.2s ease",
+        transform: visible ? "scale(1)" : "scale(0.85)",
+        opacity: visible ? 1 : 0,
+        padding: "24px",
+        maxWidth: "320px",
+        backgroundColor: "#bfdbfe",
+        borderLeft: "6px solid #3b82f6",
+        borderRadius: "12px",
+        animation: visible ? "popupGlowPro 0.5s infinite ease-in-out" : "none",
+      }}
+    >
+      <h3 style={{ marginBottom: "8px", color: "#1e40af" }}>🎁 Exclusive Offer</h3>
+      <p style={{ margin: 0, fontSize: "14px", color: "#1e3a8a" }}>
+        Get <strong>20% OFF</strong> with code{" "}
+        <strong
+          style={{ backgroundColor: "#93c5fd", padding: "2px 4px", borderRadius: "4px" }}
+        >
+          WELCOME20
+        </strong>
+      </p>
+      <button
+        style={{
+          ...BUTTON_BASE,
+          marginTop: "12px",
+          backgroundColor: "#1e3a8a",
+          color: "#bfdbfe",
+        }}
+      >
+        Apply Now
+      </button>
+    </div>
+  );
+}
+
+/* ====== Countdown existant ====== */
+function calcRemaining(deadline) {
+  const diff = Math.max(deadline - Date.now(), 0);
+  const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
+  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
+  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+  return `${h}:${m}:${s}`;
+}
+function StyledTimer({ value, variant }) {
+  const base = {
+    fontFamily: "sans-serif",
+    padding: "8px 12px",
+    minWidth: "40px",
+    textAlign: "center",
+  };
+  const styles = {
+    standard: {
+      ...base,
+      backgroundColor: "#f0f0f0",
+      color: "#333333",
+      borderRadius: "6px",
+      boxShadow: "0 0 8px rgba(59,130,246,0.3)",
+    },
+    rectangle: {
+      ...base,
+      backgroundColor: "#2d3748",
+      color: "#e2e8f0",
+      borderRadius: "4px",
+      boxShadow: "0 0 10px rgba(107,146,255,0.4)",
+    },
+    circle: {
+      ...base,
+      border: "3px solid #2b6cb0",
+      color: "#2b6cb0",
+      borderRadius: "50%",
+      boxShadow: "0 0 12px rgba(43,108,176,0.6)",
+    },
+  };
+  return <div style={styles[variant]}>{value}</div>;
+}
+function PreviewCountdown() {
+  const TWO_HOURS = 2 * 3600000;
+  const deadline = Date.now() + TWO_HOURS;
+  const [time, setTime] = useState(calcRemaining(deadline));
+  useEffect(() => {
+    const iv = setInterval(() => setTime(calcRemaining(deadline)), 1000);
+    return () => clearInterval(iv);
+  }, [deadline]);
+  const parts = time.split(":");
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        maxWidth: "360px",
+        margin: "0 auto",
+      }}
+    >
+      {[
+        ["Standard", "standard"],
+        ["Rectangle", "rectangle"],
+        ["Circle", "circle"],
+      ].map(([title, variant], i) => (
+        <div
+          key={i}
+          style={{
+            backgroundColor: "#f9f9f9",
+            borderRadius: "12px",
+            padding: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            width: "100%",
+          }}
+        >
+          <span style={{ fontSize: "16px", fontWeight: "bold", color: "#111" }}>
+            {title}
+          </span>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {parts.map((p, idx) => (
+              <StyledTimer key={idx} value={p} variant={variant} />
+            ))}
+          </div>
+          <button
+            style={{ ...BUTTON_BASE, backgroundColor: "#000", color: "#fff", padding: "8px 16px" }}
+          >
+            Add
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ==============================
-   COMPOSANT PRINCIPAL : Settings (interface ChatGPT sur fond clair)
+   🔥 Nouveaux PREVIEWS BLOCS
+================================ */
+
+/** 1) Icônes Réseaux Sociaux — logos réels + couleurs officielles */
+function PreviewSocialIcons() {
+  const Base = ({ children, title, href = "#" , bg }) => (
+    <a
+      href={href}
+      title={title}
+      style={{
+        width: 52,
+        height: 52,
+        borderRadius: "50%",
+        display: "grid",
+        placeItems: "center",
+        background: bg,
+        boxShadow: "0 6px 14px rgba(0,0,0,.2)",
+        transition: "transform .15s ease, boxShadow .15s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+      aria-label={title}
+    >
+      {children}
+    </a>
+  );
+
+  return (
+    <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+      {/* Instagram (dégradé officiel) */}
+      <Base
+        title="Instagram"
+        bg="radial-gradient(45% 45% at 30% 30%, #feda77 0%, #f58529 25%, #dd2a7b 55%, #8134af 75%, #515BD4 100%)"
+      >
+        {/* Camera simple blanche lisible sur le dégradé */}
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="10" y="10" width="44" height="44" rx="12" ry="12" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle cx="32" cy="32" r="10" fill="none" stroke="#fff" strokeWidth="4" />
+          <circle cx="46" cy="18" r="3" fill="#fff" />
+        </svg>
+      </Base>
+
+      {/* YouTube (rouge #FF0000) */}
+      <Base title="YouTube" bg="#FF0000">
+        <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="8" y="18" width="48" height="28" rx="8" ry="8" fill="none" stroke="#fff" strokeWidth="4" />
+          <polygon points="30,24 44,32 30,40" fill="#fff" />
+        </svg>
+      </Base>
+
+      {/* Facebook (bleu #1877F2) */}
+      <Base title="Facebook" bg="#1877F2">
+        {/* “f” blanche stylisée (forme vectorielle simple) */}
+        <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
+          <path
+            d="M40 12H33c-7 0-11 4.3-11 11v7h-6v9h6v13h10V39h7l2-9h-9v-5c0-2.6 1.3-4 4-4h6V12z"
+            fill="#fff"
+          />
+        </svg>
+      </Base>
+
+      {/* X (noir) */}
+      <Base title="X" bg="#000000">
+        {/* X blanc (2 diagonales) */}
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M14 14 L50 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          <path d="M50 14 L14 50" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Base>
+
+      {/* TikTok (fond noir, note blanche + petit accent cyan/rose) */}
+      <Base title="TikTok" bg="#000000">
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+          {/* tige (blanc) */}
+          <path d="M28 16 v22 a10 10 0 1 1 -6 -9" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          {/* accent cyan */}
+          <path d="M28 22 a12 12 0 0 0 12 8" fill="none" stroke="#69C9D0" strokeWidth="6" strokeLinecap="round" />
+          {/* accent rose */}
+          <path d="M22 39 a10 10 0 0 1 6 -3" fill="none" stroke="#EE1D52" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      </Base>
+
+      {/* LinkedIn (bleu #0A66C2) */}
+      <Base title="LinkedIn" bg="#0A66C2">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="#fff" strokeWidth="3" />
+          {/* “in” simplifié en formes */}
+          <circle cx="22" cy="31" r="3" fill="#fff" />
+          <rect x="19" y="36" width="6" height="12" fill="#fff" rx="1" />
+          <rect x="30" y="30" width="6" height="18" fill="#fff" rx="1" />
+          <path d="M36 36 c0-3 2-6 6-6 s6 3 6 6 v12 h-6 v-10 c0-1.7-1.3-3-3-3 s-3 1.3-3 3 v10 h-6 V36" fill="#fff" />
+        </svg>
+      </Base>
+    </div>
+  );
+}
+
+/** 2) Bouton WhatsApp Sticky (en bloc autonome) */
+function PreviewWhatsAppSticky() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div
+        style={{
+          position: "relative",
+          width: 64,
+          height: 64,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 35% 35%, rgba(255,255,255,.25), transparent 60%), #25D366",
+          boxShadow: "0 10px 20px rgba(0,0,0,.15)",
+          display: "grid",
+          placeItems: "center",
+        }}
+        title="Sticky WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 448 512" fill="#fff">
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z" />
+        </svg>
+      </div>
+      <div>
+        <div style={{ fontWeight: 700 }}>WhatsApp Sticky Button</div>
+        <div style={{ color: "#555" }}>Contact rapide — coin bas (mobile & desktop)</div>
+      </div>
+    </div>
+  );
+}
+
+/** 3) Carousel d’images circulaires (scroll auto) */
+function PreviewCircleScroller() {
+  const imgs = [
+    "https://picsum.photos/seed/a/200",
+    "https://picsum.photos/seed/b/200",
+    "https://picsum.photos/seed/c/200",
+    "https://picsum.photos/seed/d/200",
+    "https://picsum.photos/seed/e/200",
+  ];
+  return (
+    <div style={{ overflowX: "auto", display: "flex", gap: 12, paddingBottom: 6 }}>
+      {imgs.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt={`circle-${i}`}
+          width={88}
+          height={88}
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
+            boxShadow: "0 4px 10px rgba(0,0,0,.12)",
+            border: "2px solid rgba(0,0,0,.06)",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+    </div>
+  );
+}
+
+/** 4) Présentation Gold de produits (grille) */
+function PreviewGoldProducts() {
+  const items = [
+    { title: "Product One", price: "$39", img: "https://picsum.photos/seed/1/300" },
+    { title: "Product Two", price: "$49", img: "https://picsum.photos/seed/2/300" },
+    { title: "Product Three", price: "$59", img: "https://picsum.photos/seed/3/300" },
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: 12,
+        width: "100%",
+      }}
+    >
+      {items.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            background:
+              "linear-gradient(135deg, #2a2212 0%, #3b2f17 40%, #57411c 70%, #2a2212 100%)",
+            color: "#f8e7b9",
+            borderRadius: 12,
+            overflow: "hidden",
+            boxShadow: "0 6px 16px rgba(0,0,0,.2)",
+          }}
+        >
+          <div style={{ position: "relative" }}>
+            <img
+              src={p.img}
+              alt={p.title}
+              width={400}
+              height={300}
+              style={{ width: "100%", height: 140, objectFit: "cover" }}
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(60% 60% at 70% 20%, rgba(255,215,0,.25), transparent 60%)",
+              }}
+            />
+          </div>
+          <div style={{ padding: "10px 12px" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>{p.title}</div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: 14,
+              }}
+            >
+              <span>{p.price}</span>
+              <button
+                style={{
+                  ...BUTTON_BASE,
+                  padding: "6px 12px",
+                  backgroundColor: "#f8e7b9",
+                  color: "#3a2b12",
+                }}
+              >
+                View
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ==============================
+   PAGE Settings
 ================================ */
 export default function Settings() {
   const { shopSub, apiKey } = useLoaderData();
   const [lang, setLang] = useState("en");
-  const t = COPY[lang] || COPY.en;
+  const location = useLocation();
 
-  useCrispChat(CRISP_WEBSITE_ID);
+  const pricingHref = useMemo(() => `/pricing${location.search || ""}`, [location.search]);
+  const YOUTUBE_URL = "https://youtu.be/UJzd4Re21e0";
 
-  const [prompt, setPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedBlock, setGeneratedBlock] = useState(null);
-  const [chatMessages, setChatMessages] = useState([{ role: "bot", content: t.welcomeMessage }]);
-  const [previewHtml, setPreviewHtml] = useState("");
-  const messagesEndRef = useRef(null);
+  // Blocs existants + Nouveaux blocs (même design, en dessous)
+  const blocks = [
+    // === EXISTANTS ===
+    {
+      id: "announcement-premium",
+      title: "Premium Announcement Bar",
+      description: "Animated or multilingual bar to grab attention.",
+      template: "index",
+      preview: <PreviewAnnouncementBar />,
+    },
+    {
+      id: "popup-premium",
+      title: "Premium Popup",
+      description: "Modern popup with promo code and glow animation.",
+      template: "index",
+      preview: <PreviewPopup />,
+    },
+    {
+      id: "timer-premium",
+      title: "Premium Countdown",
+      description: "Three dynamic countdown styles.",
+      template: "index",
+      preview: <PreviewCountdown />,
+    },
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]);
+    // === NOUVEAUX (sous les 3 premiers) ===
+    // 1) Icônes Social
+    {
+      id: "social-icons-premium",
+      title: "Social Icons",
+      description: "Icônes réseaux sociaux avec hover & style propre.",
+      template: "index",
+      preview: <PreviewSocialIcons />,
+    },
+    // 2) WhatsApp Sticky (bloc autonome)
+    {
+      id: "whatsapp-sticky-premium",
+      title: "WhatsApp Sticky Button",
+      description: "Bouton flottant contact rapide (coin bas).",
+      template: "index",
+      preview: <PreviewWhatsAppSticky />,
+    },
+    // 3) Carousel images circulaires
+    {
+      id: "circle-scroller-premium",
+      title: "Circle Image Scroller",
+      description: "Carousel horizontal d’images rondes (look stories).",
+      template: "index",
+      preview: <PreviewCircleScroller />,
+    },
+    // 4) Présentation Gold (optionnel – retire si tu veux 3 blocs)
+ {
+  id: "gold-products-premium",
+  title: "Gold Products Showcase (Premium)",
+  description: "Grille produits style gold à partir d’une collection.",
+  template: "index",
+  preview: <div style={{padding:12, borderRadius:8, background:"#fff", border:"1px solid #eee"}}>
+    <div style={{fontWeight:"bold", marginBottom:8}}>Gold Products</div>
+    <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8}}>
+      {[1,2,3].map(i=>(
+        <div key={i} style={{height:50, background:"linear-gradient(135deg,#8A6A2A,#C9A34A)", borderRadius:8}}/>
+      ))}
+    </div>
+  </div>
+}
 
-  const renderBlockPreview = (block) => {
-    if (!block) return "";
-    switch (block.type) {
-      case "announcement_bar":
-        return `<div style="background:${block.content.bg_color || '#000'}; color:${block.content.text_color || '#fff'}; padding:12px; text-align:center; border-radius:12px;">${block.content.text || "Special offer"} <a href="${block.content.cta_link || '#'}" style="color:inherit; font-weight:bold; margin-left:8px;">${block.content.cta_text || "Shop now"} →</a></div>`;
-      case "popup":
-        return `<div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6); color:white; padding:20px; border-radius:24px; text-align:center;"><div style="font-size:28px;">🎁</div><div style="font-weight:bold; margin:8px 0">${block.content.title || "Exclusive offer"}</div><div>${block.content.code ? `Code: ${block.content.code}` : ""}</div><button style="margin-top:12px; background:white; border:none; padding:8px 20px; border-radius:40px; font-weight:bold;">${block.content.button_text || "Apply"}</button></div>`;
-      case "countdown":
-        return `<div style="display:flex; gap:12px; justify-content:center;"><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.days || "00"}</span><div style="font-size:10px;">DAYS</div></div><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.hours || "00"}</span><div style="font-size:10px;">HRS</div></div><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.minutes || "00"}</span><div style="font-size:10px;">MIN</div></div><div style="background:#2d3748; padding:8px 16px; border-radius:12px; color:white;"><span>${block.content.seconds || "00"}</span><div style="font-size:10px;">SEC</div></div></div>`;
-      case "whatsapp_button":
-        return `<div style="display:flex; align-items:center; gap:12px; background:#ffffff; padding:12px; border-radius:60px; border:1px solid #e2e8f0;"><div style="background:#25D366; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><svg width="28" viewBox="0 0 448 512" fill="white"><path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9z"/></svg></div><div><strong>WhatsApp</strong><div style="color:#5b5b5b;">${block.content.message || "Click to chat"}</div></div></div>`;
-      case "circle_scroller":
-        return `<div style="display:flex; gap:12px; overflow-x:auto;"><div style="min-width:70px; height:70px; background:#e2e8f0; border-radius:50%;"></div><div style="min-width:70px; height:70px; background:#e2e8f0; border-radius:50%;"></div><div style="min-width:70px; height:70px; background:#e2e8f0; border-radius:50%;"></div></div>`;
-      case "gold_products":
-        return `<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;"><div style="background:#fef3c7; padding:12px; text-align:center; border-radius:12px;">✨ Gold product</div><div style="background:#fef3c7; padding:12px; text-align:center; border-radius:12px;">✨ Gold product</div><div style="background:#fef3c7; padding:12px; text-align:center; border-radius:12px;">✨ Gold product</div></div>`;
-      default:
-        return `<pre style="background:#f8fafc; padding:12px; border-radius:12px;">${JSON.stringify(block, null, 2)}</pre>`;
-    }
-  };
-
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-    setChatMessages(prev => [...prev, { role: "user", content: prompt }]);
-    setIsGenerating(true);
-    setGeneratedBlock(null);
-    setPreviewHtml("");
-    try {
-      const response = await fetch("/apps/proxy/generate-block", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, lang })
-      });
-      if (!response.ok) throw new Error();
-      const block = await response.json();
-      setGeneratedBlock(block);
-      setPreviewHtml(renderBlockPreview(block));
-      setChatMessages(prev => [...prev, { role: "bot", content: `✅ **${block.type.replace(/_/g, ' ')}** block ready!` }]);
-    } catch (err) {
-      setChatMessages(prev => [...prev, { role: "bot", content: `❌ ${t.aiErrorMessage}` }]);
-    } finally {
-      setIsGenerating(false);
-      setPrompt("");
-    }
-  };
-
-  const handleSaveBlock = async () => {
-    if (!generatedBlock) return;
-    try {
-      const res = await fetch("/apps/proxy/save-block", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ block: generatedBlock, shopSub })
-      });
-      if (res.ok) {
-        alert(t.aiSuccessMsg);
-        setGeneratedBlock(null);
-        setPreviewHtml("");
-      } else throw new Error();
-    } catch (err) {
-      alert("Error saving block.");
-    }
-  };
-
-  const quickSuggestionClick = (suggestion) => {
-    setPrompt(suggestion);
-    setTimeout(() => handleGenerate(), 100);
-  };
-
-  const openSupport = (prefill) => {
-    crispSetSessionData([["source", "ai-studio"], ["shop", shopSub], ["lang", lang]]);
-    crispSetUserEmail("ktami.sami@icloud.com");
-    crispOpen();
-    if (prefill) crispSendText(prefill);
-  };
-
-  const handleFreeInstall = () => {
-    openSupport(COPY[lang]?.installPopupSupportMessage || COPY.en.installPopupSupportMessage);
-  };
+  ];
 
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
-      <OpeningPopup lang={lang} onChangeLang={setLang} />
+      <OpeningPopup />
 
-      <div className="chatgpt-container">
-        <div className="chat-header">
-          <h1>{t.heroTitle}</h1>
-          <p>{t.heroLine}</p>
+      <div style={CONTAINER_STYLE}>
+        <div
+          style={{
+            background: "linear-gradient(120deg, #1f1f1f 30%, #2c2c2c 50%, #444 70%)",
+            backgroundSize: "800px 100%",
+            borderRadius: "12px",
+            padding: "24px",
+            marginBottom: "32px",
+            color: "#fff",
+            textAlign: "center",
+            animation: "shimmer 3s infinite linear",
+          }}
+        >
+          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+            “Welcome to Triple Announcement Bar! Let’s boost your sales with
+            powerful bars, popups, and countdowns.”
+          </p>
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}></div>
         </div>
 
-        <div className="chat-window">
-          <div className="messages-area">
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`message ${msg.role}`}>
-                <div className="message-bubble">{msg.content}</div>
-              </div>
-            ))}
-            {isGenerating && (
-              <div className="message bot">
-                <div className="message-bubble">⏳ {t.aiGenerating}</div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+        {blocks.map((block) => (
+          <div key={block.id} style={CARD_STYLE}>
+            <div style={{ flex: 1, minWidth: "220px" }}>
+              <h2 style={{ fontSize: "20px", marginBottom: "8px" }}>{block.title}</h2>
+              <p style={{ marginBottom: "12px", color: "#555" }}>{block.description}</p>
 
-          <div className="input-area">
-            <div className="input-wrapper">
-              <textarea
-                rows="1"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder={t.aiPlaceholder}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleGenerate())}
-              />
-              <button onClick={handleGenerate} disabled={isGenerating || !prompt.trim()}>{t.aiGenerateBtn}</button>
+              {/* ✅ Deep link : addAppBlockId = API_KEY/HANDLE */}
+              <a
+                href={makeAddBlockLink({
+                  shopSub,
+                  apiKey,
+                  template: block.template || "index",
+                  handle: block.id,
+                  target: "newAppsSection",
+                })}
+                target="_top"
+                rel="noreferrer"
+              >
+                <button
+                  style={{
+                    ...BUTTON_BASE,
+                    backgroundColor: "#000",
+                    color: "#fff",
+                  }}
+                >
+                  Add Premium Block
+                </button>
+              </a>
             </div>
-            <div className="quick-suggestions">
-              {t.quickSuggestions.map((s, i) => (
-                <button key={i} onClick={() => quickSuggestionClick(s)}>{s}</button>
-              ))}
-            </div>
+            <div style={{ flex: 1, minWidth: "220px" }}>{block.preview}</div>
           </div>
-        </div>
-
-        {previewHtml && (
-          <div className="preview-area">
-            <h3>{t.aiPreviewTitle}</h3>
-            <div className="preview-card" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-            <button className="add-btn" onClick={handleSaveBlock}>{t.aiAddBtn}</button>
-          </div>
-        )}
-
-        <div style={{ marginTop: 24, textAlign: "center", fontSize: 12, color: "#5b5b5b" }}>
-          <span onClick={handleFreeInstall} style={{ cursor: "pointer", textDecoration: "underline" }}>🤝 {t.installPopupTitle}</span>
-        </div>
+        ))}
       </div>
 
-      {/* Boutons flottants */}
-      <div className="floating-buttons left">
-        <a href="https://youtu.be/NqKfbpymug8" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-          <button className="floating-btn">{t.youtubeLabel}</button>
-        </a>
-      </div>
-      <div className="floating-buttons right">
-        <button className="floating-btn" onClick={() => openSupport("")}>{t.chatLabel}</button>
-      </div>
+      {/* Pricing au centre en bas */}
+      <a href={pricingHref} style={{ textDecoration: "none" }}>
+        <button
+          style={{
+            position: "fixed",
+            bottom: "24px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            ...BUTTON_BASE,
+            backgroundColor: "#000",
+            color: "#fff",
+            padding: "12px 28px",
+            borderRadius: "30px",
+            cursor: "pointer",
+            zIndex: 999,
+          }}
+        >
+          Pricing
+        </button>
+      </a>
+
+      {/* YouTube en bas à droite */}
+      <a
+        href={"https://youtu.be/UJzd4Re21e0"}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          textDecoration: "none",
+          zIndex: 999,
+        }}
+        aria-label="YouTube tutorial"
+      >
+        <button
+          style={{
+            ...BUTTON_BASE,
+            backgroundColor: "#000",
+            color: "#fff",
+            padding: "12px 20px",
+            borderRadius: "30px",
+            cursor: "pointer",
+          }}
+        >
+          YouTube
+        </button>
+      </a>
+
+      {/* WhatsApp global (existant). Le bloc “whatsapp-sticky-premium” est séparé */}
+      <a
+        href="https://wa.me/+212681570887"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          left: "24px",
+          backgroundColor: "#000",
+          borderRadius: "50%",
+          padding: "14px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+          zIndex: 999,
+        }}
+        aria-label="WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#fff" viewBox="0 0 448 512">
+          <path d="M380.9 97.1C339.4 55.6 283.3 32 224 32S108.6 55.6 67.1 97.1C25.6 138.6 2 194.7 2 254c0 45.3 13.5 89.3 39 126.7L0 480l102.6-38.7C140 481.5 181.7 494 224 494c59.3 0 115.4-23.6 156.9-65.1C422.4 370.6 446 314.5 446 254s-23.6-115.4-65.1-156.9zM224 438c-37.4 0-73.5-11.1-104.4-32l-7.4-4.9-61.8 23.3 23.2-60.6-4.9-7.6C50.1 322.9 38 289.1 38 254c0-102.6 83.4-186 186-186s186 83.4 186 186-83.4 186-186 186zm101.5-138.6c-5.5-2.7-32.7-16.1-37.8-17.9-5.1-1.9-8.8-2.7-12.5 2.7s-14.3 17.9-17.5 21.6c-3.2 3.7-6.4 4.1-11.9 1.4s-23.2-8.5-44.2-27.1c-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.4-11.2 2.5-2.5 5.5-6.4 8.3-9.6 2.8-3.2 3.7-5.5 5.5-9.2s.9-6.9-.5-9.6c-1.4-2.7-12.5-30.1-17.2-41.3-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.6 1.4-14.6 6.9-19.2 18.7-19.2 45.7 19.7 53 22.4 56.7c2.7 3.7 38.6 59.1 93.7 82.8 13.1 5.7 23.3 9.1 31.3 11.7 13.1 4.2 25.1 3.6 34.6 2.2 10.5-1.6 32.7-13.4 37.3-26.3 4.6-12.7 4.6-23.5 3.2-25.7-1.4-2.2-5-3.6-10.5-6.2z"/>
+        </svg>
+      </a>
     </>
   );
 }
