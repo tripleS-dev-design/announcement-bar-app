@@ -12,16 +12,15 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2025-04"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "https://icq-menu-co-insulin.trycloudflare.com/webhooks/app/uninstalled"
+[[webhooks.subscriptions]]
+topics = [ "app/uninstalled" ]
+uri = "https://announcement-bar-app.onrender.com/webhooks/app/uninstalled"
 
-  [[webhooks.subscriptions]]
-  uri = "https://icq-menu-co-insulin.trycloudflare.com/webhooks/compliance"
-  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+[[webhooks.subscriptions]]
+uri = "https://announcement-bar-app.onrender.com/webhooks/compliance"
+compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_products,write_products,read_themes,write_themes"
 optional_scopes = [ ]
 use_legacy_install_flow = false
