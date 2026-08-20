@@ -3,24 +3,11 @@ import { redirect } from "@remix-run/node";
 
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
-  const qs = new URLSearchParams(url.search); // keep shop/host/etc.
+  const qs = new URLSearchParams(url.search); // garde shop / host / etc.
 
-  try {
-    // ⬇️ import serveur UNIQUEMENT dans le loader (OK build)
-    const { requireActiveBilling } = await import("../utils/billing-middleware.server");
-
-    const billingCheck = await requireActiveBilling(request, "/app/pricing");
-
-    if (billingCheck?.access === "denied") {
-      qs.set("billing", "required");
-      return redirect(`/app/pricing?${qs.toString()}`);
-    }
-
-    return redirect(`/app/dashboard?${qs.toString()}`);
-  } catch {
-    qs.set("error", "auth_failed");
-    return redirect(`/app/pricing?${qs.toString()}`);
-  }
+  // 🔁 Quand le marchand ouvre l'app, on le redirige juste vers la page principale
+  //    SANS aucune vérification de billing.
+  return redirect(`/settings?${qs.toString()}`);
 };
 
 export default function AppIndex() {
